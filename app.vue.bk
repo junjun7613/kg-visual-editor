@@ -1,0 +1,29 @@
+<template>
+  <v-app>
+    <!-- <Header2 class="header" /> -->
+    <v-main class="middle">
+      <NuxtPage class="main"/>
+    </v-main>
+  </v-app>
+</template>
+<style>
+.header{
+    position: fixed;
+    color: #fff;
+    background-color: #527b8e;
+    width: 100%;
+    height: 50px;
+    z-index: 1;
+}
+
+.middle{
+    position:absolute;
+    top:50px;
+    display:flex
+}
+
+.main{
+    position: relative;
+    /*left: 50px*/
+}
+</style>

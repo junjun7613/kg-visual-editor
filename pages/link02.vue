@@ -1,15 +1,11 @@
 <template>
-<v-app>
-  <v-content>
-    <v-container class="main">
-  <h1>This is link2</h1>
-  <div><Leaflet/></div>
-    </v-container>
-  </v-content>
-</v-app>
+  <v-container class="main">
+    <h1>This is link2</h1>
+    <div><Leaflet /></div>
+  </v-container>
 </template>
 <style scoped>
-.main{
+.main {
   margin-top: 10px;
 }
 </style>
