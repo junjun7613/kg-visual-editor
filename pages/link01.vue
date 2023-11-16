@@ -1,13 +1,17 @@
 <template>
   <v-container>
     <vc-config-provider :cesium-path="vcConfig.cesiumPath">
-      <vc-viewer></vc-viewer>
+      <vc-viewer>
+        <vc-entity :position="[-75.59777, 40.03883]" description="Hello VueCesium">
+      <vc-graphics-point ref="point1" color="red" :pixel-size="8"></vc-graphics-point>
+    </vc-entity>
+      </vc-viewer>
     </vc-config-provider>
   </v-container>
 </template>
 <script setup>
 import { reactive } from "vue";
-import { VcConfigProvider, VcViewer } from "vue-cesium";
+import { VcConfigProvider, VcViewer, VcEntity, VcGraphicsPoint } from "vue-cesium";
 
 const vcConfig = reactive({
   cesiumPath: "https://unpkg.com/cesium@latest/Build/Cesium/Cesium.js",

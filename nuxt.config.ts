@@ -13,7 +13,6 @@ export default defineNuxtConfig({
       config.plugins!.push(vuetify())
     },
   },
-  ssr: false,
   vite: {
     ssr: {
       noExternal: ['vuetify'],
