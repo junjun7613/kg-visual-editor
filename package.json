@@ -22,6 +22,7 @@
   "dependencies": {
     "@mdi/font": "^7.3.67",
     "cesium": "^1.111.0",
+    "leaflet.markercluster": "^1.5.3",
     "vue-cesium": "^3.2.4"
   }
 }
