@@ -1,7 +1,8 @@
 <template>
   <v-container class="main">
     <h1>This is link2</h1>
-    <div><Leaflet /></div>
+    <!--<div><Leaflet /></div>-->
+    <div><MarkerCluster /></div>
   </v-container>
 </template>
 <style scoped>

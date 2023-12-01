@@ -11,6 +11,8 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@types/leaflet": "^1.9.8",
+    "@types/leaflet.markercluster": "^1.5.4",
     "nuxt": "^3.8.1",
     "nuxt3-leaflet": "^1.0.12",
     "sass": "^1.69.5",
@@ -21,7 +23,9 @@
   },
   "dependencies": {
     "@mdi/font": "^7.3.67",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "cesium": "^1.111.0",
+    "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "vue-cesium": "^3.2.4"
   }
