@@ -4,7 +4,7 @@
     <v-container fluid class="mainSearch">
     <h1 class="searchTitle">Discovery Roman memories</h1>
     <v-text-field
-        class="searchField"
+      class="searchField"
         v-model="keyword"
         variant="solo"
         label="Search keywords"
@@ -31,11 +31,11 @@
 .mainSearch{
     background: url("../assets/img/colosseo.jpeg");
     background-size: cover;
-    background-position: center center;
+    background-position: center;
     height: 300px;
 }
 .searchTitle{
-    color:aliceblue;
+    color:blue;
     text-align: center;
     margin-top: 50px;
     margin-bottom: 50px;

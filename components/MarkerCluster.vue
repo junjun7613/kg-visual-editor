@@ -9,6 +9,8 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
 import { ref } from "vue";
 
+const places = [{name:"aaa", lat: 139.6917, lng:35.6894},{name:"bbb", lat:139.638, lng:35.4437}]
+
 // デフォルトのズームレベルとマップの中心座標
 const zoom = ref(3);
 const centerLatLng = ref<[number, number]>([54, 28]);
@@ -55,17 +57,22 @@ const generateRandomCoordinate = (min: number, max: number) => {
 
 // マーカーの表示
 const display = () => {
+
+  //ここからMarkersを作る作業のため、あらかじめMarkersが用意されていれば不要
   let markers = [];
-  for (let i = 0; i < 5000; i++) {
+  //for (let i = 0; i < 5000; i++) {
+    for (const place of places) {
     const marker = L.marker(
       L.latLng(
-        generateRandomCoordinate(53.82477192, 53.92365592),
-        generateRandomCoordinate(27.5078027, 27.70640622)
+        //generateRandomCoordinate(53.82477192, 53.92365592),
+        //generateRandomCoordinate(27.5078027, 27.70640622)
+        [place["lng"],place["lat"]]
       )
     );
-    marker.bindPopup("Number " + i);
+    marker.bindPopup(place["name"]);
     markers.push(marker);
   }
+
   markerCluster.addLayers(markers);
 };
 </script>

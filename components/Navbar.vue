@@ -9,7 +9,7 @@
 					<nuxt-link to="/link01">link 1</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link to="/link02">link 2</nuxt-link>
+					<nuxt-link to="/link02">Map Search</nuxt-link>
 				</li>
 			</ul>
 		</nav>

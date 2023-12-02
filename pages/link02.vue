@@ -1,6 +1,6 @@
 <template>
   <v-container class="main">
-    <h1>This is link2</h1>
+    <h1>Map Search</h1>
     <!--<div><Leaflet /></div>-->
     <div><MarkerCluster /></div>
   </v-container>

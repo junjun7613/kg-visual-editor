@@ -2,7 +2,7 @@
   <v-app-bar app flat border class="px-md-6">
     <v-app-bar-nav-icon @click="drawer = !drawer" class="mr-md-4" />
     <v-app-bar-title class="font-weight-bold">
-      Rome in Memories
+      Digital Archive of Roman Memories
     </v-app-bar-title>
     <v-spacer />
     <Navbar />
@@ -37,7 +37,7 @@ const items = [
     //icon: 'mdi-numeric-1'
   },
   {
-    title: "link2",
+    title: "Map Search",
     path: "/link02",
     //icon: 'mdi-numeric-2'
   },
