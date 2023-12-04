@@ -11,6 +11,9 @@
 				<li>
 					<nuxt-link to="/link02">Map Search</nuxt-link>
 				</li>
+				<li>
+					<nuxt-link to="/link03">Annotation</nuxt-link>
+				</li>
 			</ul>
 		</nav>
 	</div>

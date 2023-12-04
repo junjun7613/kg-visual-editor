@@ -41,6 +41,11 @@ const items = [
     path: "/link02",
     //icon: 'mdi-numeric-2'
   },
+  {
+    title: "Annotation",
+    path: "/link03",
+    //icon: 'mdi-numeric-2'
+  },
 ];
 // ナビゲーションの表示・非表示を制御
 const drawer = useState("drawer", () => false);
