@@ -1,16 +1,16 @@
 <template>
-    <v-container class="main">
-      <div>
-        <!--<button @click="createCircle">円を作成</button>-->
-        <div><button @click="showCreateCircleModal">円を作成</button></div>
-        <div><button @click="toggleDrawMode">
+  <v-container class="main">
+    <div>
+      <!--<button @click="createCircle">円を作成</button>-->
+      <div><button @click="showCreateCircleModal">円を作成</button></div>
+      <div><button @click="toggleDrawMode">
           {{ drawMode ? '線を引くモード' : '線を引かないモード' }}
         </button></div>
-        <div><button @click="deleteSelectedItem" v-if="selectedItem">削除</button></div>
-      </div>
+      <div><button @click="deleteSelectedItem" v-if="selectedItem">削除</button></div>
+    </div>
 
-      <!-- モーダル -->
-      <div v-if="isModalVisible" class="modal">
+    <!-- モーダル -->
+    <div v-if="isModalVisible" class="modal">
       <div class="modal-content">
         <h3>円の作成</h3>
         <input v-model="newCircleId" placeholder="IDを入力">
@@ -20,60 +20,52 @@
       </div>
     </div>
 
-      <div id="container">
-        <svg width="400" height="400" viewBox="0 0 400 400" style="background-color: #FFF;"
-             @mousemove="onDrag"
-             @mouseup="stopDrag"
-             @mouseleave="stopDrag">
-             <defs>
-              <marker id="arrowhead" markerWidth="5" markerHeight="3.5" 
-                  refX="0" refY="1.75" orient="auto">
+    <div id="container">
+      <svg width="1000" height="500" viewBox="0 0 400 400" style="background-color: #FFF;" @mousemove="onDrag"
+        @mouseup="stopDrag" @mouseleave="stopDrag">
+        <defs>
+          <marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto">
             <polygon points="0 0, 5 1.75, 0 3.5" fill="#008080" />
           </marker>
         </defs>
-          <!-- 動的に生成される円 -->
-          <g v-for="circle in circles" :key="circle.id">
-          <circle v-for="circle in circles" :key="circle.id"
-                  :cx="circle.x" :cy="circle.y" r="10"
-                  stroke="black" stroke-width="2" :fill="getColor(circle.type)"
-                  @mousedown="startDrag(circle, $event)"
-                  @click="selectItem(circle, 'circle')"/>
-                  <!--<text :x="circle.x" :y="circle.y" text-anchor="middle" dominant-baseline="central" fill="white">
+        <!-- 動的に生成される円 -->
+        <g v-for="circle in circles" :key="circle.id">
+          <circle v-for="circle in circles" :key="circle.id" :cx="circle.x" :cy="circle.y" r=20 opacity="0.3"
+            stroke="black" stroke-width="0.5" :fill="getColor(circle.type)" @mousedown="startDrag(circle, $event)"
+            @click="selectItem(circle, 'circle')" />
+          <!--<text :x="circle.x" :y="circle.y" text-anchor="middle" dominant-baseline="central" fill="white">
             {{ circle.id }}
           </text>-->
-                </g>
-          <!-- 動的に生成される線 -->
-          <line v-for="line in lines" :key="line.id"
-              :x1="line.x1" :y1="line.y1" :x2="line.x2" :y2="line.y2"
-              stroke="#008080" stroke-width="2"
-              marker-end="url(#arrowhead)"
-              @click="selectItem(line, 'line')"/>
-        </svg>
-      </div>
-      <div v-if="selectedItem">
-        選択されたアイテム: {{ selectedItem.id }}
-        <input v-model="selectedItem.id" placeholder="IDを入力" />
-        <input v-model="selectedItem.type" placeholder="タイプを入力" />
-      </div>
-      <p>{{selectedItem}}</p>
-      <p>{{circles}}</p>
-      <p>{{lines}}</p>
-    </v-container>
-  </template>
+        </g>
+        <!-- 動的に生成される線 -->
+        <line v-for="line in lines" :key="line.id" :x1="line.x1" :y1="line.y1" :x2="line.x2" :y2="line.y2"
+          stroke="#008080" stroke-width="2" marker-end="url(#arrowhead)" @click="selectItem(line, 'line')" />
+      </svg>
+    </div>
+    <div v-if="selectedItem">
+      選択されたアイテム: {{ selectedItem.id }}
+      <input v-model="selectedItem.id" placeholder="IDを入力" />
+      <input v-model="selectedItem.type" placeholder="タイプを入力" />
+    </div>
+    <p>{{ selectedItem }}</p>
+    <p>{{ circles }}</p>
+    <p>{{ lines }}</p>
+  </v-container>
+</template>
   
-  <script setup>
-  import { ref } from 'vue';
-  
-  const circles = ref([]);
-    const lines = ref([]);
-    const selectedCircles = ref([]); // 選択された円を保持する配列
-    const selectedItem = ref(null);
-    const drawMode = ref(false); // 線を引くモードのフラグ
-    const isDragging = ref(false);
-    const selectedCircle = ref(null); // ドラッグ中の円
-    const circleRadius = 20; // 円の半径
-    const arrowSize = 5; // 矢印のサイズ（おおよその長さ）
-    const isModalVisible = ref(false);
+<script setup>
+import { ref } from 'vue';
+
+const circles = ref([]);
+const lines = ref([]);
+const selectedCircles = ref([]); // 選択された円を保持する配列
+const selectedItem = ref(null);
+const drawMode = ref(false); // 線を引くモードのフラグ
+const isDragging = ref(false);
+const selectedCircle = ref(null); // ドラッグ中の円
+const circleRadius = 30; // 円の半径
+const arrowSize = 5; // 矢印のサイズ（おおよその長さ）
+const isModalVisible = ref(false);
 
 const newCircleId = ref('');
 const newCircleType = ref('');
@@ -96,13 +88,13 @@ function showCreateCircleModal() {
   }
   */
 
-  function createCircle() {
+function createCircle() {
   const newCircle = {
     id: newCircleId.value,
     type: newCircleType.value,
     shape: 'circle',
-    //x: Math.random() * 380 + 10,
-    //y: Math.random() * 380 + 10,
+    x: Math.random() * 380 + 10,
+    y: Math.random() * 380 + 10,
     color: getColor(newCircleType.value),
     radius: circleRadius
   };
@@ -110,23 +102,23 @@ function showCreateCircleModal() {
   isModalVisible.value = false;
 }
 
-  function toggleDrawMode() {
-    drawMode.value = !drawMode.value;
+function toggleDrawMode() {
+  drawMode.value = !drawMode.value;
+}
+/*
+function selectItem(item, type) {
+selectedItem.value = item;
+if (type === 'circle' && drawMode.value) {
+  if (selectedCircles.value.length < 2) {
+    selectedCircles.value.push(item);
   }
-  /*
-  function selectItem(item, type) {
-  selectedItem.value = item;
-  if (type === 'circle' && drawMode.value) {
-    if (selectedCircles.value.length < 2) {
-      selectedCircles.value.push(item);
-    }
-    if (selectedCircles.value.length === 2) {
-      // 選択された2つの円に基づいて線を作成
-      const newLine = calculateLineCoordinates(selectedCircles.value[0], selectedCircles.value[1]);
-      lines.value.push(newLine);
-      selectedCircles.value = []; // 選択された円のリストをリセット
-    }
+  if (selectedCircles.value.length === 2) {
+    // 選択された2つの円に基づいて線を作成
+    const newLine = calculateLineCoordinates(selectedCircles.value[0], selectedCircles.value[1]);
+    lines.value.push(newLine);
+    selectedCircles.value = []; // 選択された円のリストをリセット
   }
+}
 }
 */
 function selectItem(item, type) {
@@ -188,40 +180,40 @@ function getColor(type) {
     default: return 'black';
   }
 }
-  
-  function updateLinePositions(movedCircle) {
-    lines.value.forEach(line => {
-      if (line.x1 === movedCircle.oldX && line.y1 === movedCircle.oldY) {
-        line.x1 = movedCircle.x;
-        line.y1 = movedCircle.y;
-      }
-      if (line.x2 === movedCircle.oldX && line.y2 === movedCircle.oldY) {
-        line.x2 = movedCircle.x;
-        line.y2 = movedCircle.y;
-      }
-    });
-  }
-  
-  function startDrag(circle, event) {
-    selectedCircle.value = { ...circle, oldX: circle.x, oldY: circle.y };
-    isDragging.value = true;
-    event.preventDefault();
-  }
-  
-  function onDrag(event) {
-    if (isDragging.value && selectedCircle.value) {
-      const svgRect = event.target.getBoundingClientRect();
-      selectedCircle.value.x = event.clientX - svgRect.left;
-      selectedCircle.value.y = event.clientY - svgRect.top;
-      updateLinePositions(selectedCircle.value);
+
+function updateLinePositions(movedCircle) {
+  lines.value.forEach(line => {
+    if (line.x1 === movedCircle.oldX && line.y1 === movedCircle.oldY) {
+      line.x1 = movedCircle.x;
+      line.y1 = movedCircle.y;
     }
+    if (line.x2 === movedCircle.oldX && line.y2 === movedCircle.oldY) {
+      line.x2 = movedCircle.x;
+      line.y2 = movedCircle.y;
+    }
+  });
+}
+
+function startDrag(circle, event) {
+  selectedCircle.value = { ...circle, oldX: circle.x, oldY: circle.y };
+  isDragging.value = true;
+  event.preventDefault();
+}
+
+function onDrag(event) {
+  if (isDragging.value && selectedCircle.value) {
+    const svgRect = event.target.getBoundingClientRect();
+    selectedCircle.value.x = event.clientX - svgRect.left;
+    selectedCircle.value.y = event.clientY - svgRect.top;
+    updateLinePositions(selectedCircle.value);
   }
-  
-  function stopDrag() {
-    isDragging.value = false;
-    selectedCircle.value = null;
-  }
-  </script>
+}
+
+function stopDrag() {
+  isDragging.value = false;
+  selectedCircle.value = null;
+}
+</script>
 
 <style>
 .modal {
