@@ -82,6 +82,11 @@ const edgeType = ref('');
 
 const graphData = ref(null);
 
+const colors = {
+  'Action': 'red',
+  'Contact': 'blue'
+};
+
 onMounted(() => {
   cy = cytoscape({
     container: cyElement.value,
@@ -90,14 +95,20 @@ onMounted(() => {
       {
         selector: 'node',
         style: {
-          'background-color': '#666',
+          'background-color': (ele) => {
+        // ノードの type データに基づいて色を返す
+        const type = ele.data('type');
+        return colors[type] || '#666';  // 色が定義されていない場合のデフォルト値
+      },
           'label': 'data(id)',
         }
       },
       {
         selector: 'node.selected', // 選択されたノード用のスタイル
         style: {
-          'background-color': 'blue',
+          //'background-color': 'blue',
+          'border-width': 3,  // 輪郭線の太さ
+          'border-color': '#FFD700'  // 輪郭線の色、ここでは金色を使用
         }
       },
       {
@@ -118,21 +129,7 @@ onMounted(() => {
       name: 'preset'
     }
   });
-  /*
-  cy.on('click', 'node', (event) => {
-    const node = event.target;
-    //deletingElement.value = event.target
-    node.toggleClass('selected'); // ノードの選択状態を切り替える
-    if (selectedNodes.value.includes(node)) {
-      selectedNodes.value = selectedNodes.value.filter(n => n !== node); // ノードを配列から削除
-    } else {
-      if (selectedNodes.value.length >= 2) {
-        selectedNodes.value.shift(); // 最初の選択を削除
-      }
-      selectedNodes.value.push(node);
-    }
-  });
-  */
+
   cy.on('click', 'node', (event) => {
   const node = event.target;
   const nodeId = node.id();
