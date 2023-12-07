@@ -31,8 +31,8 @@
         <!-- 動的に生成される円 -->
         <g v-for="circle in circles" :key="circle.id">
           <circle v-for="circle in circles" :key="circle.id" :cx="circle.x" :cy="circle.y" r=20 opacity="0.3"
-            stroke="black" stroke-width="0.5" :fill="getColor(circle.type)" @mousedown="startDrag(circle, $event)"
-            @click="selectItem(circle, 'circle')" />
+            stroke="black" stroke-width="0.5" :fill="getColor(circle.type)"
+            @mousedown="startDrag(circle, $event)" @click="selectItem(circle, 'circle')" />
           <!--<text :x="circle.x" :y="circle.y" text-anchor="middle" dominant-baseline="central" fill="white">
             {{ circle.id }}
           </text>-->
@@ -180,38 +180,103 @@ function getColor(type) {
     default: return 'black';
   }
 }
-
+/*
 function updateLinePositions(movedCircle) {
   lines.value.forEach(line => {
-    if (line.x1 === movedCircle.oldX && line.y1 === movedCircle.oldY) {
-      line.x1 = movedCircle.x;
-      line.y1 = movedCircle.y;
+    // ドラッグされた円が線の始点である場合
+    if (line.sourceID === movedCircle.id) {
+      // 線の始点を円の外側に配置
+      const { offsetX, offsetY } = calculateOffset(movedCircle, line.x2, line.y2);
+      line.x1 = movedCircle.x + offsetX;;
+      line.y1 = movedCircle.y + offsetY;
     }
-    if (line.x2 === movedCircle.oldX && line.y2 === movedCircle.oldY) {
-      line.x2 = movedCircle.x;
-      line.y2 = movedCircle.y;
+    // ドラッグされた円が線の終点である場合
+    if (line.targetID === movedCircle.id) {
+      // 線の終点を円の外側に配置
+      const { offsetX, offsetY } = calculateOffset(movedCircle, line.x1, line.y1);
+      line.x2 = movedCircle.x + offsetX;
+      line.y2 = movedCircle.y + offsetY;
+    }
+  });
+}
+*/
+function updateLinePositions(movedCircle) {
+  lines.value.forEach(line => {
+    if (line.sourceID === movedCircle.id) {
+      const targetCircle = circles.value.find(c => c.id === line.targetID);
+      if (targetCircle) {
+        const { offsetX, offsetY } = calculateOffset(movedCircle, targetCircle.x, targetCircle.y);
+        line.x1 = movedCircle.x + offsetX;
+        line.y1 = movedCircle.y + offsetY;
+      }
+    }
+    if (line.targetID === movedCircle.id) {
+      const sourceCircle = circles.value.find(c => c.id === line.sourceID);
+      if (sourceCircle) {
+        const { offsetX, offsetY } = calculateOffset(movedCircle, sourceCircle.x, sourceCircle.y);
+        line.x2 = movedCircle.x + offsetX;
+        line.y2 = movedCircle.y + offsetY;
+      }
     }
   });
 }
 
+function calculateOffset(circle, x, y) {
+  const dx = x - circle.x;
+  const dy = y - circle.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const normX = dx / dist;
+  const normY = dy / dist;
+
+  // 円の半径を考慮してオフセットを計算
+  const offsetX = normX * circleRadius;
+  const offsetY = normY * circleRadius;
+  return { offsetX, offsetY };
+}
+
+let dragOffset = { x: 0, y: 0};
+
 function startDrag(circle, event) {
-  selectedCircle.value = { ...circle, oldX: circle.x, oldY: circle.y };
+  //const svgRect = event.target.getBoundingClientRect();
+  const svgRect = document.getElementById('container').getBoundingClientRect();
+  dragOffset.x = event.clientX - svgRect.left - circle.x;
+  dragOffset.y = event.clientY - svgRect.top - circle.y;
+  selectedCircle.value = circle;
   isDragging.value = true;
   event.preventDefault();
 }
 
 function onDrag(event) {
   if (isDragging.value && selectedCircle.value) {
-    const svgRect = event.target.getBoundingClientRect();
+    //const svgRect = event.target.getBoundingClientRect();
+    const svgRect = document.getElementById('container').getBoundingClientRect();
+    const newX = event.clientX - svgRect.left - dragOffset.x;
+    const newY = event.clientY - svgRect.top - dragOffset.y;
+    /*
     selectedCircle.value.x = event.clientX - svgRect.left;
     selectedCircle.value.y = event.clientY - svgRect.top;
     updateLinePositions(selectedCircle.value);
+    updateCirclePosition(selectedCircle.value)
+    */
+    const draggedCircle = circles.value.find(c => c === selectedCircle.value);
+    if (draggedCircle) {
+      draggedCircle.x = newX;
+      draggedCircle.y = newY;
+      updateLinePositions(draggedCircle);
+    }
   }
 }
 
 function stopDrag() {
   isDragging.value = false;
   selectedCircle.value = null;
+}
+
+function updateCirclePosition(movedCircle) {
+  const circleIndex = circles.value.findIndex(circle => circle === movedCircle);
+  if (circleIndex !== -1) {
+    circles.value[circleIndex] = movedCircle;
+  }
 }
 </script>
 

@@ -26,6 +26,7 @@
     "@recogito/recogito-js": "^1.8.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "cesium": "^1.111.0",
+    "cytoscape": "^3.27.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "vue-cesium": "^3.2.4"

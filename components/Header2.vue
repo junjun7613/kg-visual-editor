@@ -43,7 +43,7 @@ const items = [
   },
   {
     title: "Annotation",
-    path: "/link03",
+    path: "/link03cyto",
     //icon: 'mdi-numeric-2'
   },
 ];
