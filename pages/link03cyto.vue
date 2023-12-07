@@ -17,6 +17,7 @@
       </v-col>
     </v-row>
     <p>{{selectedElement}}</p>
+    <p>{{selectedNodes}}</p>
     <v-row>
       <v-col cols="12">
         <v-btn @click="showGraphData">グラフデータを表示</v-btn>
@@ -71,7 +72,7 @@ const cyElement = ref(null);
 let cy = null;
 const selectedElement = ref(null);
 const deletingElement = ref(null);
-let selectedNodes = [];
+const selectedNodes = ref([]);
 const showNodeModal = ref(false);
 const showEdgeModal = ref(false);
 const nodeId = ref('');
@@ -117,24 +118,39 @@ onMounted(() => {
       name: 'preset'
     }
   });
-
-  cy.on('click', 'node, edge', (event) => {
+  /*
+  cy.on('click', 'node', (event) => {
     const node = event.target;
-    deletingElement.value = event.target
+    //deletingElement.value = event.target
     node.toggleClass('selected'); // ノードの選択状態を切り替える
-    if (selectedNodes.includes(node)) {
-      selectedNodes = selectedNodes.filter(n => n !== node); // ノードを配列から削除
+    if (selectedNodes.value.includes(node)) {
+      selectedNodes.value = selectedNodes.value.filter(n => n !== node); // ノードを配列から削除
     } else {
-      if (selectedNodes.length >= 2) {
-        selectedNodes.shift(); // 最初の選択を削除
+      if (selectedNodes.value.length >= 2) {
+        selectedNodes.value.shift(); // 最初の選択を削除
       }
-      selectedNodes.push(node);
+      selectedNodes.value.push(node);
     }
   });
-
-  cy.on('click', 'node, edge', (event) => {
-    selectedElement.value = event.target;
-  });
+  */
+  cy.on('click', 'node', (event) => {
+  const node = event.target;
+  const nodeId = node.id();
+  
+  if (selectedNodes.value.includes(nodeId)) {
+    // ノードがすでに選択されている場合は削除
+    selectedNodes.value = selectedNodes.value.filter(id => id !== nodeId);
+    node.removeClass('selected');
+  } else {
+    // 新しいノードを選択する
+    if (selectedNodes.value.length >= 2) {
+      const removedNodeId = selectedNodes.value.shift(); // 最初の選択を削除
+      cy.getElementById(removedNodeId).removeClass('selected');
+    }
+    selectedNodes.value.push(nodeId);
+    node.addClass('selected');
+  }
+});
 
   cy.on('mouseover', 'node, edge', (event) => {
     const ele = event.target;
@@ -192,20 +208,21 @@ const addNode = () => {
 
 // エッジ作成用のメソッド
 const createEdge = () => {
-  if (selectedNodes.length === 2 && edgeId.value && edgeType.value) {
+  if (selectedNodes.value.length === 2 && edgeId.value && edgeType.value) {
+  //if (selectedNodes.length === 2) {
     cy.add({
       group: 'edges',
       data: {
         id: edgeId.value,
         type: edgeType.value,
-        source: selectedNodes[0].id(),
-        target: selectedNodes[1].id()
+        source: selectedNodes.value[0],
+        target: selectedNodes.value[1]
       }
     });
     edgeId.value = '';
     edgeType.value = '';
     showEdgeModal.value = false;
-    selectedNodes = []; // 選択されたノードの配列をクリア
+    selectedNodes.value = []; // 選択されたノードの配列をクリア
   } else {
     console.error('2つのノードを選択し、エッジIDとタイプを入力してください。');
   }
