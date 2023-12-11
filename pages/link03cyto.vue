@@ -11,6 +11,9 @@
     <v-row>
       <v-col cols="12">
         <v-btn @click="updateDB">データベースに登録</v-btn>
+        <v-btn @click="downloadJson">JSONファイルをダウンロード</v-btn>
+        <input type="file" id="jsonFileInput" style="display: none;" @change="handleFileUpload">
+        <v-btn @click="triggerFileUpload">JSONファイルをアップロード</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -132,86 +135,6 @@ const edgeType = ref('');
 
 const graphData = ref(null);
 
-/*
-const colors = {
-  [`${ex}ActionFactoid`]: 'red',
-  [`${ex}ContactFactoid`]: 'blue'
-};
-
-nodeTypeSelect.value = [
-{
-    id: `${ex}EventFactoid`,
-    label: "Event",
-    children: [
-      {
-        id: `${ex}ActionFactoid`,
-        label: "Action",
-      },
-      {
-        id: `${ex}ContactFactoid`,
-        label: "Contact",
-      },
-      {
-        id: `${ex}StatementFactoid`,
-        label: "Statement",
-      },
-      {
-        id: `${ex}ThoughtFactoid`,
-        label: "Thought",
-      },
-    ],
-  },
-  {
-    id: `${ex}StateOfAffairsFactoid`,
-    label: "State of Affairs",
-    children: [
-      {
-        id: `${ex}SituationFactoid`,
-        label: "Situation",
-      },
-      {
-        id: `${ex}OfficeFactoid`,
-        label: "Office",
-      },
-      {
-        id: `${ex}OccupationFactoid`,
-        label: "Occupation",
-      },
-      {
-        id: `${ex}PossessionFactoid`,
-        label: "Possession",
-      },
-      {
-        id: `${ex}TitleFactoid`,
-        label: "Title",
-      },
-      {
-        id: `${ex}PropertyFactoid`,
-        label: "Property",
-      },
-      {
-        id: `${ex}RelationsipFactoid`,
-        label: "Relationship",
-        children: [
-          {
-            id: `${ex}FamilialRelationshipFactoid`,
-            label: "FamilialRelationship",
-          },
-          {
-            id: `${ex}SocialRelationshipFactoid`,
-            label: "SocialRelationship",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: `${ex}GeoFactoid`,
-    label: "Geography",
-  },
-                ]
-*/
-
 onMounted(() => {
   cy = cytoscape({
     container: cyElement.value,
@@ -306,7 +229,8 @@ onMounted(() => {
 const showGraphData = () => {
   const nodes = cy.nodes().map(node => ({
     id: node.id(),
-    type: node.data('type')
+    type: node.data('type'),
+    shape: node.data('typeShape')
   }));
 
   const edges = cy.edges().map(edge => ({
@@ -386,6 +310,82 @@ const deleteSelectedElement = () => {
   if (deletingElement.value) {
     deletingElement.value.remove(); // 選択された要素を削除
     deletingElement.value = null;
+  }
+};
+
+const downloadJson = () => {
+  const nodes = cy.nodes().map(node => ({
+    id: node.id(),
+    type: node.data('type'),
+    shape: node.data('typeShape')
+  }));
+
+  const edges = cy.edges().map(edge => ({
+    id: edge.id(),
+    type: edge.data('type'),
+    source: edge.data('source'),
+    target: edge.data('target')
+  }));
+
+  const graphData = {
+    nodes,
+    edges
+  };
+  const graphDataJson = JSON.stringify(graphData, null, 2);
+  const blob = new Blob([graphDataJson], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'graph-data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target.result;
+      try {
+        const json = JSON.parse(content);
+        loadGraphData(json);
+      } catch (error) {
+        console.error('JSONファイルの読み込みエラー:', error);
+      }
+    };
+    reader.readAsText(file);
+  }
+};
+
+const triggerFileUpload = () => {
+  document.getElementById('jsonFileInput').click();
+};
+
+const loadGraphData = (data) => {
+  cy.elements().remove(); // 現在のグラフデータを削除
+  if (data.nodes && data.edges) {
+    const nodes = data.nodes.map(node => ({
+      group: 'nodes',
+      data:{
+        id: node.id,
+        type: node.type,
+        typeShape: node.shape
+      }
+    }));
+    const edges = data.edges.map(edge => ({
+      group: 'edges',
+      data: {
+        id: edge.id,
+        type: edge.type,
+        source: edge.source,
+        target: edge.target
+      }
+    }));
+
+    cy.add(nodes);
+    cy.add(edges);
+    cy.layout({ name: 'preset' }).run(); // レイアウトを更新
   }
 };
 
