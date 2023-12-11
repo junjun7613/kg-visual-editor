@@ -32,7 +32,7 @@ const items = [
     //icon: 'mdi-numeric-2'
   },
   {
-    title: "link1",
+    title: "Cesium",
     path: "/link01",
     //icon: 'mdi-numeric-1'
   },

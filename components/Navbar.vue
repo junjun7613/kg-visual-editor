@@ -6,13 +6,13 @@
 					<nuxt-link to="/">index</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link to="/link01">link 1</nuxt-link>
+					<nuxt-link to="/link01">Cesium</nuxt-link>
 				</li>
 				<li>
 					<nuxt-link to="/link02">Map Search</nuxt-link>
 				</li>
 				<li>
-					<nuxt-link to="/link03">Annotation</nuxt-link>
+					<nuxt-link to="/link03cyto">Annotation</nuxt-link>
 				</li>
 			</ul>
 		</nav>

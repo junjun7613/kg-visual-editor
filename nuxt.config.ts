@@ -21,6 +21,9 @@ export default defineNuxtConfig({
       'process.env.DEBUG': false,
     },
   },
-  css: ['@/assets/main.scss',
-  "@mdi/font/css/materialdesignicons.css"],
+  css: [
+    '@/assets/main.scss',
+    "@mdi/font/css/materialdesignicons.css",
+    "vue3-treeselect/dist/vue3-treeselect.css"
+  ],
 })

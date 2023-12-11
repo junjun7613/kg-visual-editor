@@ -2,13 +2,15 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <v-btn @click="showNodeModal = true">ノードを追加</v-btn>
+        <v-btn @click="showNodeModal = true">ファクトイドを追加</v-btn>
+        <v-btn @click="showEntityModal = true">エンティティを追加</v-btn>
         <v-btn @click="showEdgeModal = true">エッジを追加</v-btn>
+        <v-btn @click="deleteSelectedElement">削除</v-btn>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-btn @click="deleteSelectedElement">削除</v-btn>
+        <v-btn @click="updateDB">データベースに登録</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -36,14 +38,43 @@
   <!-- ノード作成用モーダル -->
   <v-dialog v-model="showNodeModal" persistent max-width="600px">
     <v-card>
-      <v-card-title>ノードの作成</v-card-title>
+      <v-card-title>ファクトイドの作成</v-card-title>
       <v-card-text>
-        <v-text-field v-model="nodeId" label="ノードID" required></v-text-field>
-        <v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>
+        <v-text-field v-model="nodeId" label="ファクトイドID" required></v-text-field>
+        <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+        <treeselect
+          :multiple="false"
+          :options="nodeTypeSelect"
+          placeholder="Select factoid type"
+          v-model="nodeType"
+          class="mb-4"
+        />
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showNodeModal = false">キャンセル</v-btn>
         <v-btn color="blue darken-1" text @click="addNode">作成</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- エンティティ作成用モーダル -->
+  <v-dialog v-model="showEntityModal" persistent max-width="600px">
+    <v-card>
+      <v-card-title>エンティティの作成</v-card-title>
+      <v-card-text>
+        <v-text-field v-model="entityId" label="エンティティID" required></v-text-field>
+        <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+        <treeselect
+          :multiple="false"
+          :options="nodeTypeSelect"
+          placeholder="Select entity type"
+          v-model="entityType"
+          class="mb-4"
+        />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="blue darken-1" text @click="showEntityModal = false">キャンセル</v-btn>
+        <v-btn color="blue darken-1" text @click="addEntity">作成</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -54,7 +85,14 @@
       <v-card-title>エッジの作成</v-card-title>
       <v-card-text>
         <v-text-field v-model="edgeId" label="エッジID" required></v-text-field>
-        <v-text-field v-model="edgeType" label="エッジタイプ" required></v-text-field>
+        <!--<v-text-field v-model="edgeType" label="エッジタイプ" required></v-text-field>-->
+        <treeselect
+          :multiple="false"
+          :options="edgeTypeSelect"
+          placeholder="Select property type"
+          v-model="edgeType"
+          class="mb-4"
+        />
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEdgeModal = false">キャンセル</v-btn>
@@ -67,6 +105,14 @@
 <script setup>
 import { ref } from 'vue';
 import cytoscape from 'cytoscape';
+import Treeselect from "vue3-treeselect";
+import "vue3-treeselect/dist/vue3-treeselect.css";
+import {
+  ex,
+  colors,
+  nodeTypeSelect,
+  edgeTypeSelect
+} from "~/utils/annotation/misc"
 
 const cyElement = ref(null);
 let cy = null;
@@ -74,18 +120,97 @@ const selectedElement = ref(null);
 const deletingElement = ref(null);
 const selectedNodes = ref([]);
 const showNodeModal = ref(false);
+const showEntityModal = ref(false);
 const showEdgeModal = ref(false);
 const nodeId = ref('');
-const nodeType = ref('');
+const nodeType = ref(null);
+const entityId = ref('');
+const entityType = ref(null);
 const edgeId = ref('');
 const edgeType = ref('');
+//const nodeTypeSelect = ref(null)
 
 const graphData = ref(null);
 
+/*
 const colors = {
-  'Action': 'red',
-  'Contact': 'blue'
+  [`${ex}ActionFactoid`]: 'red',
+  [`${ex}ContactFactoid`]: 'blue'
 };
+
+nodeTypeSelect.value = [
+{
+    id: `${ex}EventFactoid`,
+    label: "Event",
+    children: [
+      {
+        id: `${ex}ActionFactoid`,
+        label: "Action",
+      },
+      {
+        id: `${ex}ContactFactoid`,
+        label: "Contact",
+      },
+      {
+        id: `${ex}StatementFactoid`,
+        label: "Statement",
+      },
+      {
+        id: `${ex}ThoughtFactoid`,
+        label: "Thought",
+      },
+    ],
+  },
+  {
+    id: `${ex}StateOfAffairsFactoid`,
+    label: "State of Affairs",
+    children: [
+      {
+        id: `${ex}SituationFactoid`,
+        label: "Situation",
+      },
+      {
+        id: `${ex}OfficeFactoid`,
+        label: "Office",
+      },
+      {
+        id: `${ex}OccupationFactoid`,
+        label: "Occupation",
+      },
+      {
+        id: `${ex}PossessionFactoid`,
+        label: "Possession",
+      },
+      {
+        id: `${ex}TitleFactoid`,
+        label: "Title",
+      },
+      {
+        id: `${ex}PropertyFactoid`,
+        label: "Property",
+      },
+      {
+        id: `${ex}RelationsipFactoid`,
+        label: "Relationship",
+        children: [
+          {
+            id: `${ex}FamilialRelationshipFactoid`,
+            label: "FamilialRelationship",
+          },
+          {
+            id: `${ex}SocialRelationshipFactoid`,
+            label: "SocialRelationship",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: `${ex}GeoFactoid`,
+    label: "Geography",
+  },
+                ]
+*/
 
 onMounted(() => {
   cy = cytoscape({
@@ -93,8 +218,21 @@ onMounted(() => {
     elements: [],
     style: [
       {
-        selector: 'node',
+        selector: 'node[typeShape="factoid"]',
         style: {
+          'shape': 'triangle', // 三角形
+          'background-color': (ele) => {
+        // ノードの type データに基づいて色を返す
+        const type = ele.data('type');
+        return colors[type] || '#666';  // 色が定義されていない場合のデフォルト値
+      },
+          'label': 'data(id)',
+        }
+      },
+      {
+        selector: 'node[typeShape="entity"]',
+        style: {
+          'shape': 'ellipse', // 円
           'background-color': (ele) => {
         // ノードの type データに基づいて色を返す
         const type = ele.data('type');
@@ -188,7 +326,7 @@ const addNode = () => {
   if (nodeId.value && nodeType.value) {
     cy.add({
       group: 'nodes',
-      data: { id: nodeId.value, type: nodeType.value },
+      data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
     cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
@@ -197,6 +335,25 @@ const addNode = () => {
     nodeId.value = '';
     nodeType.value = '';
     showNodeModal.value = false;
+  } else {
+    // 必要な場合はエラーメッセージを表示
+    console.error('ノードIDとタイプを入力してください。');
+  }
+};
+
+const addEntity = () => {
+  if (entityId.value && entityType.value) {
+    cy.add({
+      group: 'nodes',
+      data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      position: { x: Math.random() * 800, y: Math.random() * 600 }
+    });
+    cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
+
+    // モーダルの入力フィールドをクリア
+    entityId.value = '';
+    entityType.value = '';
+    showEntityModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
     console.error('ノードIDとタイプを入力してください。');
