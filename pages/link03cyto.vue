@@ -30,7 +30,10 @@
       <v-btn @click="triggerSettingFileUpload('Colors')">配色を更新</v-btn>
 
       <input type="file" id="jsonNodeTypeSelectInput" style="display: none;" @change="handleNodeTypeSelectFileUpload">
-      <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ノードのタイプを更新</v-btn>
+      <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ファクトイドのタイプを更新</v-btn>
+
+      <input type="file" id="jsonEntityTypeSelectInput" style="display: none;" @change="handleEntityTypeSelectFileUpload">
+      <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')">エンティティのタイプを更新</v-btn>
 
       <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
       <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを更新</v-btn>
@@ -67,12 +70,12 @@
 
   <!-- エンティティ作成用モーダル -->
   <v-dialog v-model="showEntityModal" persistent max-width="600px">
-    <v-card>
+    <v-card height="600px">
       <v-card-title>エンティティの作成</v-card-title>
       <v-card-text>
         <v-text-field v-model="entityId" label="エンティティID" required></v-text-field>
         <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-        <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Select entity type" v-model="entityType"
+        <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Select entity type" v-model="entityType"
           class="mb-4" />
       </v-card-text>
       <v-card-actions>
@@ -109,12 +112,14 @@ import {
   defaultEx,
   defaultColors,
   defaultNodeTypeSelect,
+  defaultEntityTypeSelect,
   defaultEdgeTypeSelect
 } from "~/utils/annotation/misc";
 import {createPopper} from '@popperjs/core';
 
 const colors = ref(defaultColors);
 const nodeTypeSelect = ref(defaultNodeTypeSelect)
+const entityTypeSelect = ref(defaultEntityTypeSelect)
 const edgeTypeSelect = ref(defaultEdgeTypeSelect)
 
 const cyElement = ref(null);
@@ -458,6 +463,7 @@ const triggerSettingFileUpload = (type) => {
 
 const handleColorsFileUpload = (event) => handleFileUpload(event, 'Colors');
 const handleNodeTypeSelectFileUpload = (event) => handleFileUpload(event, 'NodeTypeSelect');
+const handleEntityTypeSelectFileUpload = (event) => handleFileUpload(event, 'EntityTypeSelect');
 const handleEdgeTypeSelectFileUpload = (event) => handleFileUpload(event, 'EdgeTypeSelect');
 
 
@@ -480,6 +486,9 @@ const updateSettings = (type, data) => {
       break;
     case 'NodeTypeSelect':
       nodeTypeSelect.value = data["data"];
+      break;
+    case 'EntityTypeSelect':
+      entityTypeSelect.value = data["data"];
       break;
     case 'EdgeTypeSelect':
       edgeTypeSelect.value = data["data"];

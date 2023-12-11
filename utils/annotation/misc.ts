@@ -81,6 +81,33 @@ const defaultNodeTypeSelect = [
     }
 ];
 
+const defaultEntityTypeSelect = [
+    {
+      "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+      "label": "Person",
+    },
+    {
+      "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+      "label": "Organization",
+    },
+    {
+        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
+        "label": "Place",
+    },
+    {
+        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
+        "label": "Date",
+    },
+    {
+        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
+        "label": "Physical object",
+    },
+    {
+        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
+        "label": "Conceptual object",
+    }
+  ];
+
 const defaultEdgeTypeSelect = [
     {
         "label": "Subject",
@@ -159,5 +186,6 @@ export {
     reference,
     defaultColors,
     defaultNodeTypeSelect,
+    defaultEntityTypeSelect,
     defaultEdgeTypeSelect
 };
