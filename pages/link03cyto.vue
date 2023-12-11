@@ -12,8 +12,8 @@
       <v-col cols="12">
         <v-btn @click="updateDB">データベースに登録</v-btn>
         <v-btn @click="downloadJson">JSONファイルをダウンロード</v-btn>
-        <input type="file" id="jsonFileInput" style="display: none;" @change="handleFileUpload">
-        <v-btn @click="triggerFileUpload">JSONファイルをアップロード</v-btn>
+        <input type="file" id="jsonFileInput" style="display: none;" @change="handleGraphFileUpload">
+        <v-btn @click="triggerGraphFileUpload">JSONファイルをアップロード</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -21,12 +21,22 @@
         <div id="cy" ref="cyElement" style="width: 800px; height: 600px; border: 1px solid #ccc;"></div>
       </v-col>
     </v-row>
-    <p>{{selectedElement}}</p>
-    <p>{{selectedNodes}}</p>
     <v-row>
-      <v-col cols="12">
+    <!--<p>{{ selectedElement }}</p>-->
+    <!--<p>{{ selectedNodes }}</p>-->
+    </v-row>
+    <v-row>
+      <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
+      <v-btn @click="triggerSettingFileUpload('Colors')">配色を更新</v-btn>
+
+      <input type="file" id="jsonNodeTypeSelectInput" style="display: none;" @change="handleNodeTypeSelectFileUpload">
+      <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ノードのタイプを更新</v-btn>
+
+      <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
+      <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを更新</v-btn>
+    </v-row>
+    <v-row>
         <v-btn @click="showGraphData">グラフデータを表示</v-btn>
-      </v-col>
     </v-row>
     <v-row>
       <v-col cols="12">
@@ -40,18 +50,13 @@
 
   <!-- ノード作成用モーダル -->
   <v-dialog v-model="showNodeModal" persistent max-width="600px">
-    <v-card>
+    <v-card height="600px">
       <v-card-title>ファクトイドの作成</v-card-title>
       <v-card-text>
         <v-text-field v-model="nodeId" label="ファクトイドID" required></v-text-field>
         <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-        <treeselect
-          :multiple="false"
-          :options="nodeTypeSelect"
-          placeholder="Select factoid type"
-          v-model="nodeType"
-          class="mb-4"
-        />
+        <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Select factoid type" v-model="nodeType"
+          class="mb-4" />
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showNodeModal = false">キャンセル</v-btn>
@@ -67,13 +72,8 @@
       <v-card-text>
         <v-text-field v-model="entityId" label="エンティティID" required></v-text-field>
         <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-        <treeselect
-          :multiple="false"
-          :options="nodeTypeSelect"
-          placeholder="Select entity type"
-          v-model="entityType"
-          class="mb-4"
-        />
+        <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Select entity type" v-model="entityType"
+          class="mb-4" />
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEntityModal = false">キャンセル</v-btn>
@@ -84,18 +84,13 @@
 
   <!-- エッジ作成用モーダル -->
   <v-dialog v-model="showEdgeModal" persistent max-width="600px">
-    <v-card>
+    <v-card height="600px">
       <v-card-title>エッジの作成</v-card-title>
       <v-card-text>
         <v-text-field v-model="edgeId" label="エッジID" required></v-text-field>
         <!--<v-text-field v-model="edgeType" label="エッジタイプ" required></v-text-field>-->
-        <treeselect
-          :multiple="false"
-          :options="edgeTypeSelect"
-          placeholder="Select property type"
-          v-model="edgeType"
-          class="mb-4"
-        />
+        <treeselect :multiple="false" :options="edgeTypeSelect" placeholder="Select property type" v-model="edgeType"
+          class="mb-4" />
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEdgeModal = false">キャンセル</v-btn>
@@ -111,11 +106,16 @@ import cytoscape from 'cytoscape';
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import {
-  ex,
-  colors,
-  nodeTypeSelect,
-  edgeTypeSelect
-} from "~/utils/annotation/misc"
+  defaultEx,
+  defaultColors,
+  defaultNodeTypeSelect,
+  defaultEdgeTypeSelect
+} from "~/utils/annotation/misc";
+import {createPopper} from '@popperjs/core';
+
+const colors = ref(defaultColors);
+const nodeTypeSelect = ref(defaultNodeTypeSelect)
+const edgeTypeSelect = ref(defaultEdgeTypeSelect)
 
 const cyElement = ref(null);
 let cy = null;
@@ -130,7 +130,8 @@ const nodeType = ref(null);
 const entityId = ref('');
 const entityType = ref(null);
 const edgeId = ref('');
-const edgeType = ref('');
+const edgeType = ref(null);
+const popperElement = ref(null)
 //const nodeTypeSelect = ref(null)
 
 const graphData = ref(null);
@@ -145,10 +146,10 @@ onMounted(() => {
         style: {
           'shape': 'triangle', // 三角形
           'background-color': (ele) => {
-        // ノードの type データに基づいて色を返す
-        const type = ele.data('type');
-        return colors[type] || '#666';  // 色が定義されていない場合のデフォルト値
-      },
+            // ノードの type データに基づいて色を返す
+            const type = ele.data('type');
+            return colors.value[type] || '#666';  // 色が定義されていない場合のデフォルト値
+          },
           'label': 'data(id)',
         }
       },
@@ -157,10 +158,10 @@ onMounted(() => {
         style: {
           'shape': 'ellipse', // 円
           'background-color': (ele) => {
-        // ノードの type データに基づいて色を返す
-        const type = ele.data('type');
-        return colors[type] || '#666';  // 色が定義されていない場合のデフォルト値
-      },
+            // ノードの type データに基づいて色を返す
+            const type = ele.data('type');
+            return colors.value[type] || '#666';  // 色が定義されていない場合のデフォルト値
+          },
           'label': 'data(id)',
         }
       },
@@ -192,39 +193,91 @@ onMounted(() => {
   });
 
   cy.on('click', 'node', (event) => {
-  const node = event.target;
-  const nodeId = node.id();
-  
-  if (selectedNodes.value.includes(nodeId)) {
-    // ノードがすでに選択されている場合は削除
-    selectedNodes.value = selectedNodes.value.filter(id => id !== nodeId);
-    node.removeClass('selected');
-  } else {
-    // 新しいノードを選択する
-    if (selectedNodes.value.length >= 2) {
-      const removedNodeId = selectedNodes.value.shift(); // 最初の選択を削除
-      cy.getElementById(removedNodeId).removeClass('selected');
+    const node = event.target;
+    const nodeId = node.id();
+
+    if (selectedNodes.value.includes(nodeId)) {
+      // ノードがすでに選択されている場合は削除
+      selectedNodes.value = selectedNodes.value.filter(id => id !== nodeId);
+      node.removeClass('selected');
+    } else {
+      // 新しいノードを選択する
+      if (selectedNodes.value.length >= 2) {
+        const removedNodeId = selectedNodes.value.shift(); // 最初の選択を削除
+        cy.getElementById(removedNodeId).removeClass('selected');
+      }
+      selectedNodes.value.push(nodeId);
+      node.addClass('selected');
     }
-    selectedNodes.value.push(nodeId);
-    node.addClass('selected');
-  }
-});
+  });
 
   cy.on('mouseover', 'node, edge', (event) => {
     const ele = event.target;
+    
     selectedElement.value = {
       id: ele.data('id'),
       type: ele.data('type')
     };
+    handleMouseover(event, selectedElement.value)
     console.log(selectedElement.value)
   });
 
   // ホバーが外れたときのイベントハンドラ
   cy.on('mouseout', 'node, edge', () => {
+    handleMouseout();
     selectedElement.value = null;
   });
 
 });
+
+// ポップアップのスタイル設定
+const setPopperStyle = (popper) => {
+  popper.style.background = '#fff';
+  popper.style.border = '1px solid #ddd';
+  popper.style.borderRadius = '4px';
+  popper.style.boxShadow = '0 2px 5px 0 rgba(0, 0, 0, 0.2)';
+  popper.style.padding = '10px';
+  popper.style.fontSize = '14px';
+  popper.style.color = '#333';
+  popper.style.opacity = 1;
+  popper.style.transition = 'opacity 0.3s';
+};
+
+// ノードにマウスオーバーしたときの処理
+const handleMouseover = (event, nodeData) => {
+  if (!popperElement.value) {
+    // ポップアップ要素がまだない場合は作成
+    popperElement.value = document.createElement('div');
+    setPopperStyle(popperElement.value)
+    popperElement.value.innerHTML = `ID: ${nodeData.id}<br>Type: ${nodeData.type}`;
+    document.body.appendChild(popperElement.value);
+  }
+
+  // Cytoscape.js ノードの位置を基に Popper インスタンスを作成
+  const referenceObject = {
+    getBoundingClientRect: () => ({
+      width: 0,
+      height: 0,
+      top: event.renderedPosition.y,
+      bottom: event.renderedPosition.y,
+      left: event.renderedPosition.x,
+      right: event.renderedPosition.x,
+    }),
+  };
+
+  // Popperインスタンスを作成
+  const popperInstance = createPopper(referenceObject, popperElement.value, {
+    placement: 'top',  // 好みに応じて変更
+  });
+};
+
+// ノードからマウスが離れたときの処理
+const handleMouseout = () => {
+  if (popperElement.value) {
+    document.body.removeChild(popperElement.value);
+    popperElement.value = null;
+  }
+};
 
 const showGraphData = () => {
   const nodes = cy.nodes().map(node => ({
@@ -287,7 +340,7 @@ const addEntity = () => {
 // エッジ作成用のメソッド
 const createEdge = () => {
   if (selectedNodes.value.length === 2 && edgeId.value && edgeType.value) {
-  //if (selectedNodes.length === 2) {
+    //if (selectedNodes.length === 2) {
     cy.add({
       group: 'edges',
       data: {
@@ -317,7 +370,11 @@ const downloadJson = () => {
   const nodes = cy.nodes().map(node => ({
     id: node.id(),
     type: node.data('type'),
-    shape: node.data('typeShape')
+    shape: node.data('typeShape'),
+    position: { // 位置情報の追加
+      x: node.position('x'),
+      y: node.position('y')
+    }
   }));
 
   const edges = cy.edges().map(edge => ({
@@ -341,7 +398,7 @@ const downloadJson = () => {
   URL.revokeObjectURL(url);
 };
 
-const handleFileUpload = (event) => {
+const handleGraphFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
@@ -358,7 +415,7 @@ const handleFileUpload = (event) => {
   }
 };
 
-const triggerFileUpload = () => {
+const triggerGraphFileUpload = () => {
   document.getElementById('jsonFileInput').click();
 };
 
@@ -367,10 +424,14 @@ const loadGraphData = (data) => {
   if (data.nodes && data.edges) {
     const nodes = data.nodes.map(node => ({
       group: 'nodes',
-      data:{
+      data: {
         id: node.id,
         type: node.type,
         typeShape: node.shape
+      },
+      position: {
+        x: node.position.x, // JSONデータからのX座標
+        y: node.position.y  // JSONデータからのY座標
       }
     }));
     const edges = data.edges.map(edge => ({
@@ -386,6 +447,43 @@ const loadGraphData = (data) => {
     cy.add(nodes);
     cy.add(edges);
     cy.layout({ name: 'preset' }).run(); // レイアウトを更新
+  }
+};
+
+const triggerSettingFileUpload = (type) => {
+  const inputId = `json${type}Input`; // 正しい ID 形式に修正
+  //console.log(inputId);
+  document.getElementById(inputId).click();
+};
+
+const handleColorsFileUpload = (event) => handleFileUpload(event, 'Colors');
+const handleNodeTypeSelectFileUpload = (event) => handleFileUpload(event, 'NodeTypeSelect');
+const handleEdgeTypeSelectFileUpload = (event) => handleFileUpload(event, 'EdgeTypeSelect');
+
+
+const handleFileUpload = (event, type) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const json = JSON.parse(e.target.result);
+      updateSettings(type, json);
+    };
+    reader.readAsText(file);
+  }
+};
+
+const updateSettings = (type, data) => {
+  switch (type) {
+    case 'Colors':
+      colors.value = data["data"];
+      break;
+    case 'NodeTypeSelect':
+      nodeTypeSelect.value = data["data"];
+      break;
+    case 'EdgeTypeSelect':
+      edgeTypeSelect.value = data["data"];
+      break;
   }
 };
 
