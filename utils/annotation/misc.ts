@@ -1,7 +1,17 @@
 // 定数のURL設定
-const defaultEx = "https://junjun7613.github.io/MicroKnowledge/himiko.owl#";
-const factoid = "https://junjun7613.github.io/MicroKnowledge/factoid/";
-const reference = "https://junjun7613.github.io/MicroKnowledge/reference/";
+const defaultPrefixes = [{
+    "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#",
+    "label": "ex"
+    },
+    {
+    "id": "https://junjun7613.github.io/MicroKnowledge/factoid/",
+    "label": "factoid",
+    },
+    {
+    "id": "https://junjun7613.github.io/MicroKnowledge/reference/",
+    "label":"reference"
+    }
+]
 
 const defaultColors = {
     "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid": 'red',
@@ -181,9 +191,7 @@ const defaultEdgeTypeSelect = [
 
 // エクスポート
 export {
-    defaultEx,
-    factoid,
-    reference,
+    defaultPrefixes,
     defaultColors,
     defaultNodeTypeSelect,
     defaultEntityTypeSelect,

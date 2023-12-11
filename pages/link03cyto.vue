@@ -109,7 +109,7 @@ import cytoscape from 'cytoscape';
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import {
-  defaultEx,
+  defaultPrefixes,
   defaultColors,
   defaultNodeTypeSelect,
   defaultEntityTypeSelect,
@@ -117,6 +117,7 @@ import {
 } from "~/utils/annotation/misc";
 import {createPopper} from '@popperjs/core';
 
+const prefixes = ref(defaultPrefixes);
 const colors = ref(defaultColors);
 const nodeTypeSelect = ref(defaultNodeTypeSelect)
 const entityTypeSelect = ref(defaultEntityTypeSelect)
@@ -184,7 +185,7 @@ onMounted(() => {
           'width': 3,
           'line-color': '#ccc',
           'target-arrow-color': '#ccc',
-          'target-arrow-shape': 'triangle', // エッジの矢印の形状を設定
+          'target-arrow-shape': 'triangle-tee', // エッジの矢印の形状を設定
           'curve-style': 'bezier',
           'label': 'data(type)',
           'text-rotation': 'autorotate', // ラベルの回転を自動調整
