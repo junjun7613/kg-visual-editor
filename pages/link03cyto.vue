@@ -204,7 +204,7 @@ onMounted(() => {
     elements: [],
     style: [
       {
-        selector: 'node[typeShape="factoid"]',
+        selector: 'node[shape="factoid"]',
         style: {
           'shape': 'round-rectangle', // 角なし四角形
           'background-color': (ele) => {
@@ -217,7 +217,7 @@ onMounted(() => {
             //const id = ele.data('id');
             //const parts = id.split('/');
             //return parts[parts.length - 1];
-            if (ele.data('detailType')){
+            if (ele.data('detailType')) {
               return ele.data('detailType');
             } else {
               //ID(URL)をスラッシュで分割し、最後の要素を取得
@@ -231,7 +231,7 @@ onMounted(() => {
         }
       },
       {
-        selector: 'node[typeShape="entity"]',
+        selector: 'node[shape="entity"]',
         style: {
           'shape': 'ellipse', // 円
           'background-color': (ele) => {
@@ -307,7 +307,7 @@ onMounted(() => {
     selectedElement.value = {
       id: ele.data('id'),
       type: ele.data('type'),
-      shape: ele.data('typeShape'),
+      shape: ele.data('shape'),
       label: ele.data('label')
     };
 
@@ -405,10 +405,10 @@ const handleMouseout = () => {
 const showGraphData = () => {
   const nodes = cy.nodes().map(node => {
     const nodeData = {
-    id: node.id(),
-    type: node.data('type'),
-    shape: node.data('typeShape'),
-    label: node.data('label')
+      id: node.id(),
+      type: node.data('type'),
+      shape: node.data('shape'),
+      label: node.data('label')
     };
 
     if (node.data('role') != null) {
@@ -437,7 +437,7 @@ const showGraphData = () => {
 const addNode = () => {
   if (detailType.value == "") {
     detailType.value = null;
-  }; 
+  };
 
   if (labelInput.value && prefixSelect.value && nodeId.value && nodeType.value) {
     const completeID = prefixSelect.value + nodeId.value
@@ -445,7 +445,7 @@ const addNode = () => {
     const nodeData = {
       id: completeID,
       type: nodeType.value,
-      typeShape: 'factoid',
+      shape: 'factoid',
       label: labelInput.value
     }
 
@@ -455,7 +455,7 @@ const addNode = () => {
 
     cy.add({
       group: 'nodes',
-      //data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
+      //data: { id: nodeId.value, type: nodeType.value, shape: 'factoid' },
       data: nodeData,
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
@@ -474,7 +474,7 @@ const addNode = () => {
     const nodeData = {
       id: completeID,
       type: nodeType.value,
-      typeShape: 'factoid',
+      shape: 'factoid',
       label: labelInput.value
     }
 
@@ -484,7 +484,7 @@ const addNode = () => {
 
     cy.add({
       group: 'nodes',
-      //data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
+      //data: { id: nodeId.value, type: nodeType.value, shape: 'factoid' },
       data: nodeData,
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
@@ -506,7 +506,7 @@ const addNode = () => {
 const addEntity = () => {
   if (roleInput.value == "") {
     roleInput.value = null;
-  }; 
+  };
 
   if (labelInput.value && prefixSelect.value && entityId.value && entityType.value) {
     const completeID = prefixSelect.value + entityId.value
@@ -514,7 +514,7 @@ const addEntity = () => {
     const nodeData = {
       id: completeID,
       type: entityType.value,
-      typeShape: 'entity',
+      shape: 'entity',
       label: labelInput.value
     };
 
@@ -524,7 +524,7 @@ const addEntity = () => {
 
     cy.add({
       group: 'nodes',
-      //data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      //data: { id: entityId.value, type: entityType.value, shape: 'entity' },
       data: nodeData,
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
@@ -543,7 +543,7 @@ const addEntity = () => {
     const nodeData = {
       id: completeID,
       type: entityType.value,
-      typeShape: 'entity',
+      shape: 'entity',
       label: labelInput.value
     };
 
@@ -553,7 +553,7 @@ const addEntity = () => {
 
     cy.add({
       group: 'nodes',
-      //data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      //data: { id: entityId.value, type: entityType.value, shape: 'entity' },
       data: nodeData,
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
@@ -602,15 +602,30 @@ const deleteSelectedElement = () => {
 };
 
 const downloadJson = () => {
-  const nodes = cy.nodes().map(node => ({
-    id: node.id(),
-    type: node.data('type'),
-    shape: node.data('typeShape'),
-    position: { // 位置情報の追加
-      x: node.position('x'),
-      y: node.position('y')
+  const nodes = cy.nodes().map(node => {
+  const nodeData = {
+    //group: 'nodes', // ノードのグループを指定
+    //data: {
+      id: node.id(),
+      type: node.data('type'),
+      shape: node.data('shape'),
+      label: node.data('label'),
+    //},
+    position: {
+      x: node.position('x'), // JSONデータからのX座標
+      y: node.position('y')  // JSONデータからのY座標
     }
-  }));
+  };
+
+  if (node.data('role') != null) {
+    nodeData.role = node.data('role');
+  }
+  if (node.data('detailType') != null) {
+    nodeData.detailType = node.data('detailType');
+  }
+
+  return nodeData;
+});
 
   const edges = cy.edges().map(edge => ({
     id: edge.id(),
@@ -656,19 +671,24 @@ const triggerGraphFileUpload = () => {
 
 const loadGraphData = (data) => {
   cy.elements().remove(); // 現在のグラフデータを削除
-  if (data.nodes && data.edges) {
+  if (data.nodes || data.edges) {
+
     const nodes = data.nodes.map(node => ({
       group: 'nodes',
       data: {
         id: node.id,
         type: node.type,
-        typeShape: node.shape
+        shape: node.shape,
+        label: node.label,
+        ...(node.role != null && { role: node.role }),
+        ...(node.detailType != null && { detailType: node.detailType })
       },
       position: {
-        x: node.position.x, // JSONデータからのX座標
-        y: node.position.y  // JSONデータからのY座標
+        x: node.position.x,
+        y: node.position.y
       }
     }));
+
     const edges = data.edges.map(edge => ({
       group: 'edges',
       data: {
