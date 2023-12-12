@@ -9,7 +9,8 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
 import { ref } from "vue";
 
-const places = [{name:"aaa", lat: 139.6917, lng:35.6894},{name:"bbb", lat:139.638, lng:35.4437}]
+//const places = [{name:"aaa", lat: 139.6917, lng:35.6894},{name:"bbb", lat:139.638, lng:35.4437}]
+const places = [{name:"aaa", lat: 139.6917, lng:35.6894},{name:"bbb", lat: 139.6917, lng:35.6894}]
 
 // デフォルトのズームレベルとマップの中心座標
 const zoom = ref(3);

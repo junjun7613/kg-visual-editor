@@ -143,8 +143,14 @@
       <v-card-text>
         <v-text-field v-model="edgeId" label="エッジID" required></v-text-field>
         <!--<v-text-field v-model="edgeType" label="エッジタイプ" required></v-text-field>-->
+        <div v-if="selectedNodes.length === 2 && selectedNodes[0].shape === 'factoid' && selectedNodes[1].shape === 'factoid'">
+        <treeselect :multiple="false" :options="factoidRelationSelect" placeholder="Select property type" v-model="edgeType"
+          class="mb-4" />
+        </div>
+        <div v-else>
         <treeselect :multiple="false" :options="edgeTypeSelect" placeholder="Select property type" v-model="edgeType"
           class="mb-4" />
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEdgeModal = false">キャンセル</v-btn>
@@ -165,7 +171,8 @@ import {
   defaultColors,
   defaultNodeTypeSelect,
   defaultEntityTypeSelect,
-  defaultEdgeTypeSelect
+  defaultEdgeTypeSelect,
+  defaultFactoidRelationSelect
 } from "~/utils/annotation/misc";
 import { createPopper } from '@popperjs/core';
 
@@ -174,6 +181,7 @@ const colors = ref(defaultColors);
 const nodeTypeSelect = ref(defaultNodeTypeSelect)
 const entityTypeSelect = ref(defaultEntityTypeSelect)
 const edgeTypeSelect = ref(defaultEdgeTypeSelect)
+const factoidRelationSelect = ref(defaultFactoidRelationSelect)
 
 const cyElement = ref(null);
 let cy = null;
@@ -279,7 +287,7 @@ onMounted(() => {
       name: 'preset'
     }
   });
-
+/*
   cy.on('click', 'node, edge', (event) => {
     const node = event.target;
     const nodeId = node.id();
@@ -300,6 +308,32 @@ onMounted(() => {
       node.addClass('selected');
     }
   });
+  */
+  cy.on('click', 'node, edge', (event) => {
+  const node = event.target;
+  const nodeId = node.id();
+  const nodeShape = node.data('shape') || 'unknown'; // shapeがない場合は'unknown'を使用
+
+  deletingElement.value = event.target;
+
+  // selectedNodesに現在のノードが含まれているかチェック
+  const nodeIndex = selectedNodes.value.findIndex(n => n.id === nodeId);
+
+  if (nodeIndex !== -1) {
+    // ノードがすでに選択されている場合は削除
+    selectedNodes.value.splice(nodeIndex, 1);
+    node.removeClass('selected');
+  } else {
+    // 新しいノードを選択する
+    if (selectedNodes.value.length >= 2) {
+      // 最初の選択を削除
+      const removedNode = selectedNodes.value.shift();
+      cy.getElementById(removedNode.id).removeClass('selected');
+    }
+    selectedNodes.value.push({ id: nodeId, shape: nodeShape });
+    node.addClass('selected');
+  }
+});
 
   cy.on('mouseover', 'node, edge', (event) => {
     const ele = event.target;
@@ -579,10 +613,25 @@ const createEdge = () => {
     cy.add({
       group: 'edges',
       data: {
-        id: edgeId.value,
+        id: "https://junjun7613.github.io/MicroKnowledge/property/" + edgeId.value,
         type: edgeType.value,
-        source: selectedNodes.value[0],
-        target: selectedNodes.value[1]
+        source: selectedNodes.value[0]['id'],
+        target: selectedNodes.value[1]['id']
+      }
+    });
+    edgeId.value = '';
+    edgeType.value = '';
+    showEdgeModal.value = false;
+    selectedNodes.value = []; // 選択されたノードの配列をクリア
+  } else if (selectedNodes.value.length === 2 && edgeType.value) {
+    const completeID = "https://junjun7613.github.io/MicroKnowledge/property/" + crypto.randomUUID();
+    cy.add({
+      group: 'edges',
+      data: {
+        id: completeID,
+        type: edgeType.value,
+        source: selectedNodes.value[0]['id'],
+        target: selectedNodes.value[1]['id']
       }
     });
     edgeId.value = '';
