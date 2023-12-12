@@ -155,7 +155,7 @@
 </template>
 
 <script setup>
-import ImageDrop from '@/components/ImageDrop.vue';
+import ImageDrop from '@/components/ImageTextDrop.vue';
 import { ref } from 'vue';
 import cytoscape from 'cytoscape';
 import Treeselect from "vue3-treeselect";
