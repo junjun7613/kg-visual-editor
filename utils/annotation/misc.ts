@@ -93,27 +93,27 @@ const defaultNodeTypeSelect = [
 
 const defaultEntityTypeSelect = [
     {
-      "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+      "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
       "label": "Person",
     },
     {
-      "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+      "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
       "label": "Organization",
     },
     {
-        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
         "label": "Place",
     },
     {
-        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
         "label": "Date",
     },
     {
-        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
         "label": "Physical object",
     },
     {
-        "id": "$https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
         "label": "Conceptual object",
     }
   ];
