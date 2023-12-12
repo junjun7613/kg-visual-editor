@@ -27,7 +27,7 @@
 <script setup lang="ts">
 const items = [
   {
-    title: "index",
+    title: "Top",
     path: "/",
     //icon: 'mdi-numeric-2'
   },

@@ -3,7 +3,7 @@
 		<nav>
 			<ul>
 				<li>
-					<nuxt-link to="/">index</nuxt-link>
+					<nuxt-link to="/">Top</nuxt-link>
 				</li>
 				<li>
 					<nuxt-link to="/link01">Cesium</nuxt-link>

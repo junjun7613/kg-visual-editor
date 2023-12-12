@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container width="1200">
     <v-row>
       <v-col cols="12">
         <v-btn @click="showNodeModal = true">ファクトイドを追加</v-btn>
@@ -26,20 +26,30 @@
     <!--<p>{{ selectedNodes }}</p>-->
     </v-row>
     <v-row>
-      <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
-      <v-btn @click="triggerSettingFileUpload('Colors')">配色を更新</v-btn>
+      <v-col>
+      <input type="file" id="jsonPrefixesInput" style="display: none;" @change="handlePrefixesFileUpload">
+      <v-btn @click="triggerSettingFileUpload('Prefixes')">prefixを編集</v-btn>
 
       <input type="file" id="jsonNodeTypeSelectInput" style="display: none;" @change="handleNodeTypeSelectFileUpload">
-      <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ファクトイドのタイプを更新</v-btn>
+      <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ファクトイドのタイプを編集</v-btn>
 
       <input type="file" id="jsonEntityTypeSelectInput" style="display: none;" @change="handleEntityTypeSelectFileUpload">
-      <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')">エンティティのタイプを更新</v-btn>
-
-      <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
-      <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを更新</v-btn>
+      <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')">エンティティのタイプを編集</v-btn>
+    </v-col>
     </v-row>
     <v-row>
+      <v-col>
+      <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
+      <v-btn @click="triggerSettingFileUpload('Colors')">配色を編集</v-btn>
+
+      <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
+      <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを編集</v-btn>
+    </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-btn @click="showGraphData">グラフデータを表示</v-btn>
+      </v-col>
     </v-row>
     <v-row>
       <v-col cols="12">
@@ -56,10 +66,18 @@
     <v-card height="600px">
       <v-card-title>ファクトイドの作成</v-card-title>
       <v-card-text>
+        <div>
+          <h3>ID情報を入力</h3>
+        <treeselect :multiple="false" :options="prefixes" placeholder="Select prefix" v-model="prefixSelect"
+          class="mb-4" />
         <v-text-field v-model="nodeId" label="ファクトイドID" required></v-text-field>
+      </div>
+      <div>
+        <h3>タイプを入力</h3>
         <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
         <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Select factoid type" v-model="nodeType"
           class="mb-4" />
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showNodeModal = false">キャンセル</v-btn>
@@ -73,10 +91,16 @@
     <v-card height="600px">
       <v-card-title>エンティティの作成</v-card-title>
       <v-card-text>
+        <div>
+        <treeselect :multiple="false" :options="prefixes" placeholder="Select prefix" v-model="prefixSelect"
+          class="mb-4" />
         <v-text-field v-model="entityId" label="エンティティID" required></v-text-field>
+      </div>
+      <div>
         <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
         <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Select entity type" v-model="entityType"
           class="mb-4" />
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEntityModal = false">キャンセル</v-btn>
@@ -131,11 +155,12 @@ const selectedNodes = ref([]);
 const showNodeModal = ref(false);
 const showEntityModal = ref(false);
 const showEdgeModal = ref(false);
-const nodeId = ref('');
+const prefixSelect = ref(null)
+const nodeId = ref(null);
 const nodeType = ref(null);
-const entityId = ref('');
+const entityId = ref(null);
 const entityType = ref(null);
-const edgeId = ref('');
+const edgeId = ref(null);
 const edgeType = ref(null);
 const popperElement = ref(null)
 //const nodeTypeSelect = ref(null)
@@ -150,13 +175,20 @@ onMounted(() => {
       {
         selector: 'node[typeShape="factoid"]',
         style: {
-          'shape': 'triangle', // 三角形
+          'shape': 'round-rectangle', // 角なし四角形
           'background-color': (ele) => {
             // ノードの type データに基づいて色を返す
             const type = ele.data('type');
             return colors.value[type] || '#666';  // 色が定義されていない場合のデフォルト値
           },
-          'label': 'data(id)',
+          'label': (ele) => {
+            //ID(URL)をスラッシュで分割し、最後の要素を取得
+            const id = ele.data('id');
+            const parts = id.split('/');
+            return parts[parts.length - 1];
+          },
+          'width': 70,  // 幅を50ピクセルに設定
+          'height': 50  // 高さを50ピクセルに設定
         }
       },
       {
@@ -168,7 +200,12 @@ onMounted(() => {
             const type = ele.data('type');
             return colors.value[type] || '#666';  // 色が定義されていない場合のデフォルト値
           },
-          'label': 'data(id)',
+          'label': (ele) => {
+            //ID(URL)をスラッシュで分割し、最後の要素を取得
+            const id = ele.data('id');
+            const parts = id.split('/');
+            return parts[parts.length - 1];
+          }
         }
       },
       {
@@ -187,7 +224,12 @@ onMounted(() => {
           'target-arrow-color': '#ccc',
           'target-arrow-shape': 'triangle-tee', // エッジの矢印の形状を設定
           'curve-style': 'bezier',
-          'label': 'data(type)',
+          'label': (ele) => {
+            //ID(URL)をスラッシュで分割し、最後の要素を取得
+            const id = ele.data('type');
+            const parts = id.split('#');
+            return parts[parts.length - 1];
+          },
           'text-rotation': 'autorotate', // ラベルの回転を自動調整
           'text-margin-y': -10
         }
@@ -198,9 +240,11 @@ onMounted(() => {
     }
   });
 
-  cy.on('click', 'node', (event) => {
+  cy.on('click', 'node, edge', (event) => {
     const node = event.target;
     const nodeId = node.id();
+
+    deletingElement.value = event.target;
 
     if (selectedNodes.value.includes(nodeId)) {
       // ノードがすでに選択されている場合は削除
@@ -252,10 +296,15 @@ const setPopperStyle = (popper) => {
 // ノードにマウスオーバーしたときの処理
 const handleMouseover = (event, nodeData) => {
   if (!popperElement.value) {
+    const IDParts = nodeData.id.split('/')
+    const completeID = IDParts[IDParts.length - 1]
+    const TypeParts = nodeData.type.split('#')
+    const completeType = TypeParts[TypeParts.length - 1]
     // ポップアップ要素がまだない場合は作成
     popperElement.value = document.createElement('div');
     setPopperStyle(popperElement.value)
-    popperElement.value.innerHTML = `ID: ${nodeData.id}<br>Type: ${nodeData.type}`;
+    //popperElement.value.innerHTML = `ID: ${nodeData.id}<br>Type: ${nodeData.type}`;
+    popperElement.value.innerHTML = `ID: ${completeID}<br>Type: ${completeType}`;
     document.body.appendChild(popperElement.value);
   }
 
@@ -306,17 +355,35 @@ const showGraphData = () => {
 }
 
 const addNode = () => {
-  if (nodeId.value && nodeType.value) {
+  if (prefixSelect.value && nodeId.value && nodeType.value) {
+    const completeID = prefixSelect.value + nodeId.value
     cy.add({
       group: 'nodes',
-      data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
+      //data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
+      data: { id: completeID, type: nodeType.value, typeShape: 'factoid' },
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
     cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
 
     // モーダルの入力フィールドをクリア
-    nodeId.value = '';
-    nodeType.value = '';
+    nodeId.value = null;
+    nodeType.value = null;
+    prefixSelect.value = null;
+    showNodeModal.value = false;
+  } else if (prefixSelect.value && nodeType.value) {
+    const completeID = prefixSelect.value + crypto.randomUUID();
+    cy.add({
+      group: 'nodes',
+      //data: { id: nodeId.value, type: nodeType.value, typeShape: 'factoid' },
+      data: { id: completeID, type: nodeType.value, typeShape: 'factoid' },
+      position: { x: Math.random() * 800, y: Math.random() * 600 }
+    });
+    cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
+
+    // モーダルの入力フィールドをクリア
+    nodeId.value = null;
+    nodeType.value = null;
+    prefixSelect.value = null;
     showNodeModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
@@ -325,17 +392,35 @@ const addNode = () => {
 };
 
 const addEntity = () => {
-  if (entityId.value && entityType.value) {
+  if (prefixSelect.value && entityId.value && entityType.value) {
+    const completeID = prefixSelect.value + entityId.value
     cy.add({
       group: 'nodes',
-      data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      //data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      data: { id: completeID, type: entityType.value, typeShape: 'entity' },
       position: { x: Math.random() * 800, y: Math.random() * 600 }
     });
     cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
 
     // モーダルの入力フィールドをクリア
-    entityId.value = '';
-    entityType.value = '';
+    entityId.value = null;
+    entityType.value = null;
+    prefixSelect.value = null;
+    showEntityModal.value = false;
+  } else if (prefixSelect.value && entityType.value) {
+    const completeID = prefixSelect.value + crypto.randomUUID();
+    cy.add({
+      group: 'nodes',
+      //data: { id: entityId.value, type: entityType.value, typeShape: 'entity' },
+      data: { id: completeID, type: entityType.value, typeShape: 'entity' },
+      position: { x: Math.random() * 800, y: Math.random() * 600 }
+    });
+    cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
+
+    // モーダルの入力フィールドをクリア
+    entityId.value = null;
+    entityType.value = null;
+    prefixSelect.value = null;
     showEntityModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
@@ -463,6 +548,7 @@ const triggerSettingFileUpload = (type) => {
 };
 
 const handleColorsFileUpload = (event) => handleFileUpload(event, 'Colors');
+const handlePrefixesFileUpload = (event) => handleFileUpload(event, 'Prefixes');
 const handleNodeTypeSelectFileUpload = (event) => handleFileUpload(event, 'NodeTypeSelect');
 const handleEntityTypeSelectFileUpload = (event) => handleFileUpload(event, 'EntityTypeSelect');
 const handleEdgeTypeSelectFileUpload = (event) => handleFileUpload(event, 'EdgeTypeSelect');
@@ -484,6 +570,9 @@ const updateSettings = (type, data) => {
   switch (type) {
     case 'Colors':
       colors.value = data["data"];
+      break;
+    case 'Prefixes':
+      prefixes.value = data["data"];
       break;
     case 'NodeTypeSelect':
       nodeTypeSelect.value = data["data"];

@@ -2,7 +2,7 @@
   <v-app>
     <v-content>
     <v-container fluid class="mainSearch">
-    <h1 class="searchTitle">Discovery Roman memories</h1>
+    <h1 class="searchTitle">Discovery Roman Memories</h1>
     <v-text-field
       class="searchField"
         v-model="keyword"
@@ -29,13 +29,13 @@
 </script>
 <style>
 .mainSearch{
-    background: url("../assets/img/colosseo.jpeg");
+    /*background: url("../assets/img/colosseo.jpeg");*/
     background-size: cover;
     background-position: center;
     height: 300px;
 }
 .searchTitle{
-    color:blue;
+    color:grey;
     text-align: center;
     margin-top: 50px;
     margin-bottom: 50px;
