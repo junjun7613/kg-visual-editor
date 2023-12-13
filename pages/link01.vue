@@ -1,36 +1,3 @@
-<!--
-<template>
-  <v-container>
-    <vc-config-provider :cesium-path="vcConfig.cesiumPath">
-      <vc-viewer>
-        <vc-layer-imagery>
-          <vc-imagery-provider-arcgis> </vc-imagery-provider-arcgis>
-        </vc-layer-imagery>
-        <vc-entity :position="[-75.59777, 40.03883]" description="Hello VueCesium">
-          <vc-graphics-point ref="point1" color="red" :pixel-size="8"></vc-graphics-point>
-        </vc-entity>
-      </vc-viewer>
-    </vc-config-provider>
-  </v-container>
-</template>
-<script setup>
-import { reactive } from "vue";
-import {
-  VcConfigProvider, VcViewer, VcEntity, VcGraphicsPoint, VcLayerImagery,
-  VcImageryProviderArcgis,
-} from "vue-cesium";
-
-const vcConfig = reactive({
-  cesiumPath: "https://unpkg.com/cesium@latest/Build/Cesium/Cesium.js",
-});
-</script>
-<style scoped>
-.main {
-  margin-top: 10px;
-  width: 90vw;
-}
-</style>
--->
 <template>
   <v-container>
     <vc-config-provider :cesium-path="vcConfig.cesiumPath">
@@ -38,12 +5,19 @@ const vcConfig = reactive({
         <vc-layer-imagery>
           <vc-imagery-provider-arcgis></vc-imagery-provider-arcgis>
         </vc-layer-imagery>
-        <vc-entity :position="[-75.59777, 40.03883]" description="Hello VueCesium" id="myEntity">
-          <vc-graphics-point ref="point1" color="red" :pixel-size="8"></vc-graphics-point>
+        <!-- 複数地点の表示 -->
+        <vc-entity 
+          v-for="point in points"
+          :key="point.id"
+          :position="point.position"
+          :description="point.description"
+          :id="point.id">
+          <vc-graphics-point :color="point.color" :pixel-size="8"></vc-graphics-point>
         </vc-entity>
+        <!-- オーバーレイ -->
         <vc-overlay-html :position="overlayPosition" v-if="showOverlay">
           <div class="entity-info">
-            <div v-for="(value, key) in entityInfo" :key="key">
+            <div v-for="(key,value) in entityInfo" :key="key">
               {{ key }}: {{ value }}
             </div>
           </div>
@@ -64,8 +38,17 @@ const vcConfig = reactive({
   cesiumPath: "https://unpkg.com/cesium@latest/Build/Cesium/Cesium.js",
 });
 
+// 地点データの配列
+const points = ref([])
+
+points.value = [
+  { id: "point1", position: [-75.59777, 40.03883], name: "名前1", description: "地点1の説明", additionalInfo: "追加情報1", color: 'red' },
+  { id: "point2", position: [-80.00000, 35.00000], name: "名前2", description: "地点2の説明", additionalInfo: "追加情報2", color: 'blue' }
+  // 他の地点をここに追加
+];
+
 const overlayPosition = ref(null);
-const showOverlay = ref(false);
+const showOverlay = ref(true);
 const entityInfo = ref({});
 
 const handleClick = (event) => {
@@ -73,24 +56,20 @@ const handleClick = (event) => {
   const pickedObject = viewer.scene.pick(event.cesium.movement.endPosition);
   if (Cesium.defined(pickedObject)) {
     const entity = pickedObject.id;
-    if (entity && entity.id === 'myEntity') {
-    entityInfo.value = {
-      id: entity.id,
-      name: entity.name,
-      description: entity.description,
-      // 他の属性
-    };
-    console.log(entityInfo.value)
-    overlayPosition.value = Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883);
-    showOverlay.value = true;
-  }
-  }
+    const point = points.value.find(p => p.id === entity.id);
+    if (point) {
+      entityInfo.value = point;
+      console.log(entityInfo.value)
+      overlayPosition.value = Cesium.Cartesian3.fromDegrees(...point.position);
+      showOverlay.value = true;
+    }
+  } 
 };
 </script>
 
 <style scoped>
 .entity-info {
-  background-color: white;
+  background-color: grey;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid black;
