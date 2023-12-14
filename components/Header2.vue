@@ -46,6 +46,11 @@ const items = [
     path: "/link03cyto",
     //icon: 'mdi-numeric-2'
   },
+  {
+    title: "CETEIcean",
+    path: "/link04",
+    //icon: 'mdi-numeric-2'
+  },
 ];
 // ナビゲーションの表示・非表示を制御
 const drawer = useState("drawer", () => false);

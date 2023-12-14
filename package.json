@@ -24,13 +24,18 @@
   "dependencies": {
     "@mdi/font": "^7.3.67",
     "@popperjs/core": "^2.11.8",
+    "@recogito/annotorious-openseadragon": "^2.7.16",
     "@recogito/recogito-js": "^1.8.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "cesium": "^1.111.0",
+    "CETEIcean": "^1.8.0",
     "cytoscape": "^3.27.0",
     "cytoscape-popper": "^2.0.0",
+    "install": "^0.13.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
+    "npm": "^10.2.5",
+    "openseadragon": "^4.1.0",
     "vue-cesium": "^3.2.4",
     "vue3-treeselect": "^0.1.10"
   }
