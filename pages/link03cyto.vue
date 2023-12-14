@@ -12,6 +12,7 @@
       <v-col cols="12">
         <v-btn @click="updateDB">データベースに登録</v-btn>
         <v-btn @click="downloadJson">JSONファイルをダウンロード</v-btn>
+        <v-btn @click="downloadTurtle">Turtleファイルをダウンロード</v-btn>
         <input type="file" id="jsonFileInput" style="display: none;" @change="handleGraphFileUpload">
         <v-btn @click="triggerGraphFileUpload">JSONファイルをアップロード</v-btn>
       </v-col>
@@ -69,9 +70,10 @@
   </v-container>
 
   <!-- ノード作成用モーダル -->
-  <v-dialog v-model="showNodeModal" persistent max-width="600px">
-    <v-card height="600px">
+  <v-dialog v-model="showNodeModal" persistent max-width="1000px" max-height="600px">
+    <v-card>
       <v-card-title>ファクトイドの作成</v-card-title>
+      <v-col sm="6">
       <v-card-text>
         <div>
           <h3>ID情報を入力</h3>
@@ -95,6 +97,8 @@
           <v-text-field v-model="labelInput" label="Label..." required></v-text-field>
         </div>
       </v-card-text>
+    </v-col>
+    <v-col sm="6"></v-col>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showNodeModal = false">キャンセル</v-btn>
         <v-btn color="blue darken-1" text @click="addNode">作成</v-btn>
@@ -103,9 +107,10 @@
   </v-dialog>
 
   <!-- エンティティ作成用モーダル -->
-  <v-dialog v-model="showEntityModal" persistent max-width="600px">
-    <v-card height="600px">
+  <v-dialog v-model="showEntityModal" persistent max-width="1000px" max-height="600px">
+    <v-card>
       <v-card-title>エンティティの作成</v-card-title>
+      <v-col sm="6">
       <v-card-text>
         <div>
           <h3>IDを入力</h3>
@@ -129,6 +134,8 @@
           <v-text-field v-model="labelInput" label="Label..." required></v-text-field>
         </div>
       </v-card-text>
+    </v-col>
+    <v-col sm="6"></v-col>
       <v-card-actions>
         <v-btn color="blue darken-1" text @click="showEntityModal = false">キャンセル</v-btn>
         <v-btn color="blue darken-1" text @click="addEntity">作成</v-btn>
@@ -342,9 +349,12 @@ onMounted(() => {
       id: ele.data('id'),
       type: ele.data('type'),
       shape: ele.data('shape'),
-      label: ele.data('label')
+      //label: ele.data('label')
+      ...(ele.data('label') && {label: ele.data('label')}),
+      ...(ele.data('role') && {role: ele.data('role')}),
+      ...(ele.data('detailType') && {detailType: ele.data('detailType')}),
     };
-
+    /*
     //任意の入力項目について、存在すればselectedElementに格納、なければNo ---を代入
     if (ele.data('role')) {
       selectedElement.value.role = ele.data('role')
@@ -356,6 +366,7 @@ onMounted(() => {
     } else {
       selectedElement.value.detailType = "No Detail Type"
     };
+    */
 
     handleMouseover(event, selectedElement.value)
     console.log(selectedElement.value)
@@ -473,49 +484,18 @@ const addNode = () => {
     detailType.value = null;
   };
 
-  if (labelInput.value && prefixSelect.value && nodeId.value && nodeType.value) {
-    const completeID = prefixSelect.value + nodeId.value
+  if (prefixSelect.value && nodeType.value) {
+    const completeID = prefixSelect.value + (nodeId.value || crypto.randomUUID());
 
     const nodeData = {
       id: completeID,
       type: nodeType.value,
       shape: 'factoid',
-      label: labelInput.value
+      //label: labelInput.value,
+      ...(labelInput.value && {label: labelInput.value}),
+      ...(detailType.value && { detailType: detailType.value }), // オプショナルなプロパティ
     }
-
-    if (detailType.value != null) {
-      nodeData.detailType = detailType.value;
-    }
-
-    cy.add({
-      group: 'nodes',
-      //data: { id: nodeId.value, type: nodeType.value, shape: 'factoid' },
-      data: nodeData,
-      position: { x: Math.random() * 800, y: Math.random() * 600 }
-    });
-    cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
-
-    // モーダルの入力フィールドをクリア
-    nodeId.value = null;
-    nodeType.value = null;
-    prefixSelect.value = null;
-    labelInput.value = null;
-    detailType.value = null;
-    showNodeModal.value = false;
-  } else if (labelInput.value && prefixSelect.value && nodeType.value) {
-    const completeID = prefixSelect.value + crypto.randomUUID();
-
-    const nodeData = {
-      id: completeID,
-      type: nodeType.value,
-      shape: 'factoid',
-      label: labelInput.value
-    }
-
-    if (detailType.value != null) {
-      nodeData.detailType = detailType.value;
-    }
-
+  
     cy.add({
       group: 'nodes',
       //data: { id: nodeId.value, type: nodeType.value, shape: 'factoid' },
@@ -542,48 +522,16 @@ const addEntity = () => {
     roleInput.value = null;
   };
 
-  if (labelInput.value && prefixSelect.value && entityId.value && entityType.value) {
-    const completeID = prefixSelect.value + entityId.value
+  if (prefixSelect.value && entityType.value) {
+    const completeID = prefixSelect.value + (entityId.value || crypto.randomUUID());
 
     const nodeData = {
       id: completeID,
       type: entityType.value,
       shape: 'entity',
-      label: labelInput.value
+      ...(labelInput.value && {label: labelInput.value}),
+      ...(roleInput.value && {role: roleInput.value}),
     };
-
-    if (roleInput.value != null) {
-      nodeData.role = roleInput.value;
-    }
-
-    cy.add({
-      group: 'nodes',
-      //data: { id: entityId.value, type: entityType.value, shape: 'entity' },
-      data: nodeData,
-      position: { x: Math.random() * 800, y: Math.random() * 600 }
-    });
-    cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
-
-    // モーダルの入力フィールドをクリア
-    entityId.value = null;
-    entityType.value = null;
-    prefixSelect.value = null;
-    labelInput.value = null;
-    roleInput.value = null;
-    showEntityModal.value = false;
-  } else if (labelInput.value && prefixSelect.value && entityType.value) {
-    const completeID = prefixSelect.value + crypto.randomUUID();
-
-    const nodeData = {
-      id: completeID,
-      type: entityType.value,
-      shape: 'entity',
-      label: labelInput.value
-    };
-
-    if (roleInput.value != null) {
-      nodeData.role = roleInput.value;
-    }
 
     cy.add({
       group: 'nodes',
@@ -658,21 +606,24 @@ const downloadJson = () => {
       id: node.id(),
       type: node.data('type'),
       shape: node.data('shape'),
-      label: node.data('label'),
+      ///label: node.data('label'),
+      ...(node.data(label) && {label: node.data('label')}),
+      ...(node.data(role) && {role: node.data('role')}),
+      ...(node.data(detailType) && {detailType: node.data('detailType')}),
     //},
     position: {
       x: node.position('x'), // JSONデータからのX座標
       y: node.position('y')  // JSONデータからのY座標
     }
   };
-
+/*
   if (node.data('role') != null) {
     nodeData.role = node.data('role');
   }
   if (node.data('detailType') != null) {
     nodeData.detailType = node.data('detailType');
   }
-
+*/
   return nodeData;
 });
 
@@ -695,6 +646,79 @@ const downloadJson = () => {
   a.download = 'graph-data.json';
   a.click();
   URL.revokeObjectURL(url);
+};
+
+//Turtleへの変換
+function convertToTurtle(nodes, edges) {
+  let turtleData = '@prefix : <https://example.org/> .\n'; // ベースURIを定義
+  // ノードのデータをTurtle形式に変換
+  nodes.forEach(node => {
+    turtleData += `<${node.id}> a <${node.type}>`;
+    const properties = [];
+    if (node.label) {
+      properties.push(`  :label "${node.label}"`);
+    };
+    if (node.detailType) {
+      properties.push(`  :detailType "${node.detailType}"`);
+    };
+    if (node.role) {
+      properties.push(`  :role "${node.role}"`);
+    };
+    // 最初の述語の後にpropertiesがあればセミコロンを追加
+    if (properties.length > 0) {
+      turtleData += ';\n';
+    }
+    // 各プロパティをセミコロンで終わらせ、最後のプロパティにはピリオドを付ける
+    properties.forEach((prop, index) => {
+      if (index < properties.length - 1) {
+        turtleData += prop + ';\n';
+      } else {
+        turtleData += prop + '.\n';
+      }
+    });
+
+    // プロパティがない場合はピリオドを追加
+    if (properties.length === 0) {
+      turtleData += '.\n';
+    };
+  });
+  // エッジのデータをTurtle形式に変換
+  edges.forEach(edge => {
+    turtleData += `<${edge.source}> <${edge.type}> <${edge.target}> .\n`;
+  });
+
+  return turtleData;
+}
+
+//Turtleファイルのダウンロード
+function downloadTurtleFile(nodes, edges) {
+  const turtleData = convertToTurtle(nodes, edges);
+  const blob = new Blob([turtleData], { type: 'text/turtle' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'graph-data.ttl';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const downloadTurtle = () => {
+  const nodesData = cy.nodes().map(node => ({
+    id: node.id(),
+    type: node.data('type'),
+    ...(node.data('label') && {label: node.data('label')}),
+    ...(node.data('role') && {role: node.data('role')}),
+    ...(node.data('detailType') && {detailType: node.data('detailType')}),
+    //},
+  }));
+
+  const edgesData = cy.edges().map(edge => ({
+    source: edge.data('source'),
+    target: edge.data('target'),
+    type: edge.data('type')
+  }));
+
+  downloadTurtleFile(nodesData, edgesData);
 };
 
 const handleGraphFileUpload = (event) => {
