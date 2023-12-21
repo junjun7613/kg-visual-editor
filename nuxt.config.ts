@@ -3,7 +3,8 @@ import vuetify from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
   modules: [
-    'nuxt3-leaflet'
+    'nuxt3-leaflet',
+    'nuxt-swiper'
   ],
   build: {
     transpile: ['vuetify'],
