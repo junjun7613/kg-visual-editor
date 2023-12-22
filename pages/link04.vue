@@ -55,6 +55,7 @@ onMounted(async () => {
         sequenceMode: true,
         id: "osd",
         tileSources,
+        prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
     };
 
     const viewer = $OpenSeadragon(config);
