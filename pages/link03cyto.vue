@@ -10,7 +10,7 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-btn @click="updateDB">データベースに登録</v-btn>
+        <!--<v-btn @click="updateDB">データベースに登録</v-btn>-->
         <v-btn @click="downloadJson">JSONファイルをダウンロード</v-btn>
         <v-btn @click="downloadTurtle">Turtleファイルをダウンロード</v-btn>
         <input type="file" id="jsonFileInput" style="display: none;" @change="handleGraphFileUpload">
@@ -43,17 +43,15 @@
         <input type="file" id="jsonEntityTypeSelectInput" style="display: none;"
           @change="handleEntityTypeSelectFileUpload">
         <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')">エンティティのタイプを編集</v-btn>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
-        <v-btn @click="triggerSettingFileUpload('Colors')">配色を編集</v-btn>
 
         <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
         <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを編集</v-btn>
+
+        <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
+        <v-btn @click="triggerSettingFileUpload('Colors')">配色を編集</v-btn>
       </v-col>
     </v-row>
+    
     <v-row>
       <v-col>
         <v-btn @click="showGraphData">グラフデータを表示</v-btn>
