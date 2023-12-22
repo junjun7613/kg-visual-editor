@@ -640,7 +640,7 @@ const downloadJson = () => {
 
 //Turtleへの変換
 function convertToTurtle(nodes, edges) {
-  let turtleData = '@prefix : <https://example.org/> .\n'; // ベースURIを定義
+  let turtleData = '@prefix : <https://junjun7613.github.io/MicroKnowledge/himiko.owl#> .\n'; // ベースURIを定義
   // ノードのデータをTurtle形式に変換
   nodes.forEach(node => {
     turtleData += `<${node.id}> a <${node.type}>`;
