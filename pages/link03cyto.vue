@@ -605,23 +605,15 @@ const downloadJson = () => {
       type: node.data('type'),
       shape: node.data('shape'),
       ///label: node.data('label'),
-      ...(node.data(label) && {label: node.data('label')}),
-      ...(node.data(role) && {role: node.data('role')}),
-      ...(node.data(detailType) && {detailType: node.data('detailType')}),
+      ...(node.data('label') && {label: node.data('label')}),
+      ...(node.data('role') && {role: node.data('role')}),
+      ...(node.data('detailType') && {detailType: node.data('detailType')}),
     //},
     position: {
       x: node.position('x'), // JSONデータからのX座標
       y: node.position('y')  // JSONデータからのY座標
     }
   };
-/*
-  if (node.data('role') != null) {
-    nodeData.role = node.data('role');
-  }
-  if (node.data('detailType') != null) {
-    nodeData.detailType = node.data('detailType');
-  }
-*/
   return nodeData;
 });
 
