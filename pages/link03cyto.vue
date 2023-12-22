@@ -59,7 +59,7 @@
     </v-row>
     <v-row>
       <v-col cols="12">
-        <div v-if="graphData">
+        <div v-if="graphData" class="graph-container">
           <h3>グラフデータ</h3>
           <pre>{{ graphData }}</pre>
         </div>
@@ -829,4 +829,12 @@ const updateSettings = (type, data) => {
   width: 800px;
   height: 600px;
 }
+
+.graph-container {
+    width: 800px;
+    max-height: 500px;
+    overflow: auto; /* スクロール可能にする */
+    border: 1px solid #ccc; /* 枠線を追加 */
+    padding: 10px; /* 内容と枠線の間の余白 */
+  }
 </style>

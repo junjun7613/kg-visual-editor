@@ -1,27 +1,9 @@
-<!--
+
 <template>
   <v-app>
     <v-content>
     <v-container fluid class="mainSearch">
-    <h1 class="searchTitle">Discovery Roman Memories</h1>
-    <v-text-field
-      class="searchField"
-        v-model="keyword"
-        variant="solo"
-        label="Search keywords"
-        append-inner-icon="mdi-magnify"
-      ></v-text-field>
-    </v-container>
-    <v-container fluid>
-    <div v-for="n in 10" :key="n" class="article">
-      <h3>タイトル {{ n }}</h3>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
-        perspiciatis repudiandae eveniet at totam? Animi sapiente, ipsam sed
-        laudantium hic saepe modi adipisci odio commodi deserunt nihil expedita
-        amet aperiam.
-      </p>
-    </div>
+    <h1 class="searchTitle">Knowledge Graph Visual Editor</h1>
     </v-container>
     </v-content>
   </v-app>
@@ -33,86 +15,7 @@
     /*background: url("../assets/img/colosseo.jpeg");*/
     background-size: cover;
     background-position: center;
-    height: 300px;
-}
-.searchTitle{
-    color:grey;
-    text-align: center;
-    margin-top: 50px;
-    margin-bottom: 50px;
-}
-.searchField{
-    width: 700px;
-}
-.searchBtn {
-  position: relative;
-}
-</style>
--->
-<template>
-  <v-app>
-    <v-content>
-    <v-container fluid class="mainSearch">
-    <h1 class="searchTitle">Digital Archive of Roman Memories</h1>
-    
-    <v-text-field
-      class="searchField"
-        v-model="keyword"
-        variant="solo"
-        label="Search keywords"
-        append-inner-icon="mdi-magnify"
-      ></v-text-field>
-    
-    </v-container>
-    <!--
-    <v-container class="articles" fluid>
-    <div v-for="n in 10" :key="n" class="article">
-      <h3>タイトル {{ n }}</h3>
-      <img src="../assets/img/colosseo.jpeg" alt="サムネイル" class="article-thumbnail">
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt
-        perspiciatis repudiandae eveniet at totam? Animi sapiente, ipsam sed
-        laudantium hic saepe modi adipisci odio commodi deserunt nihil expedita
-        amet aperiam.
-      </p>
-    </div>
-    </v-container>
-    -->
-    <h2 class="selectTheme">テーマで選ぶ</h2>
-    <v-container>
-      <Swiper
-      centeredSlides
-      :slides-per-view="5"
-      :space-between="5"
-      :loop="true"
-      :autoplay="{ delay: 300 }"
-      class="mySwiper"
-    >
-      <!--
-      <SwiperSlide><p>1</p></SwiperSlide>
-      <SwiperSlide><p>2</p></SwiperSlide>
-      <SwiperSlide><p>3</p></SwiperSlide>
-      -->
-      <SwiperSlide v-for="n in 10" :key="n">
-          <div class="card">
-            <img src="../assets/img/colosseo.jpeg" alt="サムネイル" class="card-thumbnail">
-            <h3 class="swipeCardTitle">タイトル {{ n }}</h3>
-            <p>Lorem ipsum dolor sit amet...</p>
-          </div>
-        </SwiperSlide>
-    </Swiper>
-    </v-container>
-    </v-content>
-  </v-app>
-</template>
-<script>
-</script>
-<style>
-.mainSearch{
-    /*background: url("../assets/img/colosseo.jpeg");*/
-    background-size: cover;
-    background-position: center;
-    height: 250px;
+    height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;

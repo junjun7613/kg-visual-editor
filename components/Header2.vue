@@ -2,7 +2,7 @@
   <v-app-bar app flat border class="px-md-6">
     <v-app-bar-nav-icon @click="drawer = !drawer" class="mr-md-4" />
     <v-app-bar-title class="font-weight-bold">
-      Digital Archive of Roman Memories
+      Knowledge Graph Visual Editor
     </v-app-bar-title>
     <v-spacer />
     <Navbar />
@@ -32,23 +32,8 @@ const items = [
     //icon: 'mdi-numeric-2'
   },
   {
-    title: "Cesium",
-    path: "/link01",
-    //icon: 'mdi-numeric-1'
-  },
-  {
-    title: "Map Search",
-    path: "/link02",
-    //icon: 'mdi-numeric-2'
-  },
-  {
-    title: "Annotation",
+    title: "Editor",
     path: "/link03cyto",
-    //icon: 'mdi-numeric-2'
-  },
-  {
-    title: "CETEIcean",
-    path: "/link04",
     //icon: 'mdi-numeric-2'
   },
 ];

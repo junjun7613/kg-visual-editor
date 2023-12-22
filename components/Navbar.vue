@@ -5,17 +5,8 @@
 				<li>
 					<nuxt-link to="/">Top</nuxt-link>
 				</li>
-				<li>
-					<nuxt-link to="/link01">Cesium</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link to="/link02">Map Search</nuxt-link>
-				</li>
-				<li>
-					<nuxt-link to="/link03cyto">Annotation</nuxt-link>
-				</li>
 				<li class="mr-4">
-					<nuxt-link to="/link04">CETEIcean</nuxt-link>
+					<nuxt-link to="/link03cyto">Editor</nuxt-link>
 				</li>
 			</ul>
 		</nav>

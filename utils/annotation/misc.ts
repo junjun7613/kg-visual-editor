@@ -1,8 +1,8 @@
 // 定数のURL設定
-const defaultPrefixes = [{
+const defaultPrefixes = [/*{
     "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#",
     "label": "ex"
-    },
+    },*/
     {
     "id": "https://junjun7613.github.io/MicroKnowledge/factoid/",
     "label": "factoid",
