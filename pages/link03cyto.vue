@@ -641,6 +641,13 @@ const downloadJson = () => {
 //Turtleへの変換
 function convertToTurtle(nodes, edges) {
   let turtleData = '@prefix : <https://junjun7613.github.io/MicroKnowledge/himiko.owl#> .\n'; // ベースURIを定義
+  //存在するprefixを記述
+  prefixes.value.forEach(prefix => {
+    turtleData += `@prefix ${prefix["label"]}: <${prefix["id"]}> .\n`;
+  });
+
+  turtleData += "\n";
+
   // ノードのデータをTurtle形式に変換
   nodes.forEach(node => {
     turtleData += `<${node.id}> a <${node.type}>`;
