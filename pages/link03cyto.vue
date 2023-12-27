@@ -2,19 +2,20 @@
   <v-container width="1200">
     <v-row>
       <v-col cols="12">
-        <v-btn @click="showNodeModal = true">ファクトイドを追加</v-btn>
-        <v-btn @click="showEntityModal = true">エンティティを追加</v-btn>
-        <v-btn @click="showEdgeModal = true">エッジを追加</v-btn>
-        <v-btn @click="deleteSelectedElement">削除</v-btn>
+        <v-btn @click="showNodeModal = true" class="ml-2 mt-2">ファクトイドを追加</v-btn>
+        <v-btn @click="showEntityModal = true" class="ml-2 mt-2">エンティティを追加</v-btn>
+        <v-btn @click="showEdgeModal = true" class="ml-2 mt-2">エッジを追加</v-btn>
+        <v-btn @click="editSelectedElement" class="ml-2 mt-2" color="blue">更新</v-btn>
+        <v-btn @click="deleteSelectedElement" class="ml-2 mt-2" color="red">削除</v-btn>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12">
         <!--<v-btn @click="updateDB">データベースに登録</v-btn>-->
-        <v-btn @click="downloadJson">JSONファイルをダウンロード</v-btn>
-        <v-btn @click="downloadTurtle">Turtleファイルをダウンロード</v-btn>
+        <v-btn @click="downloadJson" class="ml-2 mt-2">JSONファイルをダウンロード</v-btn>
+        <v-btn @click="downloadTurtle" class="ml-2 mt-2">Turtleファイルをダウンロード</v-btn>
         <input type="file" id="jsonFileInput" style="display: none;" @change="handleGraphFileUpload">
-        <v-btn @click="triggerGraphFileUpload">JSONファイルをアップロード</v-btn>
+        <v-btn @click="triggerGraphFileUpload" class="ml-2 mt-2">JSONファイルをアップロード</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -35,26 +36,26 @@
     <v-row>
       <v-col>
         <input type="file" id="jsonPrefixesInput" style="display: none;" @change="handlePrefixesFileUpload">
-        <v-btn @click="triggerSettingFileUpload('Prefixes')">prefixを編集</v-btn>
+        <v-btn @click="triggerSettingFileUpload('Prefixes')" class="ml-2 mt-2">prefixを編集</v-btn>
 
         <input type="file" id="jsonNodeTypeSelectInput" style="display: none;" @change="handleNodeTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')">ファクトイドのタイプを編集</v-btn>
+        <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')" class="ml-2 mt-2">ファクトイドのタイプを編集</v-btn>
 
         <input type="file" id="jsonEntityTypeSelectInput" style="display: none;"
           @change="handleEntityTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')">エンティティのタイプを編集</v-btn>
+        <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')" class="ml-2 mt-2">エンティティのタイプを編集</v-btn>
 
         <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')">エッジのタイプを編集</v-btn>
+        <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')" class="ml-2 mt-2">エッジのタイプを編集</v-btn>
 
         <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
-        <v-btn @click="triggerSettingFileUpload('Colors')">配色を編集</v-btn>
+        <v-btn @click="triggerSettingFileUpload('Colors')" class="ml-2 mt-2">配色を編集</v-btn>
       </v-col>
     </v-row>
     
     <v-row>
       <v-col>
-        <v-btn @click="showGraphData">グラフデータを表示</v-btn>
+        <v-btn @click="showGraphData" class="ml-2">グラフデータを表示</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -163,6 +164,85 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!--ノード編集用モーダル-->
+  <v-dialog v-model="showEditNodeModal">
+    <v-card>
+      <v-card-title>ノードの編集</v-card-title>
+      <v-col sm="6">
+      <v-card-text>
+        <div>
+          <h3>タイプを入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Factoid type..." v-model="editedNodeType"
+            class="mb-4" />
+        </div>
+        <div>
+          <h3>詳細タイプを入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <v-text-field v-model="editedDetailType" label="Detail type..." required></v-text-field>
+        </div>
+        <div>
+          <h3>ラベルを入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <v-text-field v-model="editedLabelInput" label="Label..." required></v-text-field>
+        </div>
+      </v-card-text>
+      </v-col>
+      <v-col sm="6"></v-col>
+      <v-card-actions>
+        <v-btn @click="updateNodes">更新</v-btn>
+        <v-btn @click="showEditNodeModal = false">閉じる</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!--エンティティ編集用モーダル-->
+  <v-dialog v-model="showEditEntityModal">
+    <v-card>
+      <v-card-title>エンティティの編集</v-card-title>
+      <v-col sm="6">
+      <v-card-text>
+        <div>
+          <h3>タイプを入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Entity type..." v-model="editedEntityType"
+            class="mb-4" />
+        </div>
+        <div>
+          <h3>役割を入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <v-text-field v-model="editedRoleInput" label="Roles..." required></v-text-field>
+        </div>
+        <div>
+          <h3>ラベルを入力</h3>
+          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
+          <v-text-field v-model="editedLabelInput" label="Label..." required></v-text-field>
+        </div>
+      </v-card-text>
+    </v-col>
+    <v-col sm="6"></v-col>
+      <v-card-actions>
+        <v-btn @click="updateEdges">更新</v-btn>
+        <v-btn @click="showEditEntityModal = false">閉じる</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!--エッジ編集用モーダル-->
+  <v-dialog v-model="showEditEdgeModal">
+    <v-card>
+      <v-card-title>プロパティの編集</v-card-title>
+      <v-card-text>
+        {{editableNodeData}}
+      </v-card-text>
+      <v-card-actions>
+        <v-btn>更新</v-btn>
+        <v-btn @click="showEditEdgeModal = false">閉じる</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
 </template>
 
 <script setup>
@@ -193,6 +273,7 @@ let cy = null;
 const selectedElement = ref(null);
 const deletingElement = ref(null);
 const selectedNodes = ref([]);
+const selectedEdges = ref([]);
 const showNodeModal = ref(false);
 const showEntityModal = ref(false);
 const showEdgeModal = ref(false);
@@ -208,6 +289,16 @@ const roleInput = ref(null)
 const detailType = ref(null)
 const popperElement = ref(null)
 //const nodeTypeSelect = ref(null)
+const showEditNodeModal = ref(false); // モーダル表示用のref
+const showEditEntityModal = ref(false); // モーダル表示用のref
+const showEditEdgeModal = ref(false); // モーダル表示用のref
+const editableNodeData = ref({}); // 編集するノードのデータを格納するref
+
+const editedNodeType = ref(null);
+const editedDetailType = ref(null);
+const editedLabelInput = ref(null);
+const editedEntityType = ref(null);
+const editedRoleInput = ref(null);
 
 const graphData = ref(null);
 
@@ -286,35 +377,23 @@ onMounted(() => {
           'text-rotation': 'autorotate', // ラベルの回転を自動調整
           'text-margin-y': -10
         }
-      }
+      },
+      {
+    selector: 'edge.selected',
+    style: {
+      'line-color': '#FFD700',
+      'target-arrow-color': '#FFD700',
+      'width': 4 // 選択されたときのエッジの太さ
+    }
+  }
     ],
     layout: {
       name: 'preset'
     }
   });
-/*
-  cy.on('click', 'node, edge', (event) => {
-    const node = event.target;
-    const nodeId = node.id();
 
-    deletingElement.value = event.target;
-
-    if (selectedNodes.value.includes(nodeId)) {
-      // ノードがすでに選択されている場合は削除
-      selectedNodes.value = selectedNodes.value.filter(id => id !== nodeId);
-      node.removeClass('selected');
-    } else {
-      // 新しいノードを選択する
-      if (selectedNodes.value.length >= 2) {
-        const removedNodeId = selectedNodes.value.shift(); // 最初の選択を削除
-        cy.getElementById(removedNodeId).removeClass('selected');
-      }
-      selectedNodes.value.push(nodeId);
-      node.addClass('selected');
-    }
-  });
-  */
-  cy.on('click', 'node, edge', (event) => {
+  //cy.on('click', 'node, edge', (event) => {
+cy.on('click', 'node', (event) => {
   const node = event.target;
   const nodeId = node.id();
   const nodeShape = node.data('shape') || 'unknown'; // shapeがない場合は'unknown'を使用
@@ -340,7 +419,27 @@ onMounted(() => {
   }
 });
 
-  cy.on('mouseover', 'node, edge', (event) => {
+cy.on('click', 'edge', (event) => {
+  const edge = event.target;
+  const edgeId = edge.id();
+
+  deletingElement.value = event.target;
+
+  // 選択されているエッジを探す
+  const edgeIndex = selectedEdges.value.findIndex(e => e.id === edgeId);
+
+  if (edgeIndex !== -1) {
+    // エッジがすでに選択されている場合は選択を解除
+    selectedEdges.value.splice(edgeIndex, 1);
+    edge.removeClass('selected');
+  } else {
+    // 新しいエッジを選択
+    selectedEdges.value.push({ id: edgeId });
+    edge.addClass('selected');
+  }
+});
+
+  cy.on('mouseover', 'node', (event) => {
     const ele = event.target;
 
     selectedElement.value = {
@@ -352,19 +451,18 @@ onMounted(() => {
       ...(ele.data('role') && {role: ele.data('role')}),
       ...(ele.data('detailType') && {detailType: ele.data('detailType')}),
     };
-    /*
-    //任意の入力項目について、存在すればselectedElementに格納、なければNo ---を代入
-    if (ele.data('role')) {
-      selectedElement.value.role = ele.data('role')
-    } else {
-      selectedElement.value.role = "No Role"
+
+    handleMouseover(event, selectedElement.value)
+    console.log(selectedElement.value)
+  });
+
+  cy.on('mouseover', 'edge', (event) => {
+    const ele = event.target;
+
+    selectedElement.value = {
+      id: ele.data('id'),
+      type: ele.data('type'),
     };
-    if (ele.data('detailType')) {
-      selectedElement.value.detailType = ele.data('detailType')
-    } else {
-      selectedElement.value.detailType = "No Detail Type"
-    };
-    */
 
     handleMouseover(event, selectedElement.value)
     console.log(selectedElement.value)
@@ -405,8 +503,10 @@ const handleMouseover = (event, nodeData) => {
     console.log(nodeData.shape)
     if (nodeData.shape == 'entity') {
       popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}`;
-    } else {
+    } else if (nodeData.shape == 'factoid') {
       popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Detail Type:</h5> ${nodeData.detailType}<br><h5>Label:</h5> ${nodeData.label}`;
+    } else {
+      popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}`;
     };
     document.body.appendChild(popperElement.value);
   }
@@ -594,6 +694,84 @@ const deleteSelectedElement = () => {
     deletingElement.value.remove(); // 選択された要素を削除
     deletingElement.value = null;
   }
+};
+
+const editSelectedElement = () => {
+  if (selectedNodes.value.length === 1) {
+    const selectedNodeId = selectedNodes.value[0].id;
+    const selectedNode = cy.getElementById(selectedNodeId);
+    console.log(selectedNode.data())
+    // 現在のノードデータを取得してeditableNodeDataに設定
+    editableNodeData.value = { ...selectedNode.data() };
+    // 編集用モーダルを表示
+    if (selectedNodes.value[0].shape === "factoid"){
+      editedNodeType.value = selectedNode.data().type
+      if (selectedNode.data().detailType) {
+        editedDetailType.value = selectedNode.data().detailType
+      }
+      if (selectedNode.data().label) {
+        editedLabelInput.value = selectedNode.data().label
+      }
+      //モーダルを表示させる
+      showEditNodeModal.value = true;
+    } else if (selectedNodes.value[0].shape === "entity") {
+      editedEntityType.value = selectedNode.data().type
+      if (selectedNode.data().role) {
+        editedRoleInput.value = selectedNode.data().role;
+      }
+      if (selectedNode.data().label) {
+        editedLabelInput.value = selectedNode.data().label;
+      }
+      //モーダルを開く
+      showEditEntityModal.value = true;
+    };
+  } else if (selectedEdges.value.length === 1) {
+    const selectedEdgeId = selectedEdges.value[0].id;
+    const selectedEdge = cy.getElementById(selectedEdgeId);
+    console.log(selectedEdge.data())
+    // 現在のノードデータを取得してeditableNodeDataに設定
+    editableNodeData.value = { ...selectedEdge.data() };
+    showEditEdgeModal.value = true;
+  } else {
+    alert("編集するプロパティを選択してください");
+  }
+};
+
+const updateNodes = () => {
+  let nodeId = editableNodeData.value.id;
+  let node = cy.getElementById(nodeId);
+
+  // ノードのデータを更新
+  node.data({
+    type: editedNodeType.value,
+    ...(editedDetailType.value && {detailType: editedDetailType.value}),
+    ...(editedLabelInput.value && {label: editedLabelInput.value}),
+    // その他の更新したいデータ
+  });
+
+  editableNodeData.value = {};
+  editedNodeType.value = null;
+  editedDetailType.value = null;
+  editedLabelInput.value = null;
+  showEditNodeModal.value = false;
+};
+const updateEdges = () => {
+  let nodeId = editableNodeData.value.id;
+  let node = cy.getElementById(nodeId);
+
+  // ノードのデータを更新
+  node.data({
+    type: editedEntityType.value,
+    ...(editedRoleInput.value && {role: editedRoleInput.value}),
+    ...(editedLabelInput.value && {label: editedLabelInput.value}),
+    // その他の更新したいデータ
+  });
+
+  editableNodeData.value = {};
+  editedEntityType.value = null;
+  editedRoleInput.value = null;
+  editedLabelInput.value = null;
+  showEditEntityModal.value = false;
 };
 
 const downloadJson = () => {
