@@ -34,6 +34,7 @@
       <!--<p>{{ selectedNodes }}</p>-->
     </v-row>
     <v-row>
+      <!--
       <v-col>
         <input type="file" id="jsonPrefixesInput" style="display: none;" @change="handlePrefixesFileUpload">
         <v-btn @click="triggerSettingFileUpload('Prefixes')" class="ml-2 mt-2">prefixを編集</v-btn>
@@ -50,6 +51,13 @@
 
         <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
         <v-btn @click="triggerSettingFileUpload('Colors')" class="ml-2 mt-2">配色を編集</v-btn>
+      </v-col>
+      -->
+      <v-col>
+        <!-- 一つのファイル入力要素に変更 -->
+        <input type="file" id="jsonSettingsInput" style="display: none;" @change="handleFileUpload">
+        <!-- 一つのボタンに変更 -->
+        <v-btn @click="triggerSettingFileUpload" class="ml-2 mt-2">設定を編集</v-btn>
       </v-col>
     </v-row>
     
@@ -209,7 +217,15 @@
         </div>
       </v-card-text>
       </v-col>
-      <v-col sm="6"></v-col>
+      <v-col sm="6">
+        <v-card-text>
+        <div>
+          <h3>典拠資料</h3>
+          <v-text-field v-model="editedSourceCitation" label="Source citation (String)" required></v-text-field>
+          <v-text-field v-model="editedSourceURI" label="Source URI" required></v-text-field>
+        </div>
+      </v-card-text>
+    </v-col>
     </v-row>
       <v-card-actions>
         <v-btn @click="updateNodes">更新</v-btn>
@@ -318,6 +334,8 @@ const labelInput = ref(null)
 const roleInput = ref(null)
 const detailType = ref(null)
 const referencedEntity = ref(null)
+const sourceCitation = ref(null);
+const sourceURI = ref(null);
 const popperElement = ref(null)
 //const nodeTypeSelect = ref(null)
 const showEditNodeModal = ref(false); // モーダル表示用のref
@@ -331,6 +349,8 @@ const editedLabelInput = ref(null);
 const editedEntityType = ref(null);
 const editedRoleInput = ref(null);
 const editedReferencedEntity = ref(null);
+const editedSourceCitation = ref(null);
+const editedSourceURI = ref(null);
 
 const graphData = ref(null);
 
@@ -483,6 +503,8 @@ cy.on('click', 'edge', (event) => {
       ...(ele.data('role') && {role: ele.data('role')}),
       ...(ele.data('detailType') && {detailType: ele.data('detailType')}),
       ...(ele.data('referencedEntity') && {referencedEntity: ele.data('referencedEntity')}),
+      ...(ele.data('sourceCitation') && {sourceCitation: ele.data('sourceCitation')}),
+      ...(ele.data('sourceURI') && {sourceURI: ele.data('sourceURI')}),
     };
 
     handleMouseover(event, selectedElement.value)
@@ -596,6 +618,12 @@ const showGraphData = () => {
     if (node.data('referencedEntity') != null) {
       nodeData.referencedEntity = node.data('referencedEntity');
     };
+    if (node.data('sourceCitation') != null) {
+      nodeData.sourceCitation = node.data('sourceCitation');
+    };
+    if (node.data('sourceURI') != null) {
+      nodeData.sourceURI = node.data('sourceURI');
+    };
 
     return nodeData;
   });
@@ -628,6 +656,8 @@ const addNode = () => {
       //label: labelInput.value,
       ...(labelInput.value && {label: labelInput.value}),
       ...(detailType.value && { detailType: detailType.value }), // オプショナルなプロパティ
+      ...(sourceCitation.value && { sourceCitation: sourceCitation.value }),
+      ...(sourceURI.value && { sourceURI: sourceURI.value }),
     }
   
     cy.add({
@@ -644,6 +674,8 @@ const addNode = () => {
     prefixSelect.value = null;
     labelInput.value = null;
     detailType.value = null;
+    sourceCitation.value = null;
+    sourceURI.value = null;
     showNodeModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
@@ -750,6 +782,12 @@ const editSelectedElement = () => {
       if (selectedNode.data().label) {
         editedLabelInput.value = selectedNode.data().label
       }
+      if (selectedNode.data().sourceCitation) {
+        editedSourceCitation.value = selectedNode.data().sourceCitation
+      }
+      if (selectedNode.data().sourceURI) {
+        editedSourceURI.value = selectedNode.data().sourceURI
+      }
       //モーダルを表示させる
       showEditNodeModal.value = true;
     } else if (selectedNodes.value[0].shape === "entity") {
@@ -781,12 +819,14 @@ const editSelectedElement = () => {
 const updateNodes = () => {
   let nodeId = editableNodeData.value.id;
   let node = cy.getElementById(nodeId);
-
+  
   // ノードのデータを更新
   node.data({
     type: editedNodeType.value,
     ...(editedDetailType.value && {detailType: editedDetailType.value}),
     ...(editedLabelInput.value && {label: editedLabelInput.value}),
+    ...(editedSourceCitation.value && {sourceCitation: editedSourceCitation.value}),
+    ...(editedSourceURI.value && {sourceURI: editedSourceURI.value}),
     // その他の更新したいデータ
   });
 
@@ -794,6 +834,8 @@ const updateNodes = () => {
   editedNodeType.value = null;
   editedDetailType.value = null;
   editedLabelInput.value = null;
+  editedSourceCitation.value = null;
+  editedSourceURI.value = null;
   showEditNodeModal.value = false;
 };
 const updateEntities = () => {
@@ -830,6 +872,8 @@ const downloadJson = () => {
       ...(node.data('role') && {role: node.data('role')}),
       ...(node.data('detailType') && {detailType: node.data('detailType')}),
       ...(node.data('referencedEntity') && {referencedEntity: node.data('referencedEntity')}),
+      ...(node.data("sourceCitation") && { sourceCitation: node.data("sourceCitation") }),
+      ...(node.data("sourceURI") && { sourceURI: node.data("sourceURI") }),
     //},
     position: {
       x: node.position('x'), // JSONデータからのX座標
@@ -886,6 +930,12 @@ function convertToTurtle(nodes, edges) {
     if (node.referencedEntity) {
       properties.push(`  :referencesEntity "${node.referencedEntity}"`);
     };
+    if (node.sourceCitation) {
+      properties.push(`  :hasSourceCitation "${node.sourceCitation}"`);
+    };
+    if (node.sourceURI) {
+      properties.push(`  :hasSourceURI <${node.sourceURI}>`);
+    };
     // 最初の述語の後にpropertiesがあればセミコロンを追加
     if (properties.length > 0) {
       turtleData += ';\n';
@@ -931,6 +981,9 @@ const downloadTurtle = () => {
     ...(node.data('label') && {label: node.data('label')}),
     ...(node.data('role') && {role: node.data('role')}),
     ...(node.data('detailType') && {detailType: node.data('detailType')}),
+    ...(node.data('referencedEntity') && {referencedEntity: node.data('referencedEntity')}),
+    ...(node.data('sourceCitation') && {sourceCitation: node.data('sourceCitation')}),
+    ...(node.data('sourceURI') && {sourceURI: node.data('sourceURI')}),
     //},
   }));
 
@@ -977,7 +1030,9 @@ const loadGraphData = (data) => {
         label: node.label,
         ...(node.role != null && { role: node.role }),
         ...(node.detailType != null && { detailType: node.detailType }),
-        ...(node.referencedEntity != null && { referencedEntity: node.referencedEntity })
+        ...(node.referencedEntity != null && { referencedEntity: node.referencedEntity }),
+        ...(node.sourceCitation != null && { sourceCitation: node.sourceCitation }),
+        ...(node.sourceURI != null && { sourceURI: node.sourceURI }),
       },
       position: {
         x: node.position.x,
@@ -1001,10 +1056,16 @@ const loadGraphData = (data) => {
   }
 };
 
+/*
 const triggerSettingFileUpload = (type) => {
   const inputId = `json${type}Input`; // 正しい ID 形式に修正
   //console.log(inputId);
   document.getElementById(inputId).click();
+};
+*/
+// triggerSettingFileUpload関数の変更
+const triggerSettingFileUpload = () => {
+  document.getElementById('jsonSettingsInput').click();
 };
 
 const handleColorsFileUpload = (event) => handleFileUpload(event, 'Colors');
@@ -1013,7 +1074,7 @@ const handleNodeTypeSelectFileUpload = (event) => handleFileUpload(event, 'NodeT
 const handleEntityTypeSelectFileUpload = (event) => handleFileUpload(event, 'EntityTypeSelect');
 const handleEdgeTypeSelectFileUpload = (event) => handleFileUpload(event, 'EdgeTypeSelect');
 
-
+/*
 const handleFileUpload = (event, type) => {
   const file = event.target.files[0];
   if (file) {
@@ -1021,6 +1082,21 @@ const handleFileUpload = (event, type) => {
     reader.onload = (e) => {
       const json = JSON.parse(e.target.result);
       updateSettings(type, json);
+    };
+    reader.readAsText(file);
+  }
+};
+*/
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const json = JSON.parse(e.target.result);
+      // 各タイプの設定を更新
+      for (const type in json) {
+        updateSettings(type, json[type]);
+      }
     };
     reader.readAsText(file);
   }
