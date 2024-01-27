@@ -4,12 +4,12 @@ const defaultPrefixes = [/*{
     "label": "ex"
     },*/
     {
-    "id": "https://junjun7613.github.io/MicroKnowledge/factoid/",
-    "label": "factoid",
+        "id": "https://junjun7613.github.io/MicroKnowledge/factoid/",
+        "label": "factoid",
     },
     {
-    "id": "https://junjun7613.github.io/MicroKnowledge/reference/",
-    "label":"reference"
+        "id": "https://junjun7613.github.io/MicroKnowledge/reference/",
+        "label": "reference"
     }/*,
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/property/",
@@ -18,8 +18,26 @@ const defaultPrefixes = [/*{
 ]
 
 const defaultColors = {
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid": 'red',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": 'blue'
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#EventFactoid": 'red',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid": 'darkred',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": 'crimson',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#StatementFactoid": 'coral',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ThoughtFactoid": 'lightcoral',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#StateOfAffairsFactoid": 'blue',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#SituationFactoid": 'mediumblue',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OfficeFactoid": 'royalblue',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OccupationFactoid": 'deepskyblue',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PossessionFactoid": 'lightskyblue',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#RelationsipFactoid": 'green',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#FamilialRelationshipFactoid": 'seagreen',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#SocialRelationshipFactoid": 'mediumseagreen',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#GeoFactoid": 'olive',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference": 'turquoise',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference": 'indianred',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference": 'limegreen',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference": 'gold',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference": 'indigo',
+    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference": 'blueviolet'
 }
 
 const defaultNodeTypeSelect = [
@@ -66,14 +84,6 @@ const defaultNodeTypeSelect = [
                 "label": "Possession",
             },
             {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#labelFactoid',
-                "label": "label",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#PropertyFactoid',
-                "label": "Property",
-            },
-            {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#RelationsipFactoid',
                 "label": "Relationship",
                 "children": [
@@ -97,12 +107,12 @@ const defaultNodeTypeSelect = [
 
 const defaultEntityTypeSelect = [
     {
-      "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
-      "label": "Person",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        "label": "Person",
     },
     {
-      "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
-      "label": "Organization",
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+        "label": "Organization",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
@@ -120,7 +130,7 @@ const defaultEntityTypeSelect = [
         "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
         "label": "Conceptual object",
     }
-  ];
+];
 
 const defaultEdgeTypeSelect = [
     {
@@ -195,14 +205,48 @@ const defaultEdgeTypeSelect = [
 
 const defaultFactoidRelationSelect = [
     {
-        "label": "Subject",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#subject',
+        "label": "Because",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#because',
     },
     {
-        "label": "Object",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#object',
+        "label": "Therefore",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#therefore',
     }
 ];
+
+const defaultEntityData = [
+    { 
+        title: "役割を入力", 
+        label: "Role", 
+        model: "roleInput", 
+        type: "text", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasRole" 
+    },
+    { 
+        title: "外部URIを入力", 
+        label: "External URI", 
+        model: "externalURIInput", 
+        type: "uri", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
+    },
+]
+
+const defaultNodeData = [
+    { 
+        title: "詳細タイプを入力", 
+        label: "Type Detail", 
+        model: "detailedType", 
+        type: "text", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
+    },
+    { 
+        title: "史料（文字列）を入力", 
+        label: "Source", 
+        model: "sourceCitation", 
+        type: "text", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasSourceCitation" 
+    },
+]
 
 // エクスポート
 export {
@@ -211,5 +255,7 @@ export {
     defaultNodeTypeSelect,
     defaultEntityTypeSelect,
     defaultEdgeTypeSelect,
-    defaultFactoidRelationSelect
+    defaultFactoidRelationSelect,
+    defaultEntityData,
+    defaultNodeData
 };

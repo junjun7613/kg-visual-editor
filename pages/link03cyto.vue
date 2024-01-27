@@ -19,13 +19,19 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="6">
+      <v-col cols="4">
         <div id="cy" ref="cyElement" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="4">
         <!-- ここにテキストや画像を配置 -->
         <div>
           <ImageTextDrop />
+        </div>
+      </v-col>
+      <v-col cols="4">
+        <!-- ここにテキストや画像を配置 -->
+        <div>
+          <ImageEditor />
         </div>
       </v-col>
     </v-row>
@@ -34,25 +40,6 @@
       <!--<p>{{ selectedNodes }}</p>-->
     </v-row>
     <v-row>
-      <!--
-      <v-col>
-        <input type="file" id="jsonPrefixesInput" style="display: none;" @change="handlePrefixesFileUpload">
-        <v-btn @click="triggerSettingFileUpload('Prefixes')" class="ml-2 mt-2">prefixを編集</v-btn>
-
-        <input type="file" id="jsonNodeTypeSelectInput" style="display: none;" @change="handleNodeTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('NodeTypeSelect')" class="ml-2 mt-2">ノードのタイプを編集</v-btn>
-
-        <input type="file" id="jsonEntityTypeSelectInput" style="display: none;"
-          @change="handleEntityTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('EntityTypeSelect')" class="ml-2 mt-2">エンティティのタイプを編集</v-btn>
-
-        <input type="file" id="jsonEdgeTypeSelectInput" style="display: none;" @change="handleEdgeTypeSelectFileUpload">
-        <v-btn @click="triggerSettingFileUpload('EdgeTypeSelect')" class="ml-2 mt-2">エッジのタイプを編集</v-btn>
-
-        <input type="file" id="jsonColorsInput" style="display: none;" @change="handleColorsFileUpload">
-        <v-btn @click="triggerSettingFileUpload('Colors')" class="ml-2 mt-2">配色を編集</v-btn>
-      </v-col>
-      -->
       <v-col>
         <!-- 一つのファイル入力要素に変更 -->
         <input type="file" id="jsonSettingsInput" style="display: none;" @change="handleFileUpload">
@@ -77,11 +64,11 @@
   </v-container>
 
   <!-- ノード作成用モーダル -->
-  <v-dialog v-model="showNodeModal" persistent max-width="1000px" max-height="600px">
+  <v-dialog v-model="showNodeModal" persistent max-width="500px" max-height="600px">
     <v-card>
       <v-card-title>ノードの作成</v-card-title>
       <v-row>
-      <v-col sm="6">
+      <v-col sm="12">
       <v-card-text>
         <div>
           <h3>ID情報を入力</h3>
@@ -94,25 +81,15 @@
           <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Factoid type..." v-model="nodeType"
             class="mb-4" />
         </div>
-        <div>
-          <h3>詳細タイプを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="detailType" label="Detail type..." required></v-text-field>
-        </div>
-        <div>
-          <h3>ラベルを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="labelInput" label="Label..." required></v-text-field>
-        </div>
-      </v-card-text>
-    </v-col>
-    <v-col sm="6">
-      <v-card-text>
-        <div>
-          <h3>典拠資料</h3>
-          <v-text-field v-model="sourceCitation" label="Source citation (String)" required></v-text-field>
-          <v-text-field v-model="sourceURI" label="Source URI" required></v-text-field>
-        </div>
+        <div v-for="field in nodeFields" :key="field.model">
+              <h3>{{ field.title }}</h3>
+              <v-text-field 
+                :type="field.type" 
+                :label="field.label" 
+                :required="field.required" 
+                v-model="factoidData[field.model]"
+              ></v-text-field>
+            </div>
       </v-card-text>
     </v-col>
   </v-row>
@@ -124,11 +101,11 @@
   </v-dialog>
 
   <!-- エンティティ作成用モーダル -->
-  <v-dialog v-model="showEntityModal" persistent max-width="1000px" max-height="600px">
+  <v-dialog v-model="showEntityModal" persistent max-width="500px" max-height="600px">
     <v-card>
       <v-card-title>エンティティの作成</v-card-title>
       <v-row>
-      <v-col sm="6">
+      <v-col sm="12">
       <v-card-text>
         <div>
           <h3>IDを入力</h3>
@@ -141,24 +118,15 @@
           <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Entity type..." v-model="entityType"
             class="mb-4" />
         </div>
-        <div>
-          <h3>役割を入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="roleInput" label="Roles..." required></v-text-field>
-        </div>
-        <div>
-          <h3>ラベルを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="labelInput" label="Label..." required></v-text-field>
-        </div>
-      </v-card-text>
-    </v-col>
-    <v-col sm="6">
-      <v-card-text>
-        <div>
-          <h3>外部データURIを入力</h3>
-          <v-text-field v-model="referencedEntity" label="Entity URI..." required></v-text-field>
-        </div>
+      <div v-for="field in entityFields" :key="field.model">
+              <h3>{{ field.title }}</h3>
+              <v-text-field 
+                :type="field.type" 
+                :label="field.label" 
+                :required="field.required" 
+                v-model="entityData[field.model]"
+              ></v-text-field>
+            </div>
       </v-card-text>
     </v-col>
   </v-row>
@@ -170,7 +138,7 @@
   </v-dialog>
 
   <!-- エッジ作成用モーダル -->
-  <v-dialog v-model="showEdgeModal" persistent max-width="600px">
+  <v-dialog v-model="showEdgeModal" persistent max-width="500px" max-height="400px">
     <v-card height="600px">
       <v-card-title>エッジの作成</v-card-title>
       <v-card-text>
@@ -193,11 +161,11 @@
   </v-dialog>
 
   <!--ノード編集用モーダル-->
-  <v-dialog v-model="showEditNodeModal">
+  <v-dialog v-model="showEditNodeModal" persistent max-width="500px" max-height="600px">
     <v-card>
       <v-card-title>ノードの編集</v-card-title>
       <v-row>
-      <v-col sm="6">
+      <v-col sm="12">
       <v-card-text>
         <div>
           <h3>タイプを入力</h3>
@@ -205,18 +173,18 @@
           <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Factoid type..." v-model="editedNodeType"
             class="mb-4" />
         </div>
-        <div>
-          <h3>詳細タイプを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="editedDetailType" label="Detail type..." required></v-text-field>
-        </div>
-        <div>
-          <h3>ラベルを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="editedLabelInput" label="Label..." required></v-text-field>
+        <div v-for="field in nodeFields" :key="field.model">
+          <h3>{{ field.title }}</h3>
+          <v-text-field 
+            :type="field.type" 
+            :label="field.label" 
+            :required="field.required" 
+            v-model="editableFactoidData[field.model]"
+          ></v-text-field>
         </div>
       </v-card-text>
       </v-col>
+      <!--
       <v-col sm="6">
         <v-card-text>
         <div>
@@ -226,6 +194,7 @@
         </div>
       </v-card-text>
     </v-col>
+  -->
     </v-row>
       <v-card-actions>
         <v-btn @click="updateNodes">更新</v-btn>
@@ -235,11 +204,11 @@
   </v-dialog>
 
   <!--エンティティ編集用モーダル-->
-  <v-dialog v-model="showEditEntityModal">
+  <v-dialog v-model="showEditEntityModal" persistent max-width="500px" max-height="600px">
     <v-card>
       <v-card-title>エンティティの編集</v-card-title>
       <v-row>
-      <v-col sm="6">
+      <v-col sm="12">
       <v-card-text>
         <div>
           <h3>タイプを入力</h3>
@@ -247,18 +216,18 @@
           <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Entity type..." v-model="editedEntityType"
             class="mb-4" />
         </div>
-        <div>
-          <h3>役割を入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="editedRoleInput" label="Roles..." required></v-text-field>
-        </div>
-        <div>
-          <h3>ラベルを入力</h3>
-          <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
-          <v-text-field v-model="editedLabelInput" label="Label..." required></v-text-field>
+        <div v-for="field in entityFields" :key="field.model">
+          <h3>{{ field.title }}</h3>
+          <v-text-field 
+            :type="field.type" 
+            :label="field.label" 
+            :required="field.required" 
+            v-model="editableEntityData[field.model]"
+          ></v-text-field>
         </div>
       </v-card-text>
     </v-col>
+    <!--
     <v-col sm="6">
       <v-card-text>
         <div>
@@ -267,6 +236,7 @@
         </div>
       </v-card-text>
     </v-col>
+  -->
   </v-row>
       <v-card-actions>
         <v-btn @click="updateEntities">更新</v-btn>
@@ -276,7 +246,7 @@
   </v-dialog>
 
   <!--エッジ編集用モーダル-->
-  <v-dialog v-model="showEditEdgeModal">
+  <v-dialog v-model="showEditEdgeModal" persistent max-width="500px" max-height="600px">
     <v-card>
       <v-card-title>プロパティの編集</v-card-title>
       <v-card-text>
@@ -303,7 +273,9 @@ import {
   defaultNodeTypeSelect,
   defaultEntityTypeSelect,
   defaultEdgeTypeSelect,
-  defaultFactoidRelationSelect
+  defaultFactoidRelationSelect,
+  defaultEntityData,
+  defaultNodeData
 } from "~/utils/annotation/misc";
 import { createPopper } from '@popperjs/core';
 
@@ -313,6 +285,15 @@ const nodeTypeSelect = ref(defaultNodeTypeSelect)
 const entityTypeSelect = ref(defaultEntityTypeSelect)
 const edgeTypeSelect = ref(defaultEdgeTypeSelect)
 const factoidRelationSelect = ref(defaultFactoidRelationSelect)
+const origEntityData = ref(defaultEntityData)
+const origNodeData = ref(defaultNodeData)
+
+const entityData = ref({})
+const factoidData = ref({})
+
+const entityFields = ref([])
+const nodeFields = ref([])
+const dataFields = ref([])
 
 const cyElement = ref(null);
 let cy = null;
@@ -343,6 +324,9 @@ const showEditEntityModal = ref(false); // モーダル表示用のref
 const showEditEdgeModal = ref(false); // モーダル表示用のref
 const editableNodeData = ref({}); // 編集するノードのデータを格納するref
 
+const editableFactoidData = ref({});
+const editableEntityData = ref({});
+
 const editedNodeType = ref(null);
 const editedDetailType = ref(null);
 const editedLabelInput = ref(null);
@@ -369,18 +353,7 @@ onMounted(() => {
             return colors.value[type] || '#666';  // 色が定義されていない場合のデフォルト値
           },
           'label': (ele) => {
-            //ID(URL)をスラッシュで分割し、最後の要素を取得
-            //const id = ele.data('id');
-            //const parts = id.split('/');
-            //return parts[parts.length - 1];
-            if (ele.data('detailType')) {
-              return ele.data('detailType');
-            } else {
-              //ID(URL)をスラッシュで分割し、最後の要素を取得
-              const id = ele.data('type');
-              const parts = id.split('');
-              return parts[parts.length - 1];
-            };
+            return ele.data('label');
           },
           'width': 70,  // 幅を50ピクセルに設定
           'height': 50  // 高さを50ピクセルに設定
@@ -494,19 +467,16 @@ cy.on('click', 'edge', (event) => {
   cy.on('mouseover', 'node', (event) => {
     const ele = event.target;
 
-    selectedElement.value = {
-      id: ele.data('id'),
-      type: ele.data('type'),
-      shape: ele.data('shape'),
-      //label: ele.data('label')
-      ...(ele.data('label') && {label: ele.data('label')}),
-      ...(ele.data('role') && {role: ele.data('role')}),
-      ...(ele.data('detailType') && {detailType: ele.data('detailType')}),
-      ...(ele.data('referencedEntity') && {referencedEntity: ele.data('referencedEntity')}),
-      ...(ele.data('sourceCitation') && {sourceCitation: ele.data('sourceCitation')}),
-      ...(ele.data('sourceURI') && {sourceURI: ele.data('sourceURI')}),
-    };
+    // 初期化されたselectedElementオブジェクト
+    selectedElement.value = {};
 
+    // ele.data()のすべてのエントリに対してループ処理
+    Object.entries(ele.data()).forEach(([key, value]) => {
+      // 値がnullまたはundefinedでない場合、それをselectedElementに追加する
+      if (value != null && value != undefined) {
+        selectedElement.value[key] = value;
+      }
+    });
     handleMouseover(event, selectedElement.value)
     console.log(selectedElement.value)
   });
@@ -544,6 +514,43 @@ const setPopperStyle = (popper) => {
   popper.style.transition = 'opacity 0.3s';
 };
 
+//entityDataにdefaultEntityDataからデータ挿入
+for (const i in origEntityData.value){
+  console.log(origEntityData.value[i])
+  entityData.value[origEntityData.value[i]["model"]] = ''
+  const field = {
+    title: origEntityData.value[i]["title"],
+    label: origEntityData.value[i]["label"],
+    model: origEntityData.value[i]["model"],
+    type: origEntityData.value[i]["type"],
+    id: origEntityData.value[i]["id"],
+    required: true
+  };
+  entityFields.value.push(field);
+  }
+//console.log(entityFields.value);
+console.log(entityData.value);
+
+//nodeDataにdefaultNodeDataからデータ挿入
+for (const i in origNodeData.value){
+  console.log(origNodeData.value[i])
+  factoidData.value[origNodeData.value[i]["model"]] = ''
+  const field = {
+    title: origNodeData.value[i]["title"],
+    label: origNodeData.value[i]["label"],
+    model: origNodeData.value[i]["model"],
+    type: origNodeData.value[i]["type"],
+    id: origNodeData.value[i]["id"],
+    required: true
+  };
+  nodeFields.value.push(field);
+  }
+//console.log(entityFields.value);
+console.log(factoidData.value);
+
+//entityFieldsとnodeFieldsを結合して、dataFieldsを作っておく。（Turtle作成の際に使用）
+dataFields.value = entityFields.value.concat(nodeFields.value);
+
 // ノードにマウスオーバーしたときの処理
 const handleMouseover = (event, nodeData) => {
   if (!popperElement.value) {
@@ -557,9 +564,29 @@ const handleMouseover = (event, nodeData) => {
     //popperElement.value.innerHTML = `ID: ${nodeData.id}<br>Type: ${nodeData.type}`;
     console.log(nodeData.shape)
     if (nodeData.shape == 'entity') {
-      popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}<br><h5>External URI:</h5> ${nodeData.referencedEntity}`;
+      let htmlContent = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br>`;
+      //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}<br><h5>External URI:</h5> ${nodeData.referencedEntity}`;
+      Object.entries(nodeData).forEach(([key, value]) => {
+      // IDとtypeはすでに表示されているので除外
+      if (key !== 'id' && key !== 'type' && key !== 'shape' && value) {
+        // キー名をラベルとして、値を表示
+        const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
+        htmlContent += `<h5>${label}:</h5> ${value}<br>`;
+        }
+      });
+      popperElement.value.innerHTML = htmlContent;
     } else if (nodeData.shape == 'factoid') {
-      popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Detail Type:</h5> ${nodeData.detailType}<br><h5>Label:</h5> ${nodeData.label}`;
+      //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Detail Type:</h5> ${nodeData.detailType}<br><h5>Label:</h5> ${nodeData.label}`;
+      let htmlContent = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br>`;
+      Object.entries(nodeData).forEach(([key, value]) => {
+      // IDとtypeはすでに表示されているので除外
+      if (key !== 'id' && key !== 'type' && key !== 'shape' && value) {
+        // キー名をラベルとして、値を表示
+        const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
+        htmlContent += `<h5>${label}:</h5> ${value}<br>`;
+        }
+      });
+      popperElement.value.innerHTML = htmlContent;
     } else {
       popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}`;
     };
@@ -602,6 +629,7 @@ const handleMouseout = () => {
 
 const showGraphData = () => {
   const nodes = cy.nodes().map(node => {
+    //基本的なノードを設定
     const nodeData = {
       id: node.id(),
       type: node.data('type'),
@@ -609,22 +637,13 @@ const showGraphData = () => {
       label: node.data('label')
     };
 
-    if (node.data('role') != null) {
-      nodeData.role = node.data('role');
-    };
-    if (node.data('detailType') != null) {
-      nodeData.detailType = node.data('detailType');
-    };
-    if (node.data('referencedEntity') != null) {
-      nodeData.referencedEntity = node.data('referencedEntity');
-    };
-    if (node.data('sourceCitation') != null) {
-      nodeData.sourceCitation = node.data('sourceCitation');
-    };
-    if (node.data('sourceURI') != null) {
-      nodeData.sourceURI = node.data('sourceURI');
-    };
-
+    // node.dataに含まれるすべてのキーについて反復処理を行う
+    Object.entries(node.data()).forEach(([key, value]) => {
+      // 値がnullでない場合、それをnodeDataに追加する
+      if (value != null) {
+        nodeData[key] = value;
+      }
+    });
     return nodeData;
   });
 
@@ -654,10 +673,11 @@ const addNode = () => {
       type: nodeType.value,
       shape: 'factoid',
       //label: labelInput.value,
-      ...(labelInput.value && {label: labelInput.value}),
-      ...(detailType.value && { detailType: detailType.value }), // オプショナルなプロパティ
-      ...(sourceCitation.value && { sourceCitation: sourceCitation.value }),
-      ...(sourceURI.value && { sourceURI: sourceURI.value }),
+      //...(labelInput.value && {label: labelInput.value}),
+      //...(detailType.value && { detailType: detailType.value }), // オプショナルなプロパティ
+      //...(sourceCitation.value && { sourceCitation: sourceCitation.value }),
+      //...(sourceURI.value && { sourceURI: sourceURI.value }),
+      ...Object.fromEntries(Object.entries(factoidData.value).map(([key, value]) => [key, value]))
     }
   
     cy.add({
@@ -672,10 +692,17 @@ const addNode = () => {
     nodeId.value = null;
     nodeType.value = null;
     prefixSelect.value = null;
-    labelInput.value = null;
-    detailType.value = null;
-    sourceCitation.value = null;
-    sourceURI.value = null;
+
+    // factoidDataの各プロパティをクリア
+    Object.keys(factoidData.value).forEach(key => {
+      factoidData.value[key] = null;
+    });
+
+    //labelInput.value = null;
+    //detailType.value = null;
+    //sourceCitation.value = null;
+    //sourceURI.value = null;
+
     showNodeModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
@@ -688,6 +715,8 @@ const addEntity = () => {
     roleInput.value = null;
   };
 
+  console.log(entityData.value)
+
   if (prefixSelect.value && entityType.value) {
     const completeID = prefixSelect.value + (entityId.value || crypto.randomUUID());
 
@@ -695,9 +724,11 @@ const addEntity = () => {
       id: completeID,
       type: entityType.value,
       shape: 'entity',
-      ...(labelInput.value && {label: labelInput.value}),
-      ...(roleInput.value && {role: roleInput.value}),
-      ...(referencedEntity.value && { referencedEntity: referencedEntity.value }),
+      //...(labelInput.value && {label: labelInput.value}),
+      //...(roleInput.value && {role: roleInput.value}),
+      //...(referencedEntity.value && { referencedEntity: referencedEntity.value }),
+      // entityData内の各フィールドをデータとして追加
+      ...Object.fromEntries(Object.entries(entityData.value).map(([key, value]) => [key, value]))
     };
 
     cy.add({
@@ -708,13 +739,22 @@ const addEntity = () => {
     });
     cy.layout({ name: 'preset' }).run(); // グラフのレイアウトを更新
 
+    console.log('現在のグラフデータ:', cy.json());
+
     // モーダルの入力フィールドをクリア
     entityId.value = null;
     entityType.value = null;
     prefixSelect.value = null;
-    labelInput.value = null;
-    roleInput.value = null;
-    referencedEntity.value = null;
+
+    // entityDataの各プロパティをクリア
+    Object.keys(entityData.value).forEach(key => {
+      entityData.value[key] = null;
+    });
+
+    //labelInput.value = null;
+    //roleInput.value = null;
+    //referencedEntity.value = null;
+
     showEntityModal.value = false;
   } else {
     // 必要な場合はエラーメッセージを表示
@@ -771,10 +811,14 @@ const editSelectedElement = () => {
     const selectedNodeId = selectedNodes.value[0].id;
     const selectedNode = cy.getElementById(selectedNodeId);
     console.log(selectedNode.data())
+
     // 現在のノードデータを取得してeditableNodeDataに設定
-    editableNodeData.value = { ...selectedNode.data() };
+    //editableNodeData.value = { ...selectedNode.data() };
+
     // 編集用モーダルを表示
     if (selectedNodes.value[0].shape === "factoid"){
+
+      /*
       editedNodeType.value = selectedNode.data().type
       if (selectedNode.data().detailType) {
         editedDetailType.value = selectedNode.data().detailType
@@ -788,9 +832,15 @@ const editSelectedElement = () => {
       if (selectedNode.data().sourceURI) {
         editedSourceURI.value = selectedNode.data().sourceURI
       }
+      */
+      editedNodeType.value = selectedNode.data().type;
+      Object.entries(selectedNode.data()).forEach(([key, value]) => {
+        editableFactoidData.value[key] = value;
+      });
       //モーダルを表示させる
       showEditNodeModal.value = true;
     } else if (selectedNodes.value[0].shape === "entity") {
+      /*
       editedEntityType.value = selectedNode.data().type
       if (selectedNode.data().role) {
         editedRoleInput.value = selectedNode.data().role;
@@ -801,6 +851,11 @@ const editSelectedElement = () => {
       if (selectedNode.data().referencedEntity) {
         editedReferencedEntity.value = selectedNode.data().referencedEntity;
       }
+      */
+      editedEntityType.value = selectedNode.data().type;
+      Object.entries(selectedNode.data()).forEach(([key, value]) => {
+        editableEntityData.value[key] = value;
+      });
       //モーダルを開く
       showEditEntityModal.value = true;
     };
@@ -817,10 +872,15 @@ const editSelectedElement = () => {
 };
 
 const updateNodes = () => {
-  let nodeId = editableNodeData.value.id;
+  console.log(editableFactoidData.value)
+  let nodeId = editableFactoidData.value.id;
   let node = cy.getElementById(nodeId);
+
+  // 更新前のデータをログ出力
+  console.log('Before update:', node.data());
   
   // ノードのデータを更新
+  /*
   node.data({
     type: editedNodeType.value,
     ...(editedDetailType.value && {detailType: editedDetailType.value}),
@@ -829,7 +889,20 @@ const updateNodes = () => {
     ...(editedSourceURI.value && {sourceURI: editedSourceURI.value}),
     // その他の更新したいデータ
   });
+  */
 
+  Object.entries(editableFactoidData.value).forEach(([key, value]) => {
+    if (key === 'type') {
+      node.data(key, editedNodeType.value)
+    } else {
+    node.data(key, value);
+    }
+  });
+
+  // 更新後のデータをログ出力
+  console.log('After update:', node.data());
+
+  /*
   editableNodeData.value = {};
   editedNodeType.value = null;
   editedDetailType.value = null;
@@ -837,12 +910,17 @@ const updateNodes = () => {
   editedSourceCitation.value = null;
   editedSourceURI.value = null;
   showEditNodeModal.value = false;
+  */
+  // 編集用データをクリア
+  editableFactoidData.value = {};
+  showEditNodeModal.value = false;
 };
 const updateEntities = () => {
-  let nodeId = editableNodeData.value.id;
+  let nodeId = editableEntityData.value.id;
   let node = cy.getElementById(nodeId);
 
   // ノードのデータを更新
+  /*
   node.data({
     type: editedEntityType.value,
     ...(editedRoleInput.value && {role: editedRoleInput.value}),
@@ -850,12 +928,24 @@ const updateEntities = () => {
     ...(editedReferencedEntity.value && {referencedEntity: editedReferencedEntity.value}),
     // その他の更新したいデータ
   });
+  */
+  Object.entries(editableEntityData.value).forEach(([key, value]) => {
+    if(key === 'type') {
+      node.data(key, editedEntityType.value)
+    } else {
+    node.data(key, value);}
+  });
 
+  /*
   editableNodeData.value = {};
   editedEntityType.value = null;
   editedRoleInput.value = null;
   editedLabelInput.value = null;
   editedReferencedEntity.value = null;
+  showEditEntityModal.value = false;
+  */
+  // 編集用データをクリア
+  editableEntityData.value = {};
   showEditEntityModal.value = false;
 };
 
@@ -867,19 +957,19 @@ const downloadJson = () => {
       id: node.id(),
       type: node.data('type'),
       shape: node.data('shape'),
-      ///label: node.data('label'),
-      ...(node.data('label') && {label: node.data('label')}),
-      ...(node.data('role') && {role: node.data('role')}),
-      ...(node.data('detailType') && {detailType: node.data('detailType')}),
-      ...(node.data('referencedEntity') && {referencedEntity: node.data('referencedEntity')}),
-      ...(node.data("sourceCitation") && { sourceCitation: node.data("sourceCitation") }),
-      ...(node.data("sourceURI") && { sourceURI: node.data("sourceURI") }),
-    //},
-    position: {
-      x: node.position('x'), // JSONデータからのX座標
-      y: node.position('y')  // JSONデータからのY座標
-    }
-  };
+      position: {
+        x: node.position('x'), // JSONデータからのX座標
+        y: node.position('y')  // JSONデータからのY座標
+      }
+    };
+    // node.dataに含まれるすべてのキーについて反復処理を行う
+    Object.entries(node.data()).forEach(([key, value]) => {
+      // 値がnullでない場合、それをnodeDataに追加する
+      if (value != null) {
+        nodeData[key] = value;
+      }
+    });
+
   return nodeData;
 });
 
@@ -918,24 +1008,17 @@ function convertToTurtle(nodes, edges) {
   nodes.forEach(node => {
     turtleData += `<${node.id}> a <${node.type}>`;
     const properties = [];
-    if (node.label) {
-      properties.push(`  :label "${node.label}"`);
-    };
-    if (node.detailType) {
-      properties.push(`  :detailType "${node.detailType}"`);
-    };
-    if (node.role) {
-      properties.push(`  :role "${node.role}"`);
-    };
-    if (node.referencedEntity) {
-      properties.push(`  :referencesEntity "${node.referencedEntity}"`);
-    };
-    if (node.sourceCitation) {
-      properties.push(`  :hasSourceCitation "${node.sourceCitation}"`);
-    };
-    if (node.sourceURI) {
-      properties.push(`  :hasSourceURI <${node.sourceURI}>`);
-    };
+
+    // dataFieldsに基づいてノードの各プロパティを処理
+    dataFields.value.forEach(field => {
+      console.log(field)
+      const value = node[field.model];
+      if (value != null) {
+        const object = field.type === 'uri' ? `<${value}>` : `"${value}"`; // 目的語の型に応じてフォーマット
+        properties.push(`  <${field.id}> ${object}`);
+      }
+    });
+
     // 最初の述語の後にpropertiesがあればセミコロンを追加
     if (properties.length > 0) {
       turtleData += ';\n';
@@ -975,17 +1058,26 @@ function downloadTurtleFile(nodes, edges) {
 }
 
 const downloadTurtle = () => {
-  const nodesData = cy.nodes().map(node => ({
-    id: node.id(),
-    type: node.data('type'),
-    ...(node.data('label') && {label: node.data('label')}),
-    ...(node.data('role') && {role: node.data('role')}),
-    ...(node.data('detailType') && {detailType: node.data('detailType')}),
-    ...(node.data('referencedEntity') && {referencedEntity: node.data('referencedEntity')}),
-    ...(node.data('sourceCitation') && {sourceCitation: node.data('sourceCitation')}),
-    ...(node.data('sourceURI') && {sourceURI: node.data('sourceURI')}),
-    //},
-  }));
+
+  const nodesData = cy.nodes().map(node => {
+    // 基本構造のセットアップ
+    let nodeData = {
+      id: node.id(),
+      type: node.data('type')
+    };
+
+    // node.data()の各プロパティをループ処理
+    Object.keys(node.data()).forEach(key => {
+      if (key !== 'id' && key !== 'type') { // idとtype以外のプロパティを対象
+        const value = node.data(key);
+        if (value != null) { // nullでない値のみを追加
+          nodeData[key] = value;
+        }
+      }
+    });
+
+    return nodeData;
+  });
 
   const edgesData = cy.edges().map(edge => ({
     source: edge.data('source'),
@@ -993,6 +1085,7 @@ const downloadTurtle = () => {
     type: edge.data('type')
   }));
 
+  console.log(nodesData)
   downloadTurtleFile(nodesData, edgesData);
 };
 
@@ -1021,24 +1114,29 @@ const loadGraphData = (data) => {
   cy.elements().remove(); // 現在のグラフデータを削除
   if (data.nodes || data.edges) {
 
-    const nodes = data.nodes.map(node => ({
-      group: 'nodes',
-      data: {
-        id: node.id,
-        type: node.type,
-        shape: node.shape,
-        label: node.label,
-        ...(node.role != null && { role: node.role }),
-        ...(node.detailType != null && { detailType: node.detailType }),
-        ...(node.referencedEntity != null && { referencedEntity: node.referencedEntity }),
-        ...(node.sourceCitation != null && { sourceCitation: node.sourceCitation }),
-        ...(node.sourceURI != null && { sourceURI: node.sourceURI }),
-      },
-      position: {
-        x: node.position.x,
-        y: node.position.y
-      }
-    }));
+    const nodes = data.nodes.map(node => {
+      const nodeData = {
+        group: 'nodes',
+        data: {
+          id: node.id,
+          type: node.type,
+          // 他のすべてのプロパティを動的に追加
+        },
+        position: {
+          x: node.position.x,
+          y: node.position.y
+        }
+      };
+      // nodeオブジェクトのすべてのキーに対してループ
+      Object.entries(node).forEach(([key, value]) => {
+        // id, type, positionはすでに設定されているのでスキップ
+        if (!['id', 'type', 'position'].includes(key) && value != null) {
+          nodeData.data[key] = value;
+        }
+      });
+
+      return nodeData;
+    });
 
     const edges = data.edges.map(edge => ({
       group: 'edges',
@@ -1056,13 +1154,6 @@ const loadGraphData = (data) => {
   }
 };
 
-/*
-const triggerSettingFileUpload = (type) => {
-  const inputId = `json${type}Input`; // 正しい ID 形式に修正
-  //console.log(inputId);
-  document.getElementById(inputId).click();
-};
-*/
 // triggerSettingFileUpload関数の変更
 const triggerSettingFileUpload = () => {
   document.getElementById('jsonSettingsInput').click();
@@ -1074,19 +1165,6 @@ const handleNodeTypeSelectFileUpload = (event) => handleFileUpload(event, 'NodeT
 const handleEntityTypeSelectFileUpload = (event) => handleFileUpload(event, 'EntityTypeSelect');
 const handleEdgeTypeSelectFileUpload = (event) => handleFileUpload(event, 'EdgeTypeSelect');
 
-/*
-const handleFileUpload = (event, type) => {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const json = JSON.parse(e.target.result);
-      updateSettings(type, json);
-    };
-    reader.readAsText(file);
-  }
-};
-*/
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -1119,7 +1197,51 @@ const updateSettings = (type, data) => {
     case 'EdgeTypeSelect':
       edgeTypeSelect.value = data["data"];
       break;
+    case 'FactoidRelationSelect':
+      factoidRelationSelect.value = data["data"];
+      break;
+    case 'EntityData':
+      origEntityData.value = data["data"];
+      entityFields.value = [];
+      entityData.value = {}
+      data["data"].forEach(item => {
+        entityData.value[item["model"]] = '';
+        const field = {
+          title: item["title"],
+          label: item["label"],
+          model: item["model"],
+          type: item["type"],
+          id: item["id"],
+          required: true
+        };
+        entityFields.value.push(field)
+      })
+      //dataFieldsの更新
+      updateDataFields();
+      break;
+    case 'NodeData':
+      origNodeData.value = data["data"];
+      nodeFields.value = []; // クリアする
+      factoidData.value = {}; // クリアする
+      data["data"].forEach(item => {
+        factoidData.value[item["model"]] = '';
+        const field = {
+          title: item["title"],
+          label: item["label"],
+          model: item["model"],
+          type: item["type"],
+          id: item["id"],
+          required: true
+        };
+        nodeFields.value.push(field);
+      });
+      updateDataFields();
+      break;
   }
+};
+
+const updateDataFields = () => {
+  dataFields.value = [...entityFields.value, ...nodeFields.value];
 };
 
 // その他の関数
