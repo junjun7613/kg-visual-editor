@@ -24,6 +24,7 @@
   "dependencies": {
     "@mdi/font": "^7.3.67",
     "@popperjs/core": "^2.11.8",
+    "@recogito/annotorious-openseadragon": "^2.7.17",
     "@recogito/recogito-js": "^1.8.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "cesium": "^1.111.0",

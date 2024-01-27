@@ -19,21 +19,49 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="4">
-        <div id="cy" ref="cyElement" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
+      <v-col cols="6">
+        <div id="cy" ref="cyElement" style="width: 100%; height: 660px; border: 1px solid #ccc;"></div>
       </v-col>
+      <!--
       <v-col cols="4">
-        <!-- ここにテキストや画像を配置 -->
+        //ここにテキストや画像を配置 
         <div>
           <ImageTextDrop />
         </div>
       </v-col>
-      <v-col cols="4">
-        <!-- ここにテキストや画像を配置 -->
+    
+      <v-col cols="6" style="width: 100%; height: 600px;">
+        // ここにテキストや画像を配置
         <div>
           <ImageEditor />
         </div>
       </v-col>
+    -->
+  
+      <v-col cols="6">
+        <!--{{activeTab}}-->
+        <!-- タブの追加 -->
+        <v-tabs v-model="activeTab" background-color="white" slider-color="blue">
+          <v-tab>text & image viewer</v-tab>
+          <v-tab>IIIF annotation</v-tab>
+        </v-tabs>
+
+        <!-- タブコンテンツ -->
+        <v-tabs-items v-model="activeTab">
+          <!--
+          <v-tab-item>
+            //TextImageDrop コンポーネントをここに配置
+            <ImageTextDrop />
+            1
+          </v-tab-item>
+        -->
+          <v-tab-item>
+            <!-- ImageEditor コンポーネントをここに配置 -->
+            <ImageEditor />
+          </v-tab-item>
+        </v-tabs-items>
+      </v-col>
+
     </v-row>
     <v-row>
       <!--<p>{{ selectedElement }}</p>-->
@@ -262,7 +290,9 @@
 </template>
 
 <script setup>
-import ImageDrop from '@/components/ImageTextDrop.vue';
+//import ImageDrop from '@/components/ImageTextDrop.vue';
+import ImageTextDrop from '@/components/ImageTextDrop.vue';
+import ImageEditor from '@/components/ImageEditor.vue';
 import { ref } from 'vue';
 import cytoscape from 'cytoscape';
 import Treeselect from "vue3-treeselect";
@@ -278,6 +308,8 @@ import {
   defaultNodeData
 } from "~/utils/annotation/misc";
 import { createPopper } from '@popperjs/core';
+
+const activeTab = ref(0); // 最初のタブをデフォルトとしてアクティブにする
 
 const prefixes = ref(defaultPrefixes);
 const colors = ref(defaultColors);
