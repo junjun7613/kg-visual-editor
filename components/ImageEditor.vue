@@ -26,6 +26,7 @@ const text = ref("");
 const uri = ref("");
 const height = ref(0);
 const result = ref<Entity>({} as Entity);
+const resultList = ref([])
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const manifest = ref(""); // 実際に使用するManifestのURL
@@ -35,12 +36,25 @@ const manifest: string = route.query.manifest
   : "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 */
 
+const selectedAnnotationId = ref('')
+const selectedAnnotationUri = ref('')
+
 let viewer: any = null;
 
 onMounted(async () => {
     height.value = window.innerHeight - 250;
     await loadManifest();
 })
+
+// 選択されたアノテーションのURIを検索
+const findSelectedAnnotationUri = () => {
+  const uri = result.value[selectedAnnotationId.value]?.['@id'];
+  if (uri) {
+    selectedAnnotationUri.value = uri;
+  } else {
+    selectedAnnotationUri.value = 'Not found';
+  }
+};
 
 // async
 //onMounted(async () => {
@@ -111,6 +125,16 @@ const loadManifest = async () => {
   anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
     createContentStateAPI(annotation, overrideId);
   });
+
+  // アノテーションが選択されたときのイベントハンドラ
+  anno.on("selectAnnotation", function(annotation: any) {
+    if (annotation && annotation.id) {
+      selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
+      console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
+      console.log("selected annotation URI: ", selectedAnnotationUri)
+      findSelectedAnnotationUri(); // URIを検索して表示
+    }
+  });
 };
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
@@ -172,7 +196,9 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"] = tags
   }
 
-  result.value = result_
+  //result.value = result_
+  result.value[annotation.id] = result_;
+  //resultList.value.push(result.value)
 };
 </script>
 <template>
@@ -198,15 +224,17 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
         :style="`height: ${height * 0.99}px`"
       ></div>
     </v-col>
-    <!--
+    
     <v-col sm="12">
       <div class="api-info">
           <h2>API Information</h2>
           <pre>{{ result }}</pre>
         </div>
     </v-col>
--->
+
   </v-row>
+  {{selectedAnnotationId}}
+  {{selectedAnnotationUri}}
 </client-only>
 </template>
 <style>
