@@ -113,6 +113,10 @@
           <treeselect :multiple="false" :options="nodeTypeSelect" placeholder="Factoid type..." v-model="nodeType"
             class="mb-4" />
         </div>
+        <div>
+          <h3>ラベルを入力</h3>
+          <v-text-field v-model="labelInput" label="ラベル" required></v-text-field>
+        </div>
         <div v-for="field in nodeFields" :key="field.model">
               <h3>{{ field.title }}</h3>
               <v-text-field 
@@ -149,6 +153,10 @@
           <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
           <treeselect :multiple="false" :options="entityTypeSelect" placeholder="Entity type..." v-model="entityType"
             class="mb-4" />
+        </div>
+        <div>
+          <h3>ラベルを入力</h3>
+          <v-text-field v-model="labelInput" label="ラベル" required></v-text-field>
         </div>
       <div v-for="field in entityFields" :key="field.model">
               <h3>{{ field.title }}</h3>
@@ -611,10 +619,11 @@ const handleMouseover = (event, nodeData) => {
     console.log(nodeData.shape)
     if (nodeData.shape == 'entity') {
       let htmlContent = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br>`;
+      htmlContent += `<h5>Label:</h5> ${nodeData.label}<br>`;
       //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}<br><h5>External URI:</h5> ${nodeData.referencedEntity}`;
       Object.entries(nodeData).forEach(([key, value]) => {
       // IDとtypeはすでに表示されているので除外
-      if (key !== 'id' && key !== 'type' && key !== 'shape' && value) {
+      if (key !== 'id' && key !== 'type' && key !== 'shape' && key !== 'correspondingImage' && value) {
         // キー名をラベルとして、値を表示
         const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
         htmlContent += `<h5>${label}:</h5> ${value}<br>`;
@@ -624,9 +633,10 @@ const handleMouseover = (event, nodeData) => {
     } else if (nodeData.shape == 'factoid') {
       //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Detail Type:</h5> ${nodeData.detailType}<br><h5>Label:</h5> ${nodeData.label}`;
       let htmlContent = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br>`;
+      htmlContent += `<h5>Label:</h5> ${nodeData.label}<br>`;
       Object.entries(nodeData).forEach(([key, value]) => {
       // IDとtypeはすでに表示されているので除外
-      if (key !== 'id' && key !== 'type' && key !== 'shape' && value) {
+      if (key !== 'id' && key !== 'type' && key !== 'shape' && key !== 'correspondingImage' && value) {
         // キー名をラベルとして、値を表示
         const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
         htmlContent += `<h5>${label}:</h5> ${value}<br>`;
@@ -718,7 +728,7 @@ const addNode = () => {
       id: completeID,
       type: nodeType.value,
       shape: 'factoid',
-      //label: labelInput.value,
+      label: labelInput.value,
       //...(labelInput.value && {label: labelInput.value}),
       //...(detailType.value && { detailType: detailType.value }), // オプショナルなプロパティ
       //...(sourceCitation.value && { sourceCitation: sourceCitation.value }),
@@ -744,7 +754,7 @@ const addNode = () => {
       factoidData.value[key] = null;
     });
 
-    //labelInput.value = null;
+    labelInput.value = null;
     //detailType.value = null;
     //sourceCitation.value = null;
     //sourceURI.value = null;
@@ -770,6 +780,7 @@ const addEntity = () => {
       id: completeID,
       type: entityType.value,
       shape: 'entity',
+      label: labelInput.value,
       //...(labelInput.value && {label: labelInput.value}),
       //...(roleInput.value && {role: roleInput.value}),
       //...(referencedEntity.value && { referencedEntity: referencedEntity.value }),
@@ -797,7 +808,7 @@ const addEntity = () => {
       entityData.value[key] = null;
     });
 
-    //labelInput.value = null;
+    labelInput.value = null;
     //roleInput.value = null;
     //referencedEntity.value = null;
 
@@ -880,6 +891,7 @@ const editSelectedElement = () => {
       }
       */
       editedNodeType.value = selectedNode.data().type;
+      editedLabelInput.value = selectedNode.data().label
       Object.entries(selectedNode.data()).forEach(([key, value]) => {
         editableFactoidData.value[key] = value;
       });
@@ -899,6 +911,7 @@ const editSelectedElement = () => {
       }
       */
       editedEntityType.value = selectedNode.data().type;
+      editedLabelInput.value = selectedNode.data().label
       Object.entries(selectedNode.data()).forEach(([key, value]) => {
         editableEntityData.value[key] = value;
       });
@@ -940,6 +953,8 @@ const updateNodes = () => {
   Object.entries(editableFactoidData.value).forEach(([key, value]) => {
     if (key === 'type') {
       node.data(key, editedNodeType.value)
+    } else if (key === 'label') {
+      node.data(key, editedLabelInput.value)
     } else {
     node.data(key, value);
     }
@@ -978,6 +993,8 @@ const updateEntities = () => {
   Object.entries(editableEntityData.value).forEach(([key, value]) => {
     if(key === 'type') {
       node.data(key, editedEntityType.value)
+    } else if (key === 'label') {
+      node.data(key, editedLabelInput.value)
     } else {
     node.data(key, value);}
   });
@@ -1003,6 +1020,7 @@ const downloadJson = () => {
       id: node.id(),
       type: node.data('type'),
       shape: node.data('shape'),
+      label: node.data('label'),
       position: {
         x: node.position('x'), // JSONデータからのX座標
         y: node.position('y')  // JSONデータからのY座標
@@ -1056,6 +1074,7 @@ function convertToTurtle(nodes, edges) {
     const properties = [];
 
     console.log(node)
+    properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#label> "${node.label}"`);
     if (node.correspondingImage){
       properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasVisualDescription> <${node.correspondingImage}>`)
     }
@@ -1114,7 +1133,8 @@ const downloadTurtle = () => {
     // 基本構造のセットアップ
     let nodeData = {
       id: node.id(),
-      type: node.data('type')
+      type: node.data('type'),
+      label: node.data('label')
     };
 
     // node.data()の各プロパティをループ処理
@@ -1171,6 +1191,7 @@ const loadGraphData = (data) => {
         data: {
           id: node.id,
           type: node.type,
+          label: node.label
           // 他のすべてのプロパティを動的に追加
         },
         position: {
@@ -1181,7 +1202,7 @@ const loadGraphData = (data) => {
       // nodeオブジェクトのすべてのキーに対してループ
       Object.entries(node).forEach(([key, value]) => {
         // id, type, positionはすでに設定されているのでスキップ
-        if (!['id', 'type', 'position'].includes(key) && value != null) {
+        if (!['id', 'type', 'position', 'label'].includes(key) && value != null) {
           nodeData.data[key] = value;
         }
       });

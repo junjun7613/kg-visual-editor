@@ -216,13 +216,6 @@ const defaultFactoidRelationSelect = [
 
 const defaultEntityData = [
     { 
-        title: "ラベルを入力", 
-        label: "label", 
-        model: "label", 
-        type: "text", 
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#label" 
-    },
-    { 
         title: "役割を入力", 
         label: "Role", 
         model: "roleInput", 
@@ -239,13 +232,6 @@ const defaultEntityData = [
 ]
 
 const defaultNodeData = [
-    { 
-        title: "ラベルを入力", 
-        label: "label", 
-        model: "label", 
-        type: "text", 
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#label" 
-    },
     { 
         title: "詳細タイプを入力", 
         label: "Type Detail", 
