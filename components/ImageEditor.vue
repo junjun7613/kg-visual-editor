@@ -19,6 +19,8 @@ const route = useRoute();
   //? String(route.query.manifest)
   //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
+const {content_state_api} = useEditor();
+
 const canvasImageMap: { [key: string]: string } = {};
 
 const currentIndex = ref(0);
@@ -42,7 +44,7 @@ const selectedAnnotationUri = ref('')
 let viewer: any = null;
 
 onMounted(async () => {
-    height.value = window.innerHeight - 250;
+    height.value = window.innerHeight - 255;
     await loadManifest();
 })
 
@@ -51,6 +53,7 @@ const findSelectedAnnotationUri = () => {
   const uri = result.value[selectedAnnotationId.value]?.['@id'];
   if (uri) {
     selectedAnnotationUri.value = uri;
+    content_state_api.value = uri;
   } else {
     selectedAnnotationUri.value = 'Not found';
   }
@@ -224,17 +227,20 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
         :style="`height: ${height * 0.99}px`"
       ></div>
     </v-col>
-    
+    <!--
     <v-col sm="12">
       <div class="api-info">
           <h2>API Information</h2>
           <pre>{{ result }}</pre>
         </div>
     </v-col>
+    -->
 
   </v-row>
+  <!--
   {{selectedAnnotationId}}
   {{selectedAnnotationUri}}
+  -->
 </client-only>
 </template>
 <style>

@@ -5,6 +5,7 @@
         <v-btn @click="showNodeModal = true" class="ml-2 mt-2">ノードを追加</v-btn>
         <v-btn @click="showEntityModal = true" class="ml-2 mt-2">エンティティを追加</v-btn>
         <v-btn @click="showEdgeModal = true" class="ml-2 mt-2">エッジを追加</v-btn>
+        <v-btn @click="relateImage" class="ml-2 mt-2" color="green">画像とリンク</v-btn>
         <v-btn @click="editSelectedElement" class="ml-2 mt-2" color="blue">更新</v-btn>
         <v-btn @click="deleteSelectedElement" class="ml-2 mt-2" color="red">削除</v-btn>
       </v-col>
@@ -89,6 +90,9 @@
         </div>
       </v-col>
     </v-row>
+    <p style="max-width: 300px;">
+    <!--{{content_state_api}}-->
+  </p>
   </v-container>
 
   <!-- ノード作成用モーダル -->
@@ -308,6 +312,14 @@ import {
   defaultNodeData
 } from "~/utils/annotation/misc";
 import { createPopper } from '@popperjs/core';
+import { computed } from 'vue';
+//import { useStore } from '@vue/composition-api';
+
+//const store = useStore();
+
+//const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
+
+const {content_state_api} = useEditor();
 
 const activeTab = ref(0); // 最初のタブをデフォルトとしてアクティブにする
 
@@ -379,6 +391,7 @@ onMounted(() => {
         selector: 'node[shape="factoid"]',
         style: {
           'shape': 'round-rectangle', // 角なし四角形
+          'color': 'grey',
           'background-color': (ele) => {
             // ノードの type データに基づいて色を返す
             const type = ele.data('type');
@@ -395,6 +408,7 @@ onMounted(() => {
         selector: 'node[shape="entity"]',
         style: {
           'shape': 'ellipse', // 円
+          'color': 'grey',
           'background-color': (ele) => {
             // ノードの type データに基づいて色を返す
             const type = ele.data('type');
@@ -1041,6 +1055,11 @@ function convertToTurtle(nodes, edges) {
     turtleData += `<${node.id}> a <${node.type}>`;
     const properties = [];
 
+    console.log(node)
+    if (node.correspondingImage){
+      properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasVisualDescription> <${node.correspondingImage}>`)
+    }
+
     // dataFieldsに基づいてノードの各プロパティを処理
     dataFields.value.forEach(field => {
       console.log(field)
@@ -1275,6 +1294,20 @@ const updateSettings = (type, data) => {
 const updateDataFields = () => {
   dataFields.value = [...entityFields.value, ...nodeFields.value];
 };
+
+//ノードと画像をリンクする処理
+const relateImage = () => {
+  const selectedNodes_ = selectedNodes.value;
+
+  if (selectedNodes_.length === 1) {
+    const selectedNode = selectedNodes_[0];
+
+    let nodeId = selectedNode.id;
+
+    let node = cy.getElementById(nodeId);
+    node.data("correspondingImage", content_state_api.value);
+  };
+}
 
 // その他の関数
 </script>

@@ -38,6 +38,7 @@
     "nuxt-swiper": "^1.2.2",
     "openseadragon": "^4.1.0",
     "vue-cesium": "^3.2.4",
-    "vue3-treeselect": "^0.1.10"
+    "vue3-treeselect": "^0.1.10",
+    "vuex": "^4.1.0"
   }
 }
