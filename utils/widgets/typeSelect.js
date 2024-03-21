@@ -62,11 +62,11 @@ var ColorSelectorWidget = function (args) {
             "value": `${himiko}DateDescription`
         },
         {
-            "label": "Physical object",
+            "label": "Object",
             "value": `${himiko}PhysicalObjDescription`
         },
         {
-            "label": "Conceptual object",
+            "label": "Concept",
             "value": `${himiko}ConceptualObjDescription`
         }
     ]

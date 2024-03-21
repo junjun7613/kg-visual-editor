@@ -170,12 +170,13 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const uri_ = `https://icsae.vercel.app${path}`;
   uri.value = uri_;
 
+  
   const result_: Entity = {
     "@context": "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
     "@id": uri_,
     "@type": "",
   }
-
+  
   const body = annotation.body;
 
   const tags = []
@@ -194,7 +195,6 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       tags.push(value.value)
     }
   }
-
   if(tags.length > 0) {
     result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"] = tags
   }

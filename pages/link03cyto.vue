@@ -43,20 +43,19 @@
         <!--{{activeTab}}-->
         <!-- タブの追加 -->
         <v-tabs v-model="activeTab" background-color="white" slider-color="blue">
-          <v-tab>text & image viewer</v-tab>
-          <v-tab>IIIF annotation</v-tab>
+          <v-tab value="tab-1">text & image viewer</v-tab>
+          <v-tab value="tab-2">IIIF annotation</v-tab>
         </v-tabs>
 
         <!-- タブコンテンツ -->
         <v-tabs-items v-model="activeTab">
           <!--
-          <v-tab-item>
-            //TextImageDrop コンポーネントをここに配置
+          <v-tab-item value="tab-1">
+            TextImageDrop コンポーネントをここに配置
             <ImageTextDrop />
-            1
           </v-tab-item>
         -->
-          <v-tab-item>
+          <v-tab-item value="tab-2">
             <!-- ImageEditor コンポーネントをここに配置 -->
             <ImageEditor />
           </v-tab-item>
@@ -329,7 +328,7 @@ import { computed } from 'vue';
 
 const {content_state_api} = useEditor();
 
-const activeTab = ref(0); // 最初のタブをデフォルトとしてアクティブにする
+const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
 
 const prefixes = ref(defaultPrefixes);
 const colors = ref(defaultColors);

@@ -24,6 +24,7 @@ export default defineNuxtConfig({
   },
   css: [
     '@/assets/main.scss',
+    "vuetify/lib/styles/main.sass",
     "@mdi/font/css/materialdesignicons.css",
     '@/assets/styles/CETEIcean.css',
     "vue3-treeselect/dist/vue3-treeselect.css"
