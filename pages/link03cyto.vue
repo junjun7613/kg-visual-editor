@@ -449,7 +449,12 @@ onMounted(() => {
           'label': (ele) => {
             //ID(URL)をスラッシュで分割し、最後の要素を取得
             const id = ele.data('type');
-            const parts = id.split('#');
+            let parts;
+            if (id.includes('#')){
+              parts = id.split('#');
+            } else {
+              parts = id.split('/');
+            }
             return parts[parts.length - 1];
           },
           'text-rotation': 'autorotate', // ラベルの回転を自動調整
@@ -622,7 +627,7 @@ const handleMouseover = (event, nodeData) => {
       //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}<br><h5>External URI:</h5> ${nodeData.referencedEntity}`;
       Object.entries(nodeData).forEach(([key, value]) => {
       // IDとtypeはすでに表示されているので除外
-      if (key !== 'id' && key !== 'type' && key !== 'shape' && key !== 'correspondingImage' && value) {
+      if (key !== 'id' && key !== 'type' && key !== 'label' && key !== 'shape' && key !== 'correspondingImage' && value) {
         // キー名をラベルとして、値を表示
         const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
         htmlContent += `<h5>${label}:</h5> ${value}<br>`;
@@ -635,7 +640,7 @@ const handleMouseover = (event, nodeData) => {
       htmlContent += `<h5>Label:</h5> ${nodeData.label}<br>`;
       Object.entries(nodeData).forEach(([key, value]) => {
       // IDとtypeはすでに表示されているので除外
-      if (key !== 'id' && key !== 'type' && key !== 'shape' && key !== 'correspondingImage' && value) {
+      if (key !== 'id' && key !== 'type' && key !== 'label' && key !== 'shape' && key !== 'correspondingImage' && value) {
         // キー名をラベルとして、値を表示
         const label = key.charAt(0).toUpperCase() + key.slice(1); // 最初の文字を大文字に
         htmlContent += `<h5>${label}:</h5> ${value}<br>`;

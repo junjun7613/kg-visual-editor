@@ -1,18 +1,22 @@
 {
     "Colors": {
         "data":{
-            "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid": "blue",
-            "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": "red"
+            "https://example.com/Person": "blue",
+            "https://example.com/Object": "orange"
         }
     },
     "Prefixes": {
         "data": [{
             "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#",
-            "label": "ex"
+            "label": "himiko"
             },
             {
             "id": "https://junjun7613.github.io/MicroKnowledge/factoid/",
             "label": "factoid"
+            },
+            {
+            "id": "https://example.com/",
+            "label": "ex"
             }
         ]
     },
@@ -44,12 +48,12 @@
     },
     "EntityTypeSelect": {"data": [
         {
-          "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+          "id": "https://example.com/Person",
           "label": "Person"
         },
         {
-          "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
-          "label": "Organization"
+          "id": "https://example.com/Object",
+          "label": "Object"
         }
     ]},
     "EdgeTypeSelect": {
@@ -61,6 +65,10 @@
             {
                 "label": "Object",
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#object"
+            },
+            {
+                "label": "hold",
+                "id": "https://example.com/hold"
             }
         ]
     },
