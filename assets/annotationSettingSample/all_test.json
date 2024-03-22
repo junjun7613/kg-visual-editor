@@ -69,6 +69,10 @@
             {
                 "label": "hold",
                 "id": "https://example.com/hold"
+            },
+            {
+                "label": "isFriendOf",
+                "id": "https://example.com/isFriendOf"
             }
         ]
     },
