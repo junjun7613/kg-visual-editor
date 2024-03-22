@@ -1,19 +1,19 @@
-var ExternalWidget = function (args) {
+var TranscribeWidget = function (args) {
     var currentColorBody = args.annotation ?
         args.annotation.bodies.find(function (b) {
-            return b.field == 'label';
+            return b.field == 'transcribe';
         }) : null;
 
     // 3. Triggers callbacks on user action
     var saveText = function (evt) {
         if (currentColorBody) {
             args.onUpdateBody(currentColorBody, {
-                field: "label",
+                field: "transcribe",
                 value: evt.target.value
             });
         } else {
             args.onAppendBody({
-                field: "label",
+                field: "transcribe",
                 value: evt.target.value
             });
         }
@@ -23,10 +23,10 @@ var ExternalWidget = function (args) {
     container.className = 'r6o-widget comment editable';
 
     var input = document.createElement('textarea');
-    input.name = "label";
+    input.name = "transcribe";
     input.className = "r6o-editable-text"
     input.value = currentColorBody ? currentColorBody.value : ''
-    input.placeholder = "Add a label. ex) 葛飾北斎"
+    input.placeholder = "transcribe.."
     input.onchange = saveText;
 
     container.appendChild(input);
@@ -34,4 +34,4 @@ var ExternalWidget = function (args) {
     return container;
 }
 
-export default ExternalWidget;
+export default TranscribeWidget;

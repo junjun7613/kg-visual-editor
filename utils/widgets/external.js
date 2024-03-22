@@ -26,7 +26,7 @@ var ExternalWidget = function (args) {
     input.name = "external";
     input.className = "r6o-editable-text"
     input.value = currentColorBody ? currentColorBody.value : ''
-    input.placeholder = "Input External URI. ex) http://www.wikidata.org/entity/Q707279"
+    input.placeholder = "Add an external URI. ex) http://www.wikidata.org/entity/Q707279"
     input.onchange = saveText;
 
     container.appendChild(input);

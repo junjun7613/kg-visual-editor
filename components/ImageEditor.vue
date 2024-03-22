@@ -2,6 +2,7 @@
 import ExternalWidget from "~/utils/widgets/external";
 import TypeSelectWidget from "~/utils/widgets/typeSelect";
 import LabelWidget from "~/utils/widgets/label";
+import TranscribeWidget from "~/utils/widgets/transcribe";
 // import ColorSelectorWidget from "~/utils/widgets/color";
 
 interface Entity {
@@ -11,6 +12,7 @@ interface Entity {
   "http://www.w3.org/2000/01/rdf-schema#label"?: string;
   "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity"?: string;
   "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"?: string[];
+  "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscription"?: string[];
 }
 
 const { $OpenSeadragon, $Annotorious } = useNuxtApp();
@@ -106,6 +108,7 @@ const loadManifest = async () => {
       TypeSelectWidget,
       ExternalWidget,
       LabelWidget,
+      TranscribeWidget,
       "COMMENT",
       {
         widget: "TAG",
@@ -187,6 +190,9 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     }
     else if (value.field === "label") {
       result_["http://www.w3.org/2000/01/rdf-schema#label"] = value.value
+    }
+    else if (value.field === "transcribe") {
+      result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscription"] = value.value
     }
     else if (value.field === "type") {
       result_["@type"] = value.value
