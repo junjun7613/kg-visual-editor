@@ -3,7 +3,7 @@
   <v-app>
     <v-content>
     <v-container fluid class="mainSearch">
-    <h1 class="searchTitle">Knowledge Graph Visual Editor</h1>
+    <h1 class="searchTitle">HIMIKO Image Editor</h1>
     </v-container>
     </v-content>
   </v-app>

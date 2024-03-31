@@ -40,26 +40,24 @@
     -->
   
       <v-col cols="6">
-        <!--{{activeTab}}-->
-        <!-- タブの追加 -->
+      <!--
         <v-tabs v-model="activeTab" background-color="white" slider-color="blue">
           <v-tab value="tab-1">text & image viewer</v-tab>
           <v-tab value="tab-2">IIIF annotation</v-tab>
         </v-tabs>
-
-        <!-- タブコンテンツ -->
         <v-tabs-items v-model="activeTab">
-          <!--
           <v-tab-item value="tab-1">
             TextImageDrop コンポーネントをここに配置
             <ImageTextDrop />
           </v-tab-item>
-        -->
           <v-tab-item value="tab-2">
-            <!-- ImageEditor コンポーネントをここに配置 -->
             <ImageEditor />
           </v-tab-item>
         </v-tabs-items>
+        -->
+        <div>
+          <ImageEditor />
+        </div>
       </v-col>
 
     </v-row>
@@ -304,7 +302,7 @@
 //import ImageDrop from '@/components/ImageTextDrop.vue';
 import ImageTextDrop from '@/components/ImageTextDrop.vue';
 import ImageEditor from '@/components/ImageEditor.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import cytoscape from 'cytoscape';
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
@@ -326,7 +324,7 @@ import { computed } from 'vue';
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const {content_state_api} = useEditor();
+const {content_state_api, annotation_result} = useEditor();
 
 const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
 
@@ -388,6 +386,23 @@ const editedSourceCitation = ref(null);
 const editedSourceURI = ref(null);
 
 const graphData = ref(null);
+
+// annotation_resultの値が変更された際に実行する関数
+const updateGraphDataWithAnnotation = () => {
+  // ここでGraphDataを更新するロジックを実装します。
+  // 例えば、annotation_resultの値を利用してグラフのノードやエッジを更新するなど。
+  console.log('annotation_resultが更新されました。', annotation_result.value);
+
+  // GraphDataの更新例
+  // この例では単純にconsoleに出力していますが、ここで実際にGraphDataを更新する処理を記述します。
+  // 例えば、cytoscape.jsを利用している場合、グラフのノードやエッジを追加・更新する処理をここに書きます。
+};
+
+// annotation_resultを監視する
+watch(annotation_result.value, (newValue, oldValue) => {
+  // annotation_resultが変更された際に実行される処理
+  updateGraphDataWithAnnotation();
+});
 
 onMounted(() => {
   cy = cytoscape({
@@ -714,9 +729,22 @@ const showGraphData = () => {
     target: edge.data('target')
   }));
 
+  const curations = []
+  for (const curation of annotation_result.value){
+    const item = {}
+    for (const key in curation){
+      if (key == "@context"){} else if (key == "@id" | key == "@type") {
+        item[key.replace("@","")] = curation[key] 
+      } else {
+        item[key] = curation[key]
+      }}
+    curations.push(item)
+    }
+
   graphData.value = {
     nodes,
-    edges
+    edges,
+    curations,
   };
 }
 
@@ -1048,9 +1076,22 @@ const downloadJson = () => {
     target: edge.data('target')
   }));
 
+  const curations = []
+  for (const curation of annotation_result.value){
+    const item = {}
+    for (const key in curation){
+      if (key == "@context"){} else if (key == "@id" | key == "@type") {
+        item[key.replace("@","")] = curation[key] 
+      } else {
+        item[key] = curation[key]
+      }}
+    curations.push(item)
+    }
+
   const graphData = {
     nodes,
-    edges
+    edges,
+    curations
   };
   const graphDataJson = JSON.stringify(graphData, null, 2);
   const blob = new Blob([graphDataJson], { type: 'application/json' });
@@ -1063,7 +1104,7 @@ const downloadJson = () => {
 };
 
 //Turtleへの変換
-function convertToTurtle(nodes, edges) {
+function convertToTurtle(nodes, edges, curations) {
   let turtleData = '@prefix : <https://junjun7613.github.io/MicroKnowledge/himiko.owl#> .\n'; // ベースURIを定義
   //存在するprefixを記述
   prefixes.value.forEach(prefix => {
@@ -1116,12 +1157,63 @@ function convertToTurtle(nodes, edges) {
     turtleData += `<${edge.source}> <${edge.type}> <${edge.target}> .\n`;
   });
 
+  curations.forEach(curation => {
+    turtleData += `<${curation.id}> a <${curation.type}>`;
+    const properties = [];
+
+    console.log(curation)
+
+    // 先に tags の処理を行う
+    if (curation['https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag']) {
+      const tagsString = curation['https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag'][0];
+      const tags = tagsString.split(',');
+      console.log(tags)
+      /*
+      tags.forEach(tag => {
+        properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag> "${tag}"`);
+      });
+      */
+      for (const tag of tags) {
+        properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag> "${tag}"`);
+      }
+    }
+
+    for (const key in curation) {
+      if (key != "id" && key != "type" && key != "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag") {
+        if (key == 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity') {
+          properties.push(`  <${key}> <${curation[key]}>`)
+        } else {
+          properties.push(`  <${key}> "${curation[key]}"`)
+        }
+      }
+    }
+
+    // 最初の述語の後にpropertiesがあればセミコロンを追加
+    if (properties.length > 0) {
+      turtleData += ';\n';
+    }
+    // 各プロパティをセミコロンで終わらせ、最後のプロパティにはピリオドを付ける
+    properties.forEach((prop, index) => {
+      if (index < properties.length - 1) {
+        turtleData += prop + ';\n';
+      } else {
+        turtleData += prop + '.\n';
+      }
+    });
+
+    // プロパティがない場合はピリオドを追加
+    if (properties.length === 0) {
+      turtleData += '.\n';
+    };
+
+  });
+
   return turtleData;
 }
 
 //Turtleファイルのダウンロード
-function downloadTurtleFile(nodes, edges) {
-  const turtleData = convertToTurtle(nodes, edges);
+function downloadTurtleFile(nodes, edges, curations) {
+  const turtleData = convertToTurtle(nodes, edges, curations);
   const blob = new Blob([turtleData], { type: 'text/turtle' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1160,8 +1252,20 @@ const downloadTurtle = () => {
     type: edge.data('type')
   }));
 
-  console.log(nodesData)
-  downloadTurtleFile(nodesData, edgesData);
+  const curationsData = []
+  for (const curation of annotation_result.value){
+    const item = {}
+    for (const key in curation){
+      if (key == "@context"){} else if (key == "@id" | key == "@type") {
+        item[key.replace("@","")] = curation[key] 
+      } else {
+        item[key] = curation[key]
+      }}
+    curationsData.push(item)
+    }
+
+  //console.log(nodesData)
+  downloadTurtleFile(nodesData, edgesData, curationsData);
 };
 
 const handleGraphFileUpload = (event) => {

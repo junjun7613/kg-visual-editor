@@ -215,7 +215,7 @@ const defaultFactoidRelationSelect = [
 ];
 
 const defaultEntityData = [
-    { 
+    /*{ 
         title: "役割を入力", 
         label: "Role", 
         model: "roleInput", 
@@ -229,9 +229,11 @@ const defaultEntityData = [
         type: "uri", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
     },
+    */
 ]
 
 const defaultNodeData = [
+    /*
     { 
         title: "詳細タイプを入力", 
         label: "Type Detail", 
@@ -246,6 +248,7 @@ const defaultNodeData = [
         type: "text", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasSourceCitation" 
     },
+    */
 ]
 
 // エクスポート

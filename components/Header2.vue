@@ -2,7 +2,7 @@
   <v-app-bar app flat border class="px-md-6">
     <v-app-bar-nav-icon @click="drawer = !drawer" class="mr-md-4" />
     <v-app-bar-title class="font-weight-bold">
-      Knowledge Graph Visual Editor
+      HIMIKO Image Editor
     </v-app-bar-title>
     <v-spacer />
     <Navbar />

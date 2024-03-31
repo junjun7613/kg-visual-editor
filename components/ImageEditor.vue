@@ -21,7 +21,7 @@ const route = useRoute();
   //? String(route.query.manifest)
   //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
-const {content_state_api} = useEditor();
+const {content_state_api, annotation_result} = useEditor();
 
 const canvasImageMap: { [key: string]: string } = {};
 
@@ -73,13 +73,19 @@ const loadManifest = async () => {
   const json = await res.json();
   console.log(json); // データ構造をログ出力して確認
 
-  const canvases = json.sequences?.[0]?.canvases ?? [];
+  //const canvases = json.sequences?.[0]?.canvases ?? [];
+  const canvases = json.sequences[0].canvases;
 
   const tileSources = canvases.map((canvas: any) => {
-    const infoUrl = canvas.images[0].resource["@id"].replace(
+    const resource = canvas.images[0].resource;
+    //const infoUrl = canvas.images[0].resource["@id"].replace(
+    let infoUrl = resource["@id"].replace(
       "/full/full/0/default.jpg",
       "/info.json"
     );
+    if (resource.service) {
+      infoUrl = resource.service["@id"] + "/info.json";
+    }
     canvasImageMap[infoUrl] = canvas["@id"];
     return infoUrl;
   });
@@ -206,6 +212,8 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   }
 
   //result.value = result_
+  //console.log(result_)
+  annotation_result.value.push(result_);
   result.value[annotation.id] = result_;
   //resultList.value.push(result.value)
 };
@@ -230,7 +238,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       <div
         id="osd"
         style="width: 100%; background-color: black"
-        :style="`height: ${height * 0.99}px`"
+        :style="`height: ${height * 1.1}px`"
       ></div>
     </v-col>
     <!--
@@ -247,6 +255,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   {{selectedAnnotationId}}
   {{selectedAnnotationUri}}
   -->
+  <!--{{result}}-->
 </client-only>
 </template>
 <style>
