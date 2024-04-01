@@ -1,5 +1,11 @@
 <script lang="ts" setup>
 import type { Entity } from "~/types";
+import Treeselect from "vue3-treeselect";
+import "vue3-treeselect/dist/vue3-treeselect.css";
+import {
+  defaultCurationTypeSelect,
+  defaultCurationData,
+} from "~/utils/annotation/misc";
 
 interface Annotation {
   body: {
@@ -7,6 +13,13 @@ interface Annotation {
     value: string;
   }[];
 }
+
+const curationTypeSelect = ref(defaultCurationTypeSelect);
+const origCurationData = ref(defaultCurationData);
+
+const curationData = ref({});
+
+const curationFields = ref([]);
 
 const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 //const manifest: string = route.query.manifest
@@ -42,6 +55,23 @@ onMounted(async () => {
   height.value = window.innerHeight - 255;
   await loadManifest();
 });
+
+//curaionDataにdefaultCurationDataからデータ挿入
+for (const i in origCurationData.value) {
+  console.log(origCurationData.value[i]);
+  curationData.value[origCurationData.value[i]["model"]] = "";
+  const field = {
+    title: origCurationData.value[i]["title"],
+    label: origCurationData.value[i]["label"],
+    model: origCurationData.value[i]["model"],
+    type: origCurationData.value[i]["type"],
+    id: origCurationData.value[i]["id"],
+    required: true,
+  };
+  curationFields.value.push(field);
+}
+//console.log(entityFields.value);
+console.log(curationData.value);
 
 // 選択されたアノテーションのURIを検索
 const findSelectedAnnotationUri = () => {
@@ -180,6 +210,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   };
 
   const body = annotation.body;
+  console.log(body)
 
   const tags = [];
 
@@ -198,12 +229,16 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       result_["@type"] = value.value;
     } else if (value.purpose === "tagging") {
       tags.push(value.value);
+    } else {
+      result_[value.field] = value.value;
     }
   }
+  /*
   if (tags.length > 0) {
     result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"] =
       tags;
   }
+  */
 
   // 要修正
 
@@ -246,11 +281,24 @@ const createAnnotation = async () => {
     value: valueType_,
   });
 
+  //console.log(curationData.value)
+  for (const field of curationFields.value){
+    body?.push({
+      field: field["model"],
+      value: curationData.value[field["model"]],
+    })
+  }
+  
+
   await anno.updateSelected(selectedAnnotation_);
   anno.saveSelected();
 
   dialog.value = false;
   selectedAnnotation.value = null;
+  valueType.value = null;
+  Object.keys(curationData.value).forEach((key) => {
+      curationData.value[key] = null;
+    });
 };
 
 const deleteAnnotation = async () => {
@@ -262,7 +310,7 @@ const deleteAnnotation = async () => {
   deleteContentStateAPI();
 };
 
-const valueType = ref("");
+const valueType = ref(null);
 </script>
 <template>
   <client-only>
@@ -281,7 +329,7 @@ const valueType = ref("");
 
     <div
       id="osd"
-      style="width: 100%; height: 600px; background-color: black"
+      style="width: 100%; height: 700px; background-color: black"
     ></div>
     <!-- :style="`height: ${height * 1.1}px`" -->
 
@@ -289,11 +337,22 @@ const valueType = ref("");
       <v-card>
         <v-card-title>フォーム</v-card-title>
         <v-card-text>
-          <v-text-field
-            variant="outlined"
-            label="タイプ"
+          <treeselect
+            :multiple="false"
+            :options="curationTypeSelect"
             v-model="valueType"
-          ></v-text-field>
+            placeholder="Type"
+            class="mb-4"
+          ></treeselect>
+          <div v-for="field in curationFields" :key="field.model">
+              <h3>{{ field.title }}</h3>
+              <v-text-field
+                :type="field.type"
+                :label="field.label"
+                :required="field.required"
+                v-model="curationData[field.model]"
+              ></v-text-field>
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-btn varinat="flat" @click="dialog = false">キャンセル</v-btn>

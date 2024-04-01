@@ -397,6 +397,8 @@ import {
   defaultFactoidRelationSelect,
   defaultEntityData,
   defaultNodeData,
+  defaultCurationTypeSelect,
+  defaultCurationData,
 } from "~/utils/annotation/misc";
 import { createPopper } from "@popperjs/core";
 import { computed } from "vue";
@@ -418,12 +420,16 @@ const edgeTypeSelect = ref(defaultEdgeTypeSelect);
 const factoidRelationSelect = ref(defaultFactoidRelationSelect);
 const origEntityData = ref(defaultEntityData);
 const origNodeData = ref(defaultNodeData);
+const curationTypeSelect = ref(defaultCurationTypeSelect);
+const origCurationData = ref(defaultCurationData);
 
 const entityData = ref({});
 const factoidData = ref({});
+const curationData = ref({});
 
 const entityFields = ref([]);
 const nodeFields = ref([]);
+const curationFields = ref([]);
 const dataFields = ref([]);
 
 const cyElement = ref(null);
@@ -702,8 +708,27 @@ for (const i in origNodeData.value) {
 //console.log(entityFields.value);
 console.log(factoidData.value);
 
+//curaionDataにdefaultCurationDataからデータ挿入
+for (const i in origCurationData.value) {
+  console.log(origCurationData.value[i]);
+  curationData.value[origCurationData.value[i]["model"]] = "";
+  const field = {
+    title: origCurationData.value[i]["title"],
+    label: origCurationData.value[i]["label"],
+    model: origCurationData.value[i]["model"],
+    type: origCurationData.value[i]["type"],
+    id: origCurationData.value[i]["id"],
+    required: true,
+  };
+  curationFields.value.push(field);
+}
+//console.log(entityFields.value);
+console.log(curationData.value);
+
 //entityFieldsとnodeFieldsを結合して、dataFieldsを作っておく。（Turtle作成の際に使用）
-dataFields.value = entityFields.value.concat(nodeFields.value);
+const entityNodeFields = entityFields.value.concat(nodeFields.value);
+dataFields.value = entityNodeFields.concat(curationFields.value);
+console.log(dataFields.value)
 
 // ノードにマウスオーバーしたときの処理
 const handleMouseover = (event, nodeData) => {
@@ -1277,6 +1302,7 @@ function convertToTurtle(nodes, edges, curations) {
 
     console.log(curation);
 
+    /*
     // 先に tags の処理を行う
     if (
       curation["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"]
@@ -1287,18 +1313,14 @@ function convertToTurtle(nodes, edges, curations) {
         ][0];
       const tags = tagsString.split(",");
       console.log(tags);
-      /*
-      tags.forEach(tag => {
-        properties.push(`  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag> "${tag}"`);
-      });
-      */
       for (const tag of tags) {
         properties.push(
           `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag> "${tag}"`
         );
       }
     }
-
+    */
+    /*
     for (const key in curation) {
       if (
         key != "id" &&
@@ -1315,6 +1337,17 @@ function convertToTurtle(nodes, edges, curations) {
         }
       }
     }
+    */
+
+    // dataFieldsに基づいてノードの各プロパティを処理
+    dataFields.value.forEach((field) => {
+      console.log(field);
+      const value = curation[field.model];
+      if (value != null) {
+        const object = field.type === "uri" ? `<${value}>` : `"${value}"`; // 目的語の型に応じてフォーマット
+        properties.push(`  <${field.id}> ${object}`);
+      }
+    });
 
     // 最初の述語の後にpropertiesがあればセミコロンを追加
     if (properties.length > 0) {

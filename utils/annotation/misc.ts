@@ -203,6 +203,33 @@ const defaultEdgeTypeSelect = [
     }
 ];
 
+const defaultCurationTypeSelect = [
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        "label": "Person",
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+        "label": "Organization",
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
+        "label": "Place",
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
+        "label": "Date",
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
+        "label": "Physical object",
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
+        "label": "Conceptual object",
+    }
+];
+
 const defaultFactoidRelationSelect = [
     {
         "label": "Because",
@@ -215,7 +242,7 @@ const defaultFactoidRelationSelect = [
 ];
 
 const defaultEntityData = [
-    /*{ 
+    { 
         title: "役割を入力", 
         label: "Role", 
         model: "roleInput", 
@@ -229,11 +256,9 @@ const defaultEntityData = [
         type: "uri", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
     },
-    */
 ]
 
 const defaultNodeData = [
-    /*
     { 
         title: "詳細タイプを入力", 
         label: "Type Detail", 
@@ -248,7 +273,23 @@ const defaultNodeData = [
         type: "text", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasSourceCitation" 
     },
-    */
+]
+
+const defaultCurationData = [
+    { 
+        title: "翻刻", 
+        label: "Transcription", 
+        model: "transcription", 
+        type: "uri", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscriotion" 
+    },
+    { 
+        title: "コメント", 
+        label: "Comment", 
+        model: "comment", 
+        type: "text", 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
+    },
 ]
 
 // エクスポート
@@ -258,7 +299,9 @@ export {
     defaultNodeTypeSelect,
     defaultEntityTypeSelect,
     defaultEdgeTypeSelect,
+    defaultCurationTypeSelect,
     defaultFactoidRelationSelect,
     defaultEntityData,
-    defaultNodeData
+    defaultNodeData,
+    defaultCurationData,
 };
