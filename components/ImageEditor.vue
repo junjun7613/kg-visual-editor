@@ -134,10 +134,14 @@ const loadManifest = async () => {
       console.log("selected annotation URI: ", selectedAnnotationUri);
       findSelectedAnnotationUri(); // URIを検索して表示
 
-      dialog.value = true;
+      //dialog.value = true;
     }
   });
 };
+
+const openDialog = () => {
+  dialog.value = true;
+}
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
@@ -273,6 +277,7 @@ const valueType = ref("");
     ></v-text-field>
 
     <v-btn class="my-4" @click="loadManifest">表示</v-btn>
+    <v-btn class="my-4" @click="openDialog">フォームを表示</v-btn>
 
     <div
       id="osd"
