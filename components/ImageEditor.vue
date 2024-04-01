@@ -152,7 +152,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     type: "Canvas",
     partOf: [
       {
-        id: manifest,
+        id: manifest.value,
         type: "Manifest",
       },
     ],
