@@ -266,15 +266,19 @@ const valueType = ref("");
       label="Manifest URL"
       v-model="inputManifestUrl"
       @keyup.enter="loadManifest"
+      variant="outlined"
+      density="compact"
+      single-line
+      hide-details
     ></v-text-field>
 
-    <v-btn class="ma-1" @click="loadManifest">表示</v-btn>
+    <v-btn class="my-4" @click="loadManifest">表示</v-btn>
 
     <div
       id="osd"
-      style="width: 100%; background-color: black"
-      :style="`height: ${height * 1.1}px`"
+      style="width: 100%; height: 600px; background-color: black"
     ></div>
+    <!-- :style="`height: ${height * 1.1}px`" -->
 
     <v-dialog v-model="dialog" width="600px">
       <v-card>

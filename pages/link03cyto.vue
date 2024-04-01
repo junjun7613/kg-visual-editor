@@ -46,7 +46,7 @@
           class="my-4"
           id="cy"
           ref="cyElement"
-          style="width: 100%; height: 660px; border: 1px solid #ccc"
+          style="width: 100%; border: 1px solid #ccc"
         ></div>
 
         <div>
