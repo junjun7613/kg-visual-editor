@@ -1,22 +1,14 @@
 <script lang="ts" setup>
-import ExternalWidget from "~/utils/widgets/external";
-import TypeSelectWidget from "~/utils/widgets/typeSelect";
-import LabelWidget from "~/utils/widgets/label";
-import TranscribeWidget from "~/utils/widgets/transcribe";
-// import ColorSelectorWidget from "~/utils/widgets/color";
+import type { Entity } from "~/types";
 
-interface Entity {
-  "@context": string;
-  "@id": string;
-  "@type": string;
-  "http://www.w3.org/2000/01/rdf-schema#label"?: string;
-  "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity"?: string;
-  "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"?: string[];
-  "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscription"?: string[];
+interface Annotation {
+  body: {
+    field?: string;
+    value: string;
+  }[];
 }
 
 const { $OpenSeadragon, $Annotorious } = useNuxtApp();
-const route = useRoute();
 //const manifest: string = route.query.manifest
 //? String(route.query.manifest)
 //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
@@ -29,8 +21,9 @@ const currentIndex = ref(0);
 const text = ref("");
 const uri = ref("");
 const height = ref(0);
-const result = ref<Entity>({} as Entity);
-const resultList = ref([]);
+const existsAnnotationMap = ref<{
+  [key: string]: Entity;
+}>({});
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const manifest = ref(""); // 実際に使用するManifestのURL
@@ -52,7 +45,7 @@ onMounted(async () => {
 
 // 選択されたアノテーションのURIを検索
 const findSelectedAnnotationUri = () => {
-  const uri = result.value[selectedAnnotationId.value]?.["@id"];
+  const uri = existsAnnotationMap.value[selectedAnnotationId.value]?.["@id"];
   if (uri) {
     selectedAnnotationUri.value = uri;
     content_state_api.value = uri;
@@ -60,6 +53,10 @@ const findSelectedAnnotationUri = () => {
     selectedAnnotationUri.value = "Not found";
   }
 };
+
+const selectedAnnotation = ref<Annotation | null>(null);
+
+let anno: any = null;
 
 // async
 //onMounted(async () => {
@@ -71,7 +68,6 @@ const loadManifest = async () => {
   const res = await fetch(manifest.value);
   //const res = await fetch(manifest);
   const json = await res.json();
-  console.log(json); // データ構造をログ出力して確認
 
   //const canvases = json.sequences?.[0]?.canvases ?? [];
   const canvases = json.sequences[0].canvases;
@@ -108,29 +104,21 @@ const loadManifest = async () => {
     currentIndex.value = event.page;
   });
 
-  const config_ = {
-    widgets: [
-      TypeSelectWidget,
-      ExternalWidget,
-      LabelWidget,
-      TranscribeWidget,
-      "COMMENT",
-      {
-        widget: "TAG",
-        /*
-        vocabulary: [
-          { label: "Place", uri: "http://www.example.com/ontology/place" },
-          { label: "Person", uri: "http://www.example.com/ontology/person" },
-          { label: "Event", uri: "http://www.example.com/ontology/event" },
-        ],
-        */
-      },
-    ],
-  };
-  const anno = $Annotorious(viewer, config_);
+  anno = $Annotorious(viewer);
+  anno.disableEditor = true;
 
-  anno.on("createAnnotation", function (annotation: any, overrideId: string) {
-    createContentStateAPI(annotation, overrideId);
+  anno.on("createSelection", async function (selection: any) {
+    // Tag to insert
+    selection.body = [
+      {
+        type: "TextualBody",
+        purpose: "tagging",
+        value: "",
+      },
+    ];
+
+    await anno.updateSelected(selection);
+    anno.saveSelected();
   });
 
   anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
@@ -139,11 +127,14 @@ const loadManifest = async () => {
 
   // アノテーションが選択されたときのイベントハンドラ
   anno.on("selectAnnotation", function (annotation: any) {
+    selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
       console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
       console.log("selected annotation URI: ", selectedAnnotationUri);
       findSelectedAnnotationUri(); // URIを検索して表示
+
+      dialog.value = true;
     }
   });
 };
@@ -210,50 +201,103 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       tags;
   }
 
-  //result.value = result_
-  //console.log(result_)
-  annotation_result.value.push(result_);
-  result.value[annotation.id] = result_;
-  //resultList.value.push(result.value)
+  // 要修正
+
+  const annotationsIndex = annotation_result.value.findIndex(
+    (item: Entity) => item["@id"] === result_["@id"]
+  );
+
+  if (annotationsIndex !== -1) {
+    // 要素が見つかった場合、その位置に newItem を更新
+    annotation_result.value[annotationsIndex] = result_;
+  } else {
+    // 要素が見つからなかった場合、newItem を配列の末尾に追加
+    annotation_result.value.push(result_);
+  }
+
+  existsAnnotationMap.value[annotation.id] = result_;
 };
+
+const deleteContentStateAPI = () => {
+  const index = annotation_result.value.findIndex(
+    (item: Entity) => item["@id"] === selectedAnnotationUri.value
+  );
+  if (index !== -1) {
+    annotation_result.value.splice(index, 1);
+  }
+
+  delete existsAnnotationMap.value[selectedAnnotationId.value];
+};
+
+const dialog = ref(false);
+
+const createAnnotation = async () => {
+  const valueType_ = valueType.value;
+
+  const selectedAnnotation_ = selectedAnnotation.value;
+
+  const body = selectedAnnotation_?.body;
+  body?.push({
+    field: "type",
+    value: valueType_,
+  });
+
+  await anno.updateSelected(selectedAnnotation_);
+  anno.saveSelected();
+
+  dialog.value = false;
+  selectedAnnotation.value = null;
+};
+
+const deleteAnnotation = async () => {
+  const selectedAnnotation_ = selectedAnnotation.value;
+  await anno.removeAnnotation(selectedAnnotation_);
+  dialog.value = false;
+  selectedAnnotation.value = null;
+
+  deleteContentStateAPI();
+};
+
+const valueType = ref("");
 </script>
 <template>
   <client-only>
-    <v-row class="mt-4" dense>
-      <!-- Manifest URL 入力フィールドと表示ボタンの追加 -->
-      <v-row>
-        <v-col cols="8">
+    <v-text-field
+      label="Manifest URL"
+      v-model="inputManifestUrl"
+      @keyup.enter="loadManifest"
+    ></v-text-field>
+
+    <v-btn class="ma-1" @click="loadManifest">表示</v-btn>
+
+    <div
+      id="osd"
+      style="width: 100%; background-color: black"
+      :style="`height: ${height * 1.1}px`"
+    ></div>
+
+    <v-dialog v-model="dialog" width="600px">
+      <v-card>
+        <v-card-title>フォーム</v-card-title>
+        <v-card-text>
           <v-text-field
-            label="Manifest URL"
-            v-model="inputManifestUrl"
-            @keyup.enter="loadManifest"
+            variant="outlined"
+            label="タイプ"
+            v-model="valueType"
           ></v-text-field>
-        </v-col>
-        <v-col cols="4">
-          <v-btn height="55px" @click="loadManifest">表示</v-btn>
-        </v-col>
-      </v-row>
-      <v-col sm="12">
-        <div
-          id="osd"
-          style="width: 100%; background-color: black"
-          :style="`height: ${height * 1.1}px`"
-        ></div>
-      </v-col>
-      <!--
-    <v-col sm="12">
-      <div class="api-info">
-          <h2>API Information</h2>
-          <pre>{{ result }}</pre>
-        </div>
-    </v-col>
-    -->
-    </v-row>
-    <!--
-  {{selectedAnnotationId}}
-  {{selectedAnnotationUri}}
-  -->
-    <!--{{result}}-->
+        </v-card-text>
+        <v-card-actions>
+          <v-btn varinat="flat" @click="dialog = false">キャンセル</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="error" varinat="flat" @click="deleteAnnotation"
+            >削除</v-btn
+          >
+          <v-btn color="primary" varinat="flat" @click="createAnnotation"
+            >作成</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </client-only>
 </template>
 <style>

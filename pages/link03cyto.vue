@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col>
+      <v-col cols="12" md="6">
         <div>
           <v-btn @click="showNodeModal = true" class="ml-2 mt-2"
             >ノードを追加</v-btn
@@ -62,9 +62,14 @@
           >
 
           <v-btn @click="showGraphData" class="ml-2">グラフデータを表示</v-btn>
+
+          <div v-if="graphData" class="graph-container my-4">
+            <h3>グラフデータ</h3>
+            <pre>{{ graphData }}</pre>
+          </div>
         </div>
       </v-col>
-      <v-col>
+      <v-col cols="12" md="6">
         <ImageEditor />
       </v-col>
     </v-row>
@@ -1578,7 +1583,8 @@ const relateImage = () => {
 }
 
 .graph-container {
-  width: 800px;
+  _width: 800px;
+  width: 100%;
   max-height: 500px;
   overflow: auto; /* スクロール可能にする */
   border: 1px solid #ccc; /* 枠線を追加 */
