@@ -408,7 +408,7 @@ import { computed } from "vue";
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const { content_state_api, annotation_result } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data } = useEditor();
 
 const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
 
@@ -1510,6 +1510,8 @@ const handleNodeTypeSelectFileUpload = (event) =>
   handleFileUpload(event, "NodeTypeSelect");
 const handleEntityTypeSelectFileUpload = (event) =>
   handleFileUpload(event, "EntityTypeSelect");
+const handleCurationTypeSelectFileUpload = (event) =>
+  handleFileUpload(event, "CurationTypeSelect");
 const handleEdgeTypeSelectFileUpload = (event) =>
   handleFileUpload(event, "EdgeTypeSelect");
 
@@ -1544,6 +1546,9 @@ const updateSettings = (type, data) => {
       break;
     case "EdgeTypeSelect":
       edgeTypeSelect.value = data["data"];
+      break;
+    case "CurationTypeSelect":
+      curation_type_select.value = data["data"];
       break;
     case "FactoidRelationSelect":
       factoidRelationSelect.value = data["data"];
@@ -1584,6 +1589,9 @@ const updateSettings = (type, data) => {
         nodeFields.value.push(field);
       });
       updateDataFields();
+      break;
+    case "CurationData":
+      curation_data.value = data["data"];
       break;
   }
 };

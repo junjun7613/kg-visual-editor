@@ -76,6 +76,26 @@
             }
         ]
     },
+    "CurationTypeSelect": {
+        "data":[
+            {
+                "label": "Subject",
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#subject"
+            },
+            {
+                "label": "Object",
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#object"
+            },
+            {
+                "label": "hold",
+                "id": "https://example.com/hold"
+            },
+            {
+                "label": "isFriendOf",
+                "id": "https://example.com/isFriendOf"
+            }
+        ]
+    },
     "FactoidRelationSelect": {
         "data":[
             {
@@ -100,6 +120,17 @@
         ]
     },
     "NodeData": {
+        "data":[
+            { 
+                "title": "詳細タイプを入力", 
+                "label": "Type Detail", 
+                "model": "detailedType", 
+                "type": "text", 
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
+            }
+        ]
+    },
+    "CurationData": {
         "data":[
             { 
                 "title": "詳細タイプを入力", 

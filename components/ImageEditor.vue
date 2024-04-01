@@ -26,7 +26,7 @@ const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 //? String(route.query.manifest)
 //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
-const { content_state_api, annotation_result } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data } = useEditor();
 
 const canvasImageMap: { [key: string]: string } = {};
 
@@ -329,9 +329,11 @@ const valueType = ref(null);
 
     <div
       id="osd"
-      style="width: 100%; height: 700px; background-color: black"
+      style="width: 100%; height: 650px; background-color: black"
     ></div>
     <!-- :style="`height: ${height * 1.1}px`" -->
+    {{curation_type_select}}
+    {{curation_data}}
 
     <v-dialog v-model="dialog" width="600px">
       <v-card>
