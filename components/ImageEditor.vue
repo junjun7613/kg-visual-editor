@@ -18,10 +18,10 @@ interface Entity {
 const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 const route = useRoute();
 //const manifest: string = route.query.manifest
-  //? String(route.query.manifest)
-  //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
+//? String(route.query.manifest)
+//: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
-const {content_state_api, annotation_result} = useEditor();
+const { content_state_api, annotation_result } = useEditor();
 
 const canvasImageMap: { [key: string]: string } = {};
 
@@ -30,7 +30,7 @@ const text = ref("");
 const uri = ref("");
 const height = ref(0);
 const result = ref<Entity>({} as Entity);
-const resultList = ref([])
+const resultList = ref([]);
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const manifest = ref(""); // 実際に使用するManifestのURL
@@ -40,30 +40,30 @@ const manifest: string = route.query.manifest
   : "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 */
 
-const selectedAnnotationId = ref('')
-const selectedAnnotationUri = ref('')
+const selectedAnnotationId = ref("");
+const selectedAnnotationUri = ref("");
 
 let viewer: any = null;
 
 onMounted(async () => {
-    height.value = window.innerHeight - 255;
-    await loadManifest();
-})
+  height.value = window.innerHeight - 255;
+  await loadManifest();
+});
 
 // 選択されたアノテーションのURIを検索
 const findSelectedAnnotationUri = () => {
-  const uri = result.value[selectedAnnotationId.value]?.['@id'];
+  const uri = result.value[selectedAnnotationId.value]?.["@id"];
   if (uri) {
     selectedAnnotationUri.value = uri;
     content_state_api.value = uri;
   } else {
-    selectedAnnotationUri.value = 'Not found';
+    selectedAnnotationUri.value = "Not found";
   }
 };
 
 // async
 //onMounted(async () => {
-  //height.value = window.innerHeight - 64;
+//height.value = window.innerHeight - 64;
 const loadManifest = async () => {
   manifest.value = inputManifestUrl.value; // ユーザーが入力したURLを使用する
   //manifest.value = 'https://edh.ub.uni-heidelberg.de/iiif/edh/F000001.manifest.json';
@@ -92,18 +92,17 @@ const loadManifest = async () => {
 
   if (viewer) {
     viewer.open(tileSources);
-  }else{
-  const config: any = {
-    sequenceMode: true,
-    id: "osd",
-    tileSources,
-    prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-  };
+  } else {
+    const config: any = {
+      sequenceMode: true,
+      id: "osd",
+      tileSources,
+      prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+    };
 
-  //const viewer = $OpenSeadragon(config);
-  viewer = $OpenSeadragon(config);
-
-}
+    //const viewer = $OpenSeadragon(config);
+    viewer = $OpenSeadragon(config);
+  }
 
   viewer.addHandler("page", function (event) {
     currentIndex.value = event.page;
@@ -139,18 +138,17 @@ const loadManifest = async () => {
   });
 
   // アノテーションが選択されたときのイベントハンドラ
-  anno.on("selectAnnotation", function(annotation: any) {
+  anno.on("selectAnnotation", function (annotation: any) {
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
       console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
-      console.log("selected annotation URI: ", selectedAnnotationUri)
+      console.log("selected annotation URI: ", selectedAnnotationUri);
       findSelectedAnnotationUri(); // URIを検索して表示
     }
   });
 };
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
-
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
   const intXywh = xywh
     .split(",")
@@ -179,36 +177,37 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const uri_ = `https://icsae.vercel.app${path}`;
   uri.value = uri_;
 
-  
   const result_: Entity = {
-    "@context": "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
+    "@context":
+      "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
     "@id": uri_,
     "@type": "",
-  }
-  
+  };
+
   const body = annotation.body;
 
-  const tags = []
+  const tags = [];
 
   for (const value of body) {
     if (value.field === "external") {
-      result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity"] = value.value
-    }
-    else if (value.field === "label") {
-      result_["http://www.w3.org/2000/01/rdf-schema#label"] = value.value
-    }
-    else if (value.field === "transcribe") {
-      result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscription"] = value.value
-    }
-    else if (value.field === "type") {
-      result_["@type"] = value.value
-    }
-    else if (value.purpose === "tagging") {
-      tags.push(value.value)
+      result_[
+        "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity"
+      ] = value.value;
+    } else if (value.field === "label") {
+      result_["http://www.w3.org/2000/01/rdf-schema#label"] = value.value;
+    } else if (value.field === "transcribe") {
+      result_[
+        "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscription"
+      ] = value.value;
+    } else if (value.field === "type") {
+      result_["@type"] = value.value;
+    } else if (value.purpose === "tagging") {
+      tags.push(value.value);
     }
   }
-  if(tags.length > 0) {
-    result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"] = tags
+  if (tags.length > 0) {
+    result_["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"] =
+      tags;
   }
 
   //result.value = result_
@@ -220,28 +219,28 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
 </script>
 <template>
   <client-only>
-  <v-row class="mt-4" dense>
-    <!-- Manifest URL 入力フィールドと表示ボタンの追加 -->
-    <v-row>
-    <v-col cols="8">
-        <v-text-field
-          label="Manifest URL"
-          v-model="inputManifestUrl"
-          @keyup.enter="loadManifest"
-        ></v-text-field>
+    <v-row class="mt-4" dense>
+      <!-- Manifest URL 入力フィールドと表示ボタンの追加 -->
+      <v-row>
+        <v-col cols="8">
+          <v-text-field
+            label="Manifest URL"
+            v-model="inputManifestUrl"
+            @keyup.enter="loadManifest"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="4">
+          <v-btn height="55px" @click="loadManifest">表示</v-btn>
+        </v-col>
+      </v-row>
+      <v-col sm="12">
+        <div
+          id="osd"
+          style="width: 100%; background-color: black"
+          :style="`height: ${height * 1.1}px`"
+        ></div>
       </v-col>
-      <v-col cols="4">
-        <v-btn height="55px" @click="loadManifest">表示</v-btn>
-    </v-col>
-    </v-row>
-    <v-col sm="12">
-      <div
-        id="osd"
-        style="width: 100%; background-color: black"
-        :style="`height: ${height * 1.1}px`"
-      ></div>
-    </v-col>
-    <!--
+      <!--
     <v-col sm="12">
       <div class="api-info">
           <h2>API Information</h2>
@@ -249,14 +248,13 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
         </div>
     </v-col>
     -->
-
-  </v-row>
-  <!--
+    </v-row>
+    <!--
   {{selectedAnnotationId}}
   {{selectedAnnotationUri}}
   -->
-  <!--{{result}}-->
-</client-only>
+    <!--{{result}}-->
+  </client-only>
 </template>
 <style>
 .title {
