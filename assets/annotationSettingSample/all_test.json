@@ -133,6 +133,13 @@
     "CurationData": {
         "data":[
             { 
+                "title": "外部URIを入力", 
+                "label": "External URI", 
+                "model": "externalURIInput", 
+                "type": "uri", 
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
+            },
+            { 
                 "title": "詳細タイプを入力", 
                 "label": "Type Detail", 
                 "model": "detailedType", 

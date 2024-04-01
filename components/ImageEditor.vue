@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { Entity } from "~/types";
+import { ref, watch } from "vue";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import {
@@ -50,6 +51,30 @@ const selectedAnnotationId = ref("");
 const selectedAnnotationUri = ref("");
 
 let viewer: any = null;
+
+watch(curation_type_select, () => {
+  console.log("curation_type_selectが変更されました");
+  curationTypeSelect.value = curation_type_select.value;
+});
+
+watch(curation_data, () => {
+  console.log("curation_dataが変更されました");
+  origCurationData.value = curation_data.value;
+      curationFields.value = [];
+      curationData.value = {};
+      curation_data.value.forEach((item) => {
+        curationData.value[item["model"]] = "";
+        const field = {
+          title: item["title"],
+          label: item["label"],
+          model: item["model"],
+          type: item["type"],
+          id: item["id"],
+          required: true,
+        };
+        curationFields.value.push(field);
+      });
+});
 
 onMounted(async () => {
   height.value = window.innerHeight - 255;
@@ -331,9 +356,8 @@ const valueType = ref(null);
       id="osd"
       style="width: 100%; height: 650px; background-color: black"
     ></div>
+  
     <!-- :style="`height: ${height * 1.1}px`" -->
-    {{curation_type_select}}
-    {{curation_data}}
 
     <v-dialog v-model="dialog" width="600px">
       <v-card>

@@ -1592,12 +1592,13 @@ const updateSettings = (type, data) => {
       break;
     case "CurationData":
       curation_data.value = data["data"];
+      updateDataFields();
       break;
   }
 };
 
 const updateDataFields = () => {
-  dataFields.value = [...entityFields.value, ...nodeFields.value];
+  dataFields.value = [...entityFields.value, ...nodeFields.value, ...curationFields.value];
 };
 
 //ノードと画像をリンクする処理
