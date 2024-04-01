@@ -276,8 +276,8 @@ const valueType = ref("");
       hide-details
     ></v-text-field>
 
-    <v-btn class="my-4" @click="loadManifest">表示</v-btn>
-    <v-btn class="my-4" @click="openDialog">フォームを表示</v-btn>
+    <v-btn class="my-4 mr-4" @click="loadManifest">表示</v-btn>
+    <v-btn class="my-4 mr-4" color="primary" @click="openDialog">フォームを表示</v-btn>
 
     <div
       id="osd"
