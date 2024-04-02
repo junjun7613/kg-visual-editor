@@ -2,7 +2,7 @@
   <v-app-bar app flat border class="px-md-6">
     <v-app-bar-nav-icon @click="drawer = !drawer" class="mr-md-4" />
     <v-app-bar-title class="font-weight-bold">
-      HIMIKO Image Editor
+      HIMIKO Editor for Image
     </v-app-bar-title>
     <v-spacer />
     <Navbar />
@@ -27,13 +27,20 @@
 <script setup lang="ts">
 const items = [
   {
-    title: "Top",
+    title: "Editor",
     path: "/",
     //icon: 'mdi-numeric-2'
   },
+  /*
   {
     title: "Editor",
     path: "/link03cyto",
+    //icon: 'mdi-numeric-2'
+  },
+  */
+  {
+    title: "Help",
+    path: "/help",
     //icon: 'mdi-numeric-2'
   },
 ];

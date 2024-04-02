@@ -9,7 +9,7 @@ const defaultPrefixes = [/*{
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/reference/",
-        "label": "reference"
+        "label": "entity"
     }/*,
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/property/",
@@ -124,11 +124,11 @@ const defaultEntityTypeSelect = [
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
-        "label": "Physical object",
+        "label": "Object",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
-        "label": "Conceptual object",
+        "label": "Concept",
     }
 ];
 
@@ -242,6 +242,7 @@ const defaultFactoidRelationSelect = [
 ];
 
 const defaultEntityData = [
+    /*
     { 
         title: "役割を入力", 
         label: "Role", 
@@ -249,6 +250,7 @@ const defaultEntityData = [
         type: "text", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasRole" 
     },
+    */
     { 
         title: "外部URIを入力", 
         label: "External URI", 
@@ -267,7 +269,7 @@ const defaultNodeData = [
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
     },
     { 
-        title: "史料（文字列）を入力", 
+        title: "典拠情報を入力", 
         label: "Source", 
         model: "sourceCitation", 
         type: "text", 
@@ -276,6 +278,7 @@ const defaultNodeData = [
 ]
 
 const defaultCurationData = [
+    /*
     { 
         title: "翻刻", 
         label: "Transcription", 
@@ -283,6 +286,7 @@ const defaultCurationData = [
         type: "uri", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscriotion" 
     },
+    */
     { 
         title: "コメント", 
         label: "Comment", 
