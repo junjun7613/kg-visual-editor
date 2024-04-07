@@ -268,6 +268,7 @@ const defaultNodeData = [
         type: "text", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
     },
+    /*
     { 
         title: "典拠情報を入力", 
         label: "Source", 
@@ -275,6 +276,7 @@ const defaultNodeData = [
         type: "text", 
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasSourceCitation" 
     },
+    */
 ]
 
 const defaultCurationData = [
