@@ -1742,5 +1742,4 @@ const relateImage = () => {
   border: 1px solid #ccc; /* 枠線を追加 */
   padding: 10px; /* 内容と枠線の間の余白 */
 }
-
 </style>
