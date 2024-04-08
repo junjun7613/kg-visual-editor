@@ -19,6 +19,10 @@
             <a href="https://junjun7613.hatenablog.com/entry/2024/04/07/154436" target="_blank"
               class="blog-link">「HIMIKO Editor for Imageの使い方（基礎編）」</a>
           </li>
+          <li class="blog-list-item">
+            <a href="https://junjun7613.hatenablog.com/entry/2024/04/08/130128" target="_blank"
+              class="blog-link">「HIMIKO Editor for Imageの使い方（カスタマイズ編）」</a>
+          </li>
         </ul>
       </div>
     </v-container>
