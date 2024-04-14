@@ -394,6 +394,7 @@ const backToDialog = () => {
       <v-card>
         <v-card-title>キュレーションの作成</v-card-title>
         <v-card-text>
+          <h3 class="input-title">タイプを選択</h3>
           <treeselect
             :multiple="false"
             :options="curationTypeSelect"
@@ -420,7 +421,7 @@ const backToDialog = () => {
         <v-card-title>詳細データの入力</v-card-title>
         <v-card-text>
           <div v-for="field in filteredCurationFields" :key="field.model">
-              <!--<h3>{{ field.title }}</h3>-->
+              <h3 class="input-title">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
                 :type="field.type"
@@ -445,5 +446,12 @@ const backToDialog = () => {
 <style>
 .title {
   color: red;
+}
+
+.input-title {
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>

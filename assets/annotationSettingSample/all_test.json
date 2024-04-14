@@ -111,6 +111,14 @@
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
             },
             { 
+                "title": "役割を入力", 
+                "label": "Role", 
+                "model": "roleInput", 
+                "type": "text", 
+                "attachedType": ["https://example.com/Person"],
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasRole" 
+            },
+            { 
                 "title": "詳細タイプを入力", 
                 "label": "Type Detail", 
                 "model": "detailedType", 

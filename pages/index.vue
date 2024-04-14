@@ -98,7 +98,7 @@
         <v-col sm="12">
           <v-card-text>
             <div>
-              <!--<h3>ID情報を入力</h3>-->
+              <h3 class="input-title">ID情報を入力</h3>
               <treeselect
                 :multiple="false"
                 :options="prefixes"
@@ -115,7 +115,7 @@
               ></v-text-field>
             </div>
             <div>
-              <!--<h3>タイプを入力</h3>-->
+              <h3 class="input-title">タイプを選択</h3>
               <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
               <treeselect
                 :multiple="false"
@@ -136,7 +136,7 @@
               ></v-text-field>
             </div>
             <div v-for="field in nodeFields" :key="field.model">
-              <!--<h3>{{ field.title }}</h3>-->
+              <h3 class="input-title">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
                 :type="field.type"
@@ -171,7 +171,7 @@
         <v-col sm="12">
           <v-card-text>
             <div>
-              <!--<h3>IDを入力</h3>-->
+              <h3 class="input-title">IDを入力</h3>
               <treeselect
                 :multiple="false"
                 :options="prefixes"
@@ -188,7 +188,7 @@
               ></v-text-field>
             </div>
             <div>
-              <!--<h3>タイプを入力</h3>-->
+              <h3 class="input-title">タイプを選択</h3>
               <!--<v-text-field v-model="nodeType" label="ノードタイプ" required></v-text-field>-->
               <treeselect
                 :multiple="false"
@@ -199,7 +199,7 @@
               />
             </div>
             <div>
-              <!--<h3>ラベルを入力</h3>-->
+              <h3 class="input-title">ラベルを入力</h3>
               <v-text-field
                 density="compact"
                 v-model="labelInput"
@@ -226,7 +226,7 @@
         <v-btn color="blue darken-1" text @click="showEntityModal = false"
           >キャンセル</v-btn
         >
-        <v-btn color="blue darken-1" text @click="createEntityDataModal">作成</v-btn>
+        <v-btn color="blue darken-1" text @click="createEntityDataModal">データ入力へ</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -244,7 +244,7 @@
         <v-col sm="12">
           <v-card-text>
             <div v-for="field in filteredEntityFields" :key="field.model">
-              <!--<h3 style="margin-bottom: 5xp;">{{ field.title }}</h3>-->
+              <h3 class="input-title" style="margin-bottom: 5xp;">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
                 :type="field.type"
@@ -345,7 +345,7 @@
               ></v-text-field>
             </div>
             <div v-for="field in nodeFields" :key="field.model">
-              <!--<h3>{{ field.title }}</h3>-->
+              <h3 class="input-title">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
                 :type="field.type"
@@ -409,7 +409,7 @@
               ></v-text-field>
             </div>
             <div v-for="field in entityFields" :key="field.model">
-              <!--<h3>{{ field.title }}</h3>-->
+              <h3 class="input-title">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
                 :type="field.type"
@@ -1847,5 +1847,12 @@ const backToEntityDialog = () => {
   overflow: auto; /* スクロール可能にする */
   border: 1px solid #ccc; /* 枠線を追加 */
   padding: 10px; /* 内容と枠線の間の余白 */
+}
+
+.input-title {
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>
