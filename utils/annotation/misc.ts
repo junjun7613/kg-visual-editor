@@ -262,11 +262,11 @@ const defaultEntityData = [
 
 const defaultNodeData = [
     { 
-        title: "詳細タイプを入力", 
-        label: "Type Detail", 
-        model: "detailedType", 
+        title: "コメントを入力", 
+        label: "Comment", 
+        model: "comment", 
         type: "text", 
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
+        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
     },
     /*
     { 
