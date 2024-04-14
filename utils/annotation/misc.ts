@@ -256,6 +256,7 @@ const defaultEntityData = [
         label: "External URI", 
         model: "externalURIInput", 
         type: "uri", 
+        attachedType: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
     },
 ]
@@ -294,6 +295,7 @@ const defaultCurationData = [
         label: "Comment", 
         model: "comment", 
         type: "text", 
+        attachedType: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
     },
 ]
