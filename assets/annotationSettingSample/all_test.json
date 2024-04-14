@@ -138,7 +138,7 @@
                 "label": "External URI", 
                 "model": "externalURIInput", 
                 "type": "uri", 
-                "attachedType": "https://example.com/Person",
+                "attachedType": ["https://example.com/Person", "https://example.com/Object"],
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
             },
             { 
@@ -146,7 +146,7 @@
                 "label": "Type Detail", 
                 "model": "detailedType", 
                 "type": "text", 
-                "attachedType": "https://example.com/Object",
+                "attachedType": ["https://example.com/Object"],
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
             }
         ]

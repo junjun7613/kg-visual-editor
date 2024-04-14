@@ -242,21 +242,20 @@ const defaultFactoidRelationSelect = [
 ];
 
 const defaultEntityData = [
-    /*
     { 
         title: "役割を入力", 
         label: "Role", 
         model: "roleInput", 
         type: "text", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasRole" 
     },
-    */
     { 
         title: "外部URIを入力", 
         label: "External URI", 
         model: "externalURIInput", 
         type: "uri", 
-        attachedType: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference", "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
     },
 ]
@@ -281,21 +280,20 @@ const defaultNodeData = [
 ]
 
 const defaultCurationData = [
-    /*
     { 
         title: "翻刻", 
         label: "Transcription", 
         model: "transcription", 
         type: "uri", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscriotion" 
     },
-    */
     { 
         title: "コメント", 
         label: "Comment", 
         model: "comment", 
         type: "text", 
-        attachedType: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference", "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
     },
 ]

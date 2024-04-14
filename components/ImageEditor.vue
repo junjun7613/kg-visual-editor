@@ -351,8 +351,8 @@ const curationDataModal = () => {
   for (const field of curationFields.value){
     console.log('Field attachedType:', field.attachedType)
     console.log('Curation Type Value:', curationTypeValue)
-    //if (field.attachedType.includes(curationTypeValue)){
-    if (field["attachedType"] == curationTypeValue){
+    if (field.attachedType.includes(curationTypeValue)){
+    //if (field["attachedType"] == curationTypeValue){
       newCurationFields.push(field)
     }
   };
@@ -420,7 +420,7 @@ const backToDialog = () => {
         <v-card-title>詳細データの入力</v-card-title>
         <v-card-text>
           <div v-for="field in filteredCurationFields" :key="field.model">
-              <h3>{{ field.title }}</h3>
+              <!--<h3>{{ field.title }}</h3>-->
               <v-text-field
                 density="compact"
                 :type="field.type"
