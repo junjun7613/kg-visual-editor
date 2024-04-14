@@ -79,21 +79,13 @@
     "CurationTypeSelect": {
         "data":[
             {
-                "label": "Subject",
-                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#subject"
-            },
-            {
-                "label": "Object",
-                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#object"
-            },
-            {
-                "label": "hold",
-                "id": "https://example.com/hold"
-            },
-            {
-                "label": "isFriendOf",
-                "id": "https://example.com/isFriendOf"
-            }
+                "id": "https://example.com/Person",
+                "label": "Person"
+              },
+              {
+                "id": "https://example.com/Object",
+                "label": "Object"
+              }
         ]
     },
     "FactoidRelationSelect": {
@@ -115,7 +107,16 @@
                 "label": "External URI", 
                 "model": "externalURIInput", 
                 "type": "uri", 
+                "attachedType": ["https://example.com/Person", "https://example.com/Object"],
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
+            },
+            { 
+                "title": "詳細タイプを入力", 
+                "label": "Type Detail", 
+                "model": "detailedType", 
+                "type": "text", 
+                "attachedType": ["https://example.com/Object"],
+                "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
             }
         ]
     },
@@ -137,6 +138,7 @@
                 "label": "External URI", 
                 "model": "externalURIInput", 
                 "type": "uri", 
+                "attachedType": "https://example.com/Person",
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
             },
             { 
@@ -144,6 +146,7 @@
                 "label": "Type Detail", 
                 "model": "detailedType", 
                 "type": "text", 
+                "attachedType": "https://example.com/Object",
                 "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasDetailedType" 
             }
         ]

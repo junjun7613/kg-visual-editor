@@ -15,12 +15,16 @@ interface Annotation {
   }[];
 }
 
+const dialog = ref(false);
+const dialog2 = ref(false);
+
 const curationTypeSelect = ref(defaultCurationTypeSelect);
 const origCurationData = ref(defaultCurationData);
 
 const curationData = ref({});
 
 const curationFields = ref([]);
+const filteredCurationFields = ref([]);
 
 const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 //const manifest: string = route.query.manifest
@@ -69,6 +73,7 @@ watch(curation_data, () => {
           label: item["label"],
           model: item["model"],
           type: item["type"],
+          attachedType: item["attachedType"],
           id: item["id"],
           required: true,
         };
@@ -90,6 +95,7 @@ for (const i in origCurationData.value) {
     label: origCurationData.value[i]["label"],
     model: origCurationData.value[i]["model"],
     type: origCurationData.value[i]["type"],
+    attachedType: origCurationData.value[i]["attachedType"],
     id: origCurationData.value[i]["id"],
     required: true,
   };
@@ -293,8 +299,6 @@ const deleteContentStateAPI = () => {
   delete existsAnnotationMap.value[selectedAnnotationId.value];
 };
 
-const dialog = ref(false);
-
 const createAnnotation = async () => {
   const valueType_ = valueType.value;
 
@@ -307,7 +311,7 @@ const createAnnotation = async () => {
   });
 
   //console.log(curationData.value)
-  for (const field of curationFields.value){
+  for (const field of filteredCurationFields.value){
     body?.push({
       field: field["model"],
       value: curationData.value[field["model"]],
@@ -324,6 +328,9 @@ const createAnnotation = async () => {
   Object.keys(curationData.value).forEach((key) => {
       curationData.value[key] = null;
     });
+
+  dialog2.value = false;
+  filteredCurationFields.value = [];
 };
 
 const deleteAnnotation = async () => {
@@ -336,6 +343,30 @@ const deleteAnnotation = async () => {
 };
 
 const valueType = ref(null);
+
+const curationDataModal = () => {
+  const curationTypeValue = valueType.value
+  const newCurationFields = []
+  console.log(curationFields.value)
+  for (const field of curationFields.value){
+    console.log('Field attachedType:', field.attachedType)
+    console.log('Curation Type Value:', curationTypeValue)
+    //if (field.attachedType.includes(curationTypeValue)){
+    if (field["attachedType"] == curationTypeValue){
+      newCurationFields.push(field)
+    }
+  };
+  console.log(newCurationFields)
+  filteredCurationFields.value = newCurationFields;
+  dialog.value = false;
+  dialog2.value = true;
+}
+
+const backToDialog = () => {
+  dialog2.value = false;
+  dialog.value = true;
+}
+
 </script>
 <template>
   <client-only>
@@ -361,7 +392,7 @@ const valueType = ref(null);
 
     <v-dialog v-model="dialog" width="600px">
       <v-card>
-        <v-card-title>フォーム</v-card-title>
+        <v-card-title>キュレーションの作成</v-card-title>
         <v-card-text>
           <treeselect
             :multiple="false"
@@ -370,15 +401,6 @@ const valueType = ref(null);
             placeholder="Type"
             class="mb-4"
           ></treeselect>
-          <div v-for="field in curationFields" :key="field.model">
-              <h3>{{ field.title }}</h3>
-              <v-text-field
-                :type="field.type"
-                :label="field.label"
-                :required="field.required"
-                v-model="curationData[field.model]"
-              ></v-text-field>
-          </div>
         </v-card-text>
         <v-card-actions>
           <v-btn varinat="flat" @click="dialog = false">キャンセル</v-btn>
@@ -386,6 +408,32 @@ const valueType = ref(null);
           <v-btn color="error" varinat="flat" @click="deleteAnnotation"
             >削除</v-btn
           >
+          <v-btn color="primary" varinat="flat" @click="curationDataModal"
+            >データ入力へ</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="dialog2" width="600px">
+      <v-card>
+        <v-card-title>詳細データの入力</v-card-title>
+        <v-card-text>
+          <div v-for="field in filteredCurationFields" :key="field.model">
+              <h3>{{ field.title }}</h3>
+              <v-text-field
+                density="compact"
+                :type="field.type"
+                :label="field.label"
+                :required="field.required"
+                variant="outlined"
+                v-model="curationData[field.model]"
+              ></v-text-field>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn varinat="flat" @click="backToDialog">戻る</v-btn>
+          <v-spacer></v-spacer>
           <v-btn color="primary" varinat="flat" @click="createAnnotation"
             >作成</v-btn
           >
