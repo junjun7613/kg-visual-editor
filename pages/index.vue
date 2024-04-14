@@ -128,17 +128,21 @@
             <div>
               <!--<h3>ラベルを入力</h3>-->
               <v-text-field
+                density="compact"
                 v-model="labelInput"
                 label="ラベル"
                 required
+                variant="outlined"
               ></v-text-field>
             </div>
             <div v-for="field in nodeFields" :key="field.model">
               <!--<h3>{{ field.title }}</h3>-->
               <v-text-field
+                density="compact"
                 :type="field.type"
                 :label="field.label"
                 :required="field.required"
+                variant="outlined"
                 v-model="factoidData[field.model]"
               ></v-text-field>
             </div>
