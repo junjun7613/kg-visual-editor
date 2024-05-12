@@ -1327,6 +1327,8 @@ function convertToTurtle(nodes, edges, curations) {
   let turtleData =
     "@prefix : <https://junjun7613.github.io/MicroKnowledge/himiko.owl#> .\n"; // ベースURIを定義
   //存在するprefixを記述
+  turtleData += "@prefix class: <https://junjun7613.github.io/MicroKnowledge/class/> .\n";
+  turtleData += "@prefix property: <https://junjun7613.github.io/MicroKnowledge/property/> .\n";
   prefixes.value.forEach((prefix) => {
     turtleData += `@prefix ${prefix["label"]}: <${prefix["id"]}> .\n`;
   });
@@ -1353,9 +1355,16 @@ function convertToTurtle(nodes, edges, curations) {
     dataFields.value.forEach((field) => {
       if (!processedModels.has(field.model)) {
         const value = node[field.model];
-        if (value != null) {
-          const object = field.type === "uri" ? `<${value}>` : `"${value}"`; // 目的語の型に応じてフォーマット
-          properties.push(`  <${field.id}> ${object}`);
+        if (value != "" && value != null) {
+          //const object = field.type === "uri" ? `<${value}>` : `"${value}"`; // 目的語の型に応じてフォーマット
+          //properties.push(`  <${field.id}> ${object}`);
+          if (field.type === "uri") {
+            properties.push(`  <${field.id}> <${value}>`);
+          } else if (field.type === "number") {
+            properties.push(`  <${field.id}> ${Number(value)}`);
+          } else {
+            properties.push(`  <${field.id}> "${value}"`);
+          }
         }
         processedModels.add(field.model);
       }

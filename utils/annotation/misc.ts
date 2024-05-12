@@ -18,230 +18,184 @@ const defaultPrefixes = [/*{
 ]
 
 const defaultColors = {
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#EventFactoid": 'red',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid": 'darkred',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": 'crimson',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#StatementFactoid": 'coral',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ThoughtFactoid": 'lightcoral',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#StateOfAffairsFactoid": 'blue',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#SituationFactoid": 'mediumblue',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OfficeFactoid": 'royalblue',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OccupationFactoid": 'deepskyblue',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PossessionFactoid": 'lightskyblue',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#RelationsipFactoid": 'green',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#FamilialRelationshipFactoid": 'seagreen',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#SocialRelationshipFactoid": 'mediumseagreen',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#GeoFactoid": 'olive',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference": 'turquoise',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference": 'indianred',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference": 'limegreen',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference": 'gold',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference": 'indigo',
-    "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference": 'blueviolet'
+    "https://junjun7613.github.io/MicroKnowledge/class/EventFactoid": 'red',
+    "https://junjun7613.github.io/MicroKnowledge/class/Dedication": 'darkred',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": 'crimson',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#StatementFactoid": 'coral',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#ThoughtFactoid": 'lightcoral',
+    "https://junjun7613.github.io/MicroKnowledge/class/StateOfAffairsFactoid": 'blue',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#SituationFactoid": 'mediumblue',
+    "https://junjun7613.github.io/MicroKnowledge/class/OfficeFactoid": 'royalblue',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#OccupationFactoid": 'deepskyblue',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#PossessionFactoid": 'lightskyblue',
+    "https://junjun7613.github.io/MicroKnowledge/class/RelationsipFactoid": 'green',
+    "https://junjun7613.github.io/MicroKnowledge/class/FamilialRelationshipFactoid": 'seagreen',
+    "https://junjun7613.github.io/MicroKnowledge/class/SocialRelationshipFactoid": 'mediumseagreen',
+    //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#GeoFactoid": 'olive',
+    "https://junjun7613.github.io/MicroKnowledge/class/PersonReference": 'turquoise',
+    "https://junjun7613.github.io/MicroKnowledge/class/OrgReference": 'indianred',
+    "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference": 'limegreen',
+    "https://junjun7613.github.io/MicroKnowledge/class/DateReference": 'gold',
+    "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference": 'indigo',
+    "https://junjun7613.github.io/MicroKnowledge/class/OfficeReference": 'darkorange',
+    "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference": 'blueviolet'
 }
 
 const defaultNodeTypeSelect = [
     {
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#EventFactoid',
+        "id": 'https://junjun7613.github.io/MicroKnowledge/class/EventFactoid',
         "label": "Event",
         "children": [
             {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#ActionFactoid',
-                "label": "Action",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid',
-                "label": "Contact",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#StatementFactoid',
-                "label": "Statement",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#ThoughtFactoid',
-                "label": "Thought",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Dedication',
+                "label": "Dedication",
             },
         ],
     },
     {
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#StateOfAffairsFactoid',
+        "id": 'https://junjun7613.github.io/MicroKnowledge/class/StateOfAffairsFactoid',
         "label": "State of Affairs",
         "children": [
             {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#SituationFactoid',
-                "label": "Situation",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#OfficeFactoid',
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeFactoid',
                 "label": "Office",
             },
             {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#OccupationFactoid',
-                "label": "Occupation",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#PossessionFactoid',
-                "label": "Possession",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#RelationsipFactoid',
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/RelationsipFactoid',
                 "label": "Relationship",
                 "children": [
                     {
-                        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#FamilialRelationshipFactoid',
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/FamilialRelationshipFactoid',
                         "label": "FamilialRelationship",
                     },
                     {
-                        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#SocialRelationshipFactoid',
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/SocialRelationshipFactoid',
                         "label": "SocialRelationship",
                     }
                 ],
             }
         ],
     },
-    {
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#GeoFactoid',
-        "label": "Geography",
-    }
 ];
 
 const defaultEntityTypeSelect = [
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PersonReference",
         "label": "Person",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/OrgReference",
         "label": "Organization",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference",
         "label": "Place",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/DateReference",
         "label": "Date",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference",
         "label": "Object",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference",
         "label": "Concept",
+        "children": [
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeReference',
+                "label": "Office",
+            },
+        ],
     }
 ];
 
 const defaultEdgeTypeSelect = [
     {
-        "label": "Subject",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#subject',
+        "label": "Dedication",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedication',
+        "children": [
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicant',
+                "label": "Dedicant",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicatee',
+                "label": "Dedicatee",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicated',
+                "label": "Dedicated",
+            },
+        ],
     },
     {
-        "label": "Object",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#object',
+        "label": "Office",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/office',
+        "children": [
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/officeHolder',
+                "label": "Holder",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/officeHolded',
+                "label": "Holded",
+            },
+        ],
     },
-    {
-        "label": "Of",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#of',
-    },
-    {
-        "label": "At",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#at',
-    },
-    {
-        "label": "To",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#to',
-    },
-    {
-        "label": "On",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#on',
-    },
-    {
-        "label": "In",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#in',
-    },
-    {
-        "label": "For",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#for',
-    },
-    {
-        "label": "By",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#by',
-    },
-    {
-        "label": "With",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#with',
-    },
-    {
-        "labe": "From",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#from',
-    },
-    {
-        "label": "Before",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#before',
-    },
-    {
-        "label": "After",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#after',
-    },
-    {
-        "label": "About",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#about',
-    },
-    {
-        "label": "Near",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#near',
-    },
-    {
-        "label": "Until",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#until',
-    },
-    {
-        "label": "As",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#as',
-    }
 ];
 
 const defaultCurationTypeSelect = [
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PersonReference",
         "label": "Person",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/OrgReference",
         "label": "Organization",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PlaceReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference",
         "label": "Place",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#DateReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/DateReference",
         "label": "Date",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#PhysicalObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference",
         "label": "Physical object",
     },
     {
-        "id": "https://junjun7613.github.io/MicroKnowledge/himiko.owl#ConceptualObjReference",
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference",
         "label": "Conceptual object",
+        "children": [
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeReference',
+                "label": "Office",
+            },
+        ],
     }
 ];
 
 const defaultFactoidRelationSelect = [
     {
         "label": "Because",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#because',
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
     },
     {
         "label": "Therefore",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/himiko.owl#therefore',
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
+    },
+    {
+        "label": "During",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/during',
     }
 ];
 
 const defaultEntityData = [
+    /*
     { 
         title: "役割を入力", 
         label: "Role", 
@@ -250,13 +204,14 @@ const defaultEntityData = [
         attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasRole" 
     },
+    */
     { 
         title: "外部URIを入力", 
         label: "External URI", 
         model: "externalURIInput", 
         type: "uri", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference", "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference"],
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity" 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/class/referencesEntity" 
     },
 ]
 
@@ -266,17 +221,15 @@ const defaultNodeData = [
         label: "Comment", 
         model: "comment", 
         type: "text", 
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
+        id: "https://junjun7613.github.io/MicroKnowledge/property/hasComment" 
     },
-    /*
     { 
         title: "典拠情報を入力", 
         label: "Source", 
         model: "sourceCitation", 
-        type: "text", 
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasSourceCitation" 
+        type: "uri", 
+        id: "https://junjun7613.github.io/MicroKnowledge/property/hasSourceCitation" 
     },
-    */
 ]
 
 const defaultCurationData = [
@@ -284,17 +237,17 @@ const defaultCurationData = [
         title: "翻刻", 
         label: "Transcription", 
         model: "transcription", 
-        type: "uri", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference"],
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTranscriotion" 
+        type: "text", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/property/hasTranscriotion" 
     },
     { 
         title: "コメント", 
         label: "Comment", 
         model: "comment", 
         type: "text", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/himiko.owl#PersonReference", "https://junjun7613.github.io/MicroKnowledge/himiko.owl#OrgReference"],
-        id: "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasComment" 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/property/hasComment" 
     },
 ]
 
