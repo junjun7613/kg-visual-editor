@@ -9,10 +9,13 @@ export const useEditor = () => {
 
   const curation_data = useState<Entity[]>("curation_data", () => []);
 
+  const curationURIs = useState<Entity[]>("curations", () => []);
+
   return {
     content_state_api,
     annotation_result,
     curation_type_select,
-    curation_data
+    curation_data,
+    curationURIs,
   };
 };

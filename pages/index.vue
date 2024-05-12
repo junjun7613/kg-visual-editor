@@ -486,7 +486,11 @@ import { computed } from "vue";
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const { content_state_api, annotation_result, curation_type_select, curation_data } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs } = useEditor();
+
+watch(annotation_result, (newValue, oldValue) => {
+  console.log("annotation_resultが更新されました。", annotation_result.value);
+});
 
 const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
 
@@ -1555,7 +1559,7 @@ const triggerGraphFileUpload = () => {
 
 const loadGraphData = (data) => {
   cy.elements().remove(); // 現在のグラフデータを削除
-  if (data.nodes || data.edges) {
+  if (data.nodes || data.edges || data.curations) {
     const nodes = data.nodes.map((node) => {
       const nodeData = {
         group: "nodes",
@@ -1594,8 +1598,31 @@ const loadGraphData = (data) => {
       },
     }));
 
+    const curations = data.curations.map((curation) => {
+      const curationData = {
+        id: curation.id,
+        type: curation.type,
+        // 他のすべてのプロパティを動的に追加
+      };
+      // nodeオブジェクトのすべてのキーに対してループ
+      Object.entries(curation).forEach(([key, value]) => {
+        // id, type, positionはすでに設定されているのでスキップ
+        if (
+          !["id", "type"].includes(key) &&
+          value != null
+        ) {
+          curationData[key] = value;
+        }
+      });
+
+      return curationData;
+    });
+
     cy.add(nodes);
     cy.add(edges);
+    console.log(curations);
+    curationURIs.value = curations;
+    annotation_result.value = curations;
     cy.layout({ name: "preset" }).run(); // レイアウトを更新
   }
 };

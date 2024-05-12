@@ -31,7 +31,131 @@ const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 //? String(route.query.manifest)
 //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
-const { content_state_api, annotation_result, curation_type_select, curation_data } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs } = useEditor();
+
+const uploadedManifest = ref(null);
+const uploadedPositions = ref([]);
+
+watch(curationURIs, () => {
+  console.log("curationsが変更されました");
+  curationURIs.value.forEach((uri) => {
+    const origUri = uri.id
+    const decodeUri = origUri.replace('https://icsae.vercel.app/viewer/?iiif-content=','')
+    const decodedString = atob(decodeUri)
+    console.log(decodedString)
+    if (uploadedManifest.value === null) {
+      const manifest = JSON.parse(decodedString).partOf[0].id
+      uploadedManifest.value = manifest
+    }
+    const xywh = JSON.parse(decodedString)["id"].split("#xywh=")[1]
+    //console.log(xywh)
+    uploadedPositions.value.push(xywh)
+  });
+  console.log(uploadedManifest.value)
+  console.log(uploadedPositions.value)
+  
+  const loadManifest = async () => {
+    const res = await fetch(uploadedManifest.value);
+    //const res = await fetch(manifest);
+    const json = await res.json();
+
+    //const canvases = json.sequences?.[0]?.canvases ?? [];
+    const canvases = json.sequences[0].canvases;
+
+    const tileSources = canvases.map((canvas: any) => {
+      const resource = canvas.images[0].resource;
+      //const infoUrl = canvas.images[0].resource["@id"].replace(
+      let infoUrl = resource["@id"].replace(
+        "/full/full/0/default.jpg",
+        "/info.json"
+      );
+      if (resource.service) {
+        infoUrl = resource.service["@id"] + "/info.json";
+      }
+      canvasImageMap[infoUrl] = canvas["@id"];
+      return infoUrl;
+    });
+
+    if (viewer) {
+      viewer.open(tileSources);
+    } else {
+      const config: any = {
+        sequenceMode: true,
+        id: "osd",
+        tileSources,
+        prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+      };
+
+      //const viewer = $OpenSeadragon(config);
+      viewer = $OpenSeadragon(config);
+    }
+
+    viewer.addHandler("page", function (event) {
+      currentIndex.value = event.page;
+    });
+
+    anno = $Annotorious(viewer);
+    anno.disableEditor = true;
+
+    uploadedPositions.value.forEach((position) => {
+      console.log(position);
+      const index = currentIndex.value;
+      const canvasId = Object.values(canvasImageMap)[index];
+      //const [x, y, width, height] = position.split(',').map(Number);
+      anno.addAnnotation({
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        "id": `${position}#xywh=${position}`,
+        "type": "Annotation",
+        "body": {
+          "type": "TextualBody",
+          "value": "",
+          "format": "text/plain"
+        },
+        "target": {
+          "source": uploadedManifest.value,
+          "selector": {
+            "type": "FragmentSelector",
+            "conformsTo": "http://www.w3.org/TR/media-frags/",
+            "value": `xywh=${position}`
+          }
+        }
+      });
+    });
+
+    anno.on("createSelection", async function (selection: any) {
+      // Tag to insert
+      selection.body = [
+        {
+          type: "TextualBody",
+          purpose: "tagging",
+          value: "",
+        },
+      ];
+
+      await anno.updateSelected(selection);
+      anno.saveSelected();
+    });
+
+    anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
+      createContentStateAPI(annotation, overrideId);
+    });
+
+    // アノテーションが選択されたときのイベントハンドラ
+    anno.on("selectAnnotation", function (annotation: any) {
+      selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
+      if (annotation && annotation.id) {
+        selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
+        console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
+        console.log("selected annotation URI: ", selectedAnnotationUri);
+        findSelectedAnnotationUri(); // URIを検索して表示
+
+        //dialog.value = true;
+      }
+    });
+  }
+  loadManifest();
+  
+})
 
 const canvasImageMap: { [key: string]: string } = {};
 
@@ -123,9 +247,11 @@ let anno: any = null;
 //onMounted(async () => {
 //height.value = window.innerHeight - 64;
 const loadManifest = async () => {
+  
   manifest.value = inputManifestUrl.value; // ユーザーが入力したURLを使用する
   //manifest.value = 'https://edh.ub.uni-heidelberg.de/iiif/edh/F000001.manifest.json';
-
+  
+  
   const res = await fetch(manifest.value);
   //const res = await fetch(manifest);
   const json = await res.json();
@@ -211,6 +337,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     .map((num: string) => Math.round(parseFloat(num)));
   const index = currentIndex.value;
   const canvasId = Object.values(canvasImageMap)[index];
+  console.log(canvasId);
 
   const api = {
     id: `${canvasId}#xywh=${intXywh}`,
