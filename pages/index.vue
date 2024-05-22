@@ -833,6 +833,7 @@ const handleMouseover = (event, nodeData) => {
       htmlContent += `<h5>Label:</h5> ${nodeData.label}<br>`;
       //popperElement.value.innerHTML = `<h5>ID:</h5> ${completeID}<br><h5>Type:</h5> ${completeType}<br><h5>Role:</h5> ${nodeData.role}<br><h5>Label:</h5> ${nodeData.label}<br><h5>External URI:</h5> ${nodeData.referencedEntity}`;
       Object.entries(nodeData).forEach(([key, value]) => {
+        console.log(key);
         // IDとtypeはすでに表示されているので除外
         if (
           key !== "id" &&

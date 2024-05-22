@@ -33,31 +33,61 @@ const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 
 const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs } = useEditor();
 
-const uploadedManifest = ref(null);
 const uploadedPositions = ref([]);
 
 watch(curationURIs, () => {
+
+  let loadedID = ""
+
   console.log("curationsが変更されました");
   curationURIs.value.forEach((uri) => {
-    const origUri = uri.id
-    const decodeUri = origUri.replace('https://icsae.vercel.app/viewer/?iiif-content=','')
+    console.log(uri)
+
+    const loadedId = uri.id
+    //console.log(loadedId)
+    //const id = loadedId.replace("https://dl.ndl.go.jp/api/iiif/1307825/manifest.json",'')
+    const id = "#" + loadedId.split("#")[1]
+    console.log(id)
+    loadedID = id
+    const loadedUri = uri.contentStateAPI
+    const decodeUri = loadedUri.replace('https://icsae.vercel.app/viewer/?iiif-content=','')
     const decodedString = atob(decodeUri)
     console.log(decodedString)
+    /*
     if (uploadedManifest.value === null) {
       const manifest = JSON.parse(decodedString).partOf[0].id
       uploadedManifest.value = manifest
     }
+    */
+    const manifest = JSON.parse(decodedString).partOf[0].id
+    inputManifestUrl.value = manifest
+
     const xywh = JSON.parse(decodedString)["id"].split("#xywh=")[1]
     //console.log(xywh)
     uploadedPositions.value.push(xywh)
+
+    //ここでresult_を作成し、existsAnnotationMapに追加する
+    const result_ = {
+      "@context":
+        "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
+      //"@id": uploadedManifest.value.replace(".json","") + id,
+      "@id": inputManifestUrl.value + id,
+      "@type": "",
+    };
+    result_["contentStateAPI"] = loadedUri;
+
+    existsAnnotationMap.value[id] = result_;
+
   });
-  console.log(uploadedManifest.value)
-  console.log(uploadedPositions.value)
+  
+  //console.log(uploadedManifest.value)
+  //console.log(uploadedPositions.value)
   
   const loadManifest = async () => {
-    const res = await fetch(uploadedManifest.value);
-    //const res = await fetch(manifest);
+    //const res = await fetch(uploadedManifest.value);
+    const res = await fetch(inputManifestUrl.value);
     const json = await res.json();
+    console.log(json)
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
     const canvases = json.sequences[0].canvases;
@@ -104,7 +134,8 @@ watch(curationURIs, () => {
       //const [x, y, width, height] = position.split(',').map(Number);
       anno.addAnnotation({
         "@context": "http://www.w3.org/ns/anno.jsonld",
-        "id": `${position}#xywh=${position}`,
+        //"id": `${position}#xywh=${position}`,
+        "id": loadedID,
         "type": "Annotation",
         "body": {
           "type": "TextualBody",
@@ -112,7 +143,8 @@ watch(curationURIs, () => {
           "format": "text/plain"
         },
         "target": {
-          "source": uploadedManifest.value,
+          //"source": uploadedManifest.value,
+          "source": inputManifestUrl.value,
           "selector": {
             "type": "FragmentSelector",
             "conformsTo": "http://www.w3.org/TR/media-frags/",
@@ -142,9 +174,11 @@ watch(curationURIs, () => {
 
     // アノテーションが選択されたときのイベントハンドラ
     anno.on("selectAnnotation", function (annotation: any) {
+      console.log(annotation)
       selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
       if (annotation && annotation.id) {
         selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
+        //selectedAnnotationId.value = uploadedManifest.value + annotation.id; // 選択されたアノテーションのIDを保存
         console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
         console.log("selected annotation URI: ", selectedAnnotationUri);
         findSelectedAnnotationUri(); // URIを検索して表示
@@ -153,6 +187,7 @@ watch(curationURIs, () => {
       }
     });
   }
+  
   loadManifest();
   
 })
@@ -314,6 +349,7 @@ const loadManifest = async () => {
 
   // アノテーションが選択されたときのイベントハンドラ
   anno.on("selectAnnotation", function (annotation: any) {
+    console.log(annotation)
     selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -331,6 +367,9 @@ const openDialog = () => {
 }
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
+  const annotationId = annotation.id;
+  console.log(annotation)
+
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
   const intXywh = xywh
     .split(",")
@@ -363,9 +402,12 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const result_: Entity = {
     "@context":
       "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
-    "@id": uri_,
+    //"@id": uri_,
+    "@id": inputManifestUrl.value + annotationId,
     "@type": "",
   };
+
+  result_["contentStateAPI"] = uri_;
 
   const body = annotation.body;
   console.log(body)
@@ -497,6 +539,10 @@ const backToDialog = () => {
 </script>
 <template>
   <client-only>
+    <!--
+    {{existsAnnotationMap}}
+    {{selectedAnnotationUri}}
+    -->
     <v-text-field
       label="Manifest URL"
       v-model="inputManifestUrl"
