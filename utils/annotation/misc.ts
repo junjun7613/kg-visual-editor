@@ -148,6 +148,10 @@ const defaultEntityTypeSelect = [
                 "label": "役職",
             },
         ],
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/LexiconReference",
+        "label": "語彙",
     }
 ];
 
@@ -216,6 +220,10 @@ const defaultCurationTypeSelect = [
                 "label": "役職",
             },
         ],
+    },
+    {
+        "id": "https://junjun7613.github.io/MicroKnowledge/class/LexiconReference",
+        "label": "語彙",
     }
 ];
 
@@ -258,7 +266,7 @@ const defaultEntityData = [
         label: "External URI", 
         model: "externalURIInput", 
         type: "uri", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference"],
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference", "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference", "https://junjun7613.github.io/MicroKnowledge/class/DateReference", "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference", "https://junjun7613.github.io/MicroKnowledge/class/OfficeReference", "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference", "https://junjun7613.github.io/MicroKnowledge/class/LexiconReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/class/referencesEntity" 
     },
     { 
@@ -294,7 +302,7 @@ const defaultCurationData = [
         label: "Transcription", 
         model: "transcription", 
         type: "text", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference","https://junjun7613.github.io/MicroKnowledge/class/OrgReference","https://junjun7613.github.io/MicroKnowledge/class/PlaceReference","https://junjun7613.github.io/MicroKnowledge/class/DateReference","https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference","https://junjun7613.github.io/MicroKnowledge/class/OfficeReference","https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference"],
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference","https://junjun7613.github.io/MicroKnowledge/class/OrgReference","https://junjun7613.github.io/MicroKnowledge/class/PlaceReference","https://junjun7613.github.io/MicroKnowledge/class/DateReference","https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference","https://junjun7613.github.io/MicroKnowledge/class/OfficeReference","https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference","https://junjun7613.github.io/MicroKnowledge/class/LexiconReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/property/hasTranscriotion" 
     },
     { 
@@ -302,7 +310,7 @@ const defaultCurationData = [
         label: "Comment", 
         model: "comment", 
         type: "text", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference", "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference", "https://junjun7613.github.io/MicroKnowledge/class/DateReference", "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference", "https://junjun7613.github.io/MicroKnowledge/class/OfficeReference", "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference"],
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference", "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference", "https://junjun7613.github.io/MicroKnowledge/class/DateReference", "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference", "https://junjun7613.github.io/MicroKnowledge/class/OfficeReference", "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference", "https://junjun7613.github.io/MicroKnowledge/class/LexiconReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/property/hasComment" 
     },
 ]
