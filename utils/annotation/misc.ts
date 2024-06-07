@@ -227,6 +227,17 @@ const defaultCurationTypeSelect = [
     }
 ];
 
+const defaultEntityRelationSelect = [
+    {
+        "label": "なぜなら",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
+    },
+    {
+        "label": "それゆえ",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
+    }
+];
+
 const defaultFactoidRelationSelect = [
     {
         "label": "なぜなら",
@@ -323,6 +334,7 @@ export {
     defaultEntityTypeSelect,
     defaultEdgeTypeSelect,
     defaultCurationTypeSelect,
+    defaultEntityRelationSelect,
     defaultFactoidRelationSelect,
     defaultEntityData,
     defaultNodeData,

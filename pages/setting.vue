@@ -220,7 +220,7 @@
             <!--エッジ・タイプの入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">エッジのタイプを設定</p>
+                    <p class="card-title">ファクトイド-エンティティ・リレーションのタイプを設定</p>
                     <v-btn class="add-button" @click="addEdgeTypeRow">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in edgeTypeRows" :key="index">
                         <v-row>
@@ -270,6 +270,68 @@
                                 </v-col>
                                 <v-col cols="12" md="1">
                                     <v-btn @click="removeEdgeSub2TypeRow(index, childIndex, grandChildIndex)">削除</v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                        </v-col>
+                    </v-col>
+                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+
+            <!--エンティティ関係・タイプの入力カード-->
+            <v-card class="input-card">
+                <div>
+                    <p class="card-title">エンティティ・リレーションのタイプを設定</p>
+                    <v-btn class="add-button" @click="addEntityRelationTypeRow">+</v-btn>
+                    <v-col class="input-row" v-for="(row, index) in entityRelationTypeRows" :key="index">
+                        <v-row>
+                            *
+                            <v-col cols="12" md="3">
+                                <v-text-field density="compact" v-model="row.label" label="Labelを入力"
+                                    outlined />
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-text-field density="compact" v-model="row.id" label="IDを入力" outlined />
+                            </v-col>
+                            <v-col cols="12" md="1">
+                                <v-btn @click="removeEntityRelationTypeRow(index)">削除</v-btn>
+                            </v-col>
+                            <v-col cols="12" md="3">
+                                <v-btn @click="addEntityRelationSubTypeRow(index)">サブタイプを入力</v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-col v-for="(child, childIndex) in row.children" :key="childIndex" class="pl-15">
+                            <v-row>
+                                **
+                                <v-col cols="12" md="3">
+                                    <v-text-field density="compact" v-model="child.label" label="Labelを入力"
+                                        outlined />
+                                </v-col>
+                                <v-col cols="12" md="3">
+                                    <v-text-field density="compact" v-model="child.id" label="IDを入力"
+                                        outlined />
+                                </v-col>
+                                <v-col cols="12" md="1">
+                                    <v-btn @click="removeEntityRelationSubTypeRow(index, childIndex)">削除</v-btn>
+                                </v-col>
+                                <v-col cols="12" md="3">
+                                    <v-btn @click="addEntityRelationSub2TypeRow(index, childIndex)">サブサブタイプを入力</v-btn>
+                                </v-col>
+                            </v-row>
+                            <v-col v-for="(grandChild, grandChildIndex) in child.children" :key="grandChildIndex" class="pl-15">
+                            <v-row>
+                                ***
+                                <v-col cols="12" md="3">
+                                    <v-text-field density="compact" v-model="grandChild.label" label="Labelを入力"
+                                        outlined />
+                                </v-col>
+                                <v-col cols="12" md="3">
+                                    <v-text-field density="compact" v-model="grandChild.id" label="IDを入力"
+                                        outlined />
+                                </v-col>
+                                <v-col cols="12" md="1">
+                                    <v-btn @click="removeEntityRelationSub2TypeRow(index, childIndex, grandChildIndex)">削除</v-btn>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -554,6 +616,9 @@ const edgeTypeLabel = ref("");
 const edgeTypeId = ref("");
 const edgeTypeRows = ref([]);
 
+const entityRelationTypeLabel = ref("");
+const entityRelationTypeId = ref("");
+const entityRelationTypeRows = ref([]);
 const factoidRelationTypeLabel = ref("");
 const factoidRelationTypeId = ref("");
 const factoidRelationTypeRows = ref([]);
@@ -831,6 +896,36 @@ function removeEdgeSubTypeRow(index, childIndex) {
 };
 function removeEdgeSub2TypeRow(index, childIndex, grandChildIndex) {
     edgeTypeRows.value[index].children[childIndex].children.splice(grandChildIndex, 1);
+};
+
+//エンティティ関係タイプの追加・削除
+function addEntityRelationTypeRow() {
+    entityRelationTypeRows.value.push({ label: entityRelationTypeLabel.value, id: entityRelationTypeId.value });
+};
+
+function addEntityRelationSubTypeRow(index) {
+    if (!entityRelationTypeRows.value[index].children) {
+        entityRelationTypeRows.value[index].children = [];
+    };
+    entityRelationTypeRows.value[index].children.push({ label: entityRelationTypeLabel.value, id: entityRelationTypeId.value });
+};
+
+function addEntityRelationSub2TypeRow(index, childIndex) {
+    if (!entityRelationTypeRows.value[index].children[childIndex].children) {
+        entityRelationTypeRows.value[index].children[childIndex].children = [];
+    };
+    entityRelationTypeRows.value[index].children[childIndex].children.push({ label: entityRelationTypeLabel.value, id: entityRelationTypeId.value });
+};
+
+function removeEntityRelationTypeRow(index) {
+    entityRelationTypeRows.value.splice(index, 1);
+};
+
+function removeEntityRelationSubTypeRow(index, childIndex) {
+    entityRelationTypeRows.value[index].children.splice(childIndex, 1);
+};
+function removeEntityRelationSub2TypeRow(index, childIndex, grandChildIndex) {
+    entityRelationTypeRows.value[index].children[childIndex].children.splice(grandChildIndex, 1);
 };
 
 //ファクトイド関係タイプの追加・削除
