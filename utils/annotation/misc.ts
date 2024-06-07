@@ -44,33 +44,73 @@ const defaultColors = {
 const defaultNodeTypeSelect = [
     {
         "id": 'https://junjun7613.github.io/MicroKnowledge/class/EventFactoid',
-        "label": "Event",
+        "label": "出来事",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Dedication',
-                "label": "Dedication",
+                "label": "奉献",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Honoring',
+                "label": "顕彰",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Mourning',
+                "label": "追悼",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Decree',
+                "label": "決議",
             },
         ],
     },
     {
         "id": 'https://junjun7613.github.io/MicroKnowledge/class/StateOfAffairsFactoid',
-        "label": "State of Affairs",
+        "label": "状態・状況",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeFactoid',
-                "label": "Office",
+                "label": "役職在任",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/AffiliationFactoid',
+                "label": "所属",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/StatusFactoid',
+                "label": "身分",
             },
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/RelationsipFactoid',
-                "label": "Relationship",
+                "label": "関係",
                 "children": [
                     {
                         "id": 'https://junjun7613.github.io/MicroKnowledge/class/FamilialRelationshipFactoid',
-                        "label": "FamilialRelationship",
+                        "label": "親族関係",
+                        "children": [
+                            {
+                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/HusbandWifeFactoid',
+                                "label": "夫ー妻",
+                            },
+                            {
+                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/FatherSonFactoid',
+                                "label": "父ー子",
+                            },
+                        ],
                     },
                     {
                         "id": 'https://junjun7613.github.io/MicroKnowledge/class/SocialRelationshipFactoid',
-                        "label": "SocialRelationship",
+                        "label": "社会関係",
+                        "children": [
+                            {
+                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/PatronageFactoid',
+                                "label": "パトロネジ",
+                            },
+                            {
+                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/ExSlaveFactoid',
+                                "label": "被解放関係",
+                            },
+                        ],
                     }
                 ],
             }
@@ -81,31 +121,31 @@ const defaultNodeTypeSelect = [
 const defaultEntityTypeSelect = [
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PersonReference",
-        "label": "Person",
+        "label": "人物",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/OrgReference",
-        "label": "Organization",
+        "label": "組織・集団",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference",
-        "label": "Place",
+        "label": "場所",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/DateReference",
-        "label": "Date",
+        "label": "日時",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference",
-        "label": "Object",
+        "label": "モノ",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference",
-        "label": "Concept",
+        "label": "概念・概念的モノ",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeReference',
-                "label": "Office",
+                "label": "役職",
             },
         ],
     }
@@ -113,67 +153,67 @@ const defaultEntityTypeSelect = [
 
 const defaultEdgeTypeSelect = [
     {
-        "label": "Dedication",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedication',
-        "children": [
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicant',
-                "label": "Dedicant",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicatee',
-                "label": "Dedicatee",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/property/dedicated',
-                "label": "Dedicated",
-            },
-        ],
+        "label": "主体・主語",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/subject',
     },
     {
-        "label": "Office",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/office',
-        "children": [
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/property/officeHolder',
-                "label": "Holder",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/property/officeHolded',
-                "label": "Holded",
-            },
-        ],
+        "label": "述部・述語",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/predicate',
+    },
+    {
+        "label": "直接的な対象（直接目的語）",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/directObject',
+    },
+    {
+        "label": "間接的な対象（関節目的語）",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/indirectObject',
+    },
+    {
+        "label": "始まり",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/hasStartTime',
+    },
+    {
+        "label": "終わり",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/hasEndTime',
+    },
+    {
+        "label": "場所",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/hasLocation',
+    },
+    {
+        "label": "関連する人・組織・モノ・概念",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/hasRelatedEntity',
     },
 ];
 
 const defaultCurationTypeSelect = [
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PersonReference",
-        "label": "Person",
+        "label": "人物",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/OrgReference",
-        "label": "Organization",
+        "label": "組織・集団",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference",
-        "label": "Place",
+        "label": "場所",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/DateReference",
-        "label": "Date",
+        "label": "日時",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference",
-        "label": "Physical object",
+        "label": "モノ",
     },
     {
         "id": "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference",
-        "label": "Conceptual object",
+        "label": "概念・概念的モノ",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeReference',
-                "label": "Office",
+                "label": "役職",
             },
         ],
     }
@@ -181,16 +221,24 @@ const defaultCurationTypeSelect = [
 
 const defaultFactoidRelationSelect = [
     {
-        "label": "Because",
+        "label": "なぜなら",
         "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
     },
     {
-        "label": "Therefore",
+        "label": "それゆえ",
         "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
     },
     {
-        "label": "During",
+        "label": "の間",
         "id": 'https://junjun7613.github.io/MicroKnowledge/property/during',
+    },
+    {
+        "label": "の前に生じた",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/before',
+    },
+    {
+        "label": "の後に生じた",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/after',
     }
 ];
 
@@ -213,6 +261,14 @@ const defaultEntityData = [
         attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/class/referencesEntity" 
     },
+    { 
+        title: "（生物学的）性別", 
+        label: "(Biological) Sex", 
+        model: "SexInput", 
+        type: "text", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/class/sex" 
+    },
 ]
 
 const defaultNodeData = [
@@ -224,7 +280,7 @@ const defaultNodeData = [
         id: "https://junjun7613.github.io/MicroKnowledge/property/hasComment" 
     },
     { 
-        title: "典拠情報を入力", 
+        title: "典拠URIを入力", 
         label: "Source", 
         model: "sourceCitation", 
         type: "uri", 
@@ -238,7 +294,7 @@ const defaultCurationData = [
         label: "Transcription", 
         model: "transcription", 
         type: "text", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference"],
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference","https://junjun7613.github.io/MicroKnowledge/class/OrgReference","https://junjun7613.github.io/MicroKnowledge/class/PlaceReference","https://junjun7613.github.io/MicroKnowledge/class/DateReference","https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference","https://junjun7613.github.io/MicroKnowledge/class/OfficeReference","https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/property/hasTranscriotion" 
     },
     { 
@@ -246,7 +302,7 @@ const defaultCurationData = [
         label: "Comment", 
         model: "comment", 
         type: "text", 
-        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference"],
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference", "https://junjun7613.github.io/MicroKnowledge/class/OrgReference", "https://junjun7613.github.io/MicroKnowledge/class/PlaceReference", "https://junjun7613.github.io/MicroKnowledge/class/DateReference", "https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference", "https://junjun7613.github.io/MicroKnowledge/class/OfficeReference", "https://junjun7613.github.io/MicroKnowledge/class/ConceptualObjReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/property/hasComment" 
     },
 ]
