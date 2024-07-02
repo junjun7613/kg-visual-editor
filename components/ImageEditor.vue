@@ -544,6 +544,7 @@ const backToDialog = () => {
     {{selectedAnnotationUri}}
     -->
     <v-text-field
+      class="mt-4"
       label="IIIF Manifest URL"
       v-model="inputManifestUrl"
       @keyup.enter="loadManifest"

@@ -14,17 +14,24 @@
       <v-col cols="12" md="6">
         <div>
           <v-btn @click="showNodeModal = true" class="ml-2 mt-2"
-            >ファクトイドを追加</v-btn
+            >Statementを追加</v-btn
           >
           <v-btn @click="showEntityModal = true" class="ml-2 mt-2"
-            >エンティティを追加</v-btn
+            >Entityを追加</v-btn
           >
           <v-btn @click="showEdgeModal = true" class="ml-2 mt-2"
-            >エッジを追加</v-btn
+            >Edgeを追加</v-btn
           >
-          <v-btn @click="relateImage" class="ml-2 mt-2" color="green"
-            >画像とリンク</v-btn
+        </div>
+        <div class="mt-3">
+          <v-btn v-if="tabIndex == 0" @click="relateImage" class="ml-2 mt-2" color="green"
+            ><em>画像</em>とリンク</v-btn
           >
+          <v-btn v-if="tabIndex == 1" @click="relateText" class="ml-2 mt-2" color="green"
+            ><em>テクスト</em>とリンク</v-btn
+          >
+        </div>
+        <div class="mt-3">
           <v-btn @click="editSelectedElement" class="ml-2 mt-2" color="blue"
             >更新</v-btn
           >
@@ -33,13 +40,20 @@
           >
         </div>
 
+        <div
+          class="my-4"
+          id="cy"
+          ref="cyElement"
+          style="width: 100%; height: 650px; border: 1px solid #ccc"
+        ></div>
+
         <div>
           <!--<v-btn @click="updateDB">データベースに登録</v-btn>-->
-          <v-btn @click="downloadJson" class="ml-2 mt-3"
-            >JSONファイルをダウンロード</v-btn
+          <v-btn @click="downloadJson" class="ml-2 mt-2"
+            >JSON Download</v-btn
           >
-          <v-btn @click="downloadTurtle" class="ml-2 mt-3"
-            >Turtleファイルをダウンロード</v-btn
+          <v-btn @click="downloadTurtle" class="ml-2 mt-2"
+            >Turtle Download</v-btn
           >
           <input
             type="file"
@@ -47,17 +61,10 @@
             style="display: none"
             @change="handleGraphFileUpload"
           />
-          <v-btn @click="triggerGraphFileUpload" class="ml-2 mt-3"
-            >JSONファイルをアップロード</v-btn
+          <v-btn @click="triggerGraphFileUpload" class="ml-2 mt-2"
+            >JSON Upload</v-btn
           >
         </div>
-
-        <div
-          class="my-4"
-          id="cy"
-          ref="cyElement"
-          style="width: 100%; border: 1px solid #ccc"
-        ></div>
 
         <div>
           <input
@@ -80,7 +87,17 @@
         </div>
       </v-col>
       <v-col cols="12" md="6">
-        <ImageEditor />
+        <v-tabs v-model="tabIndex">
+          <v-tab>IIIF Image Viewer</v-tab>
+          <v-tab>TEI Viewer</v-tab>
+        </v-tabs>
+        <div v-show="tabIndex===0">
+            <ImageEditor />
+        </div>
+        <div v-show="tabIndex===1">
+            <TextEditor />
+        </div>
+    
       </v-col>
     </v-row>
   </v-container>
@@ -98,7 +115,7 @@
         <v-col sm="12">
           <v-card-text>
             <div>
-              <h3 class="input-title">ID情報を入力</h3>
+              <h3 class="input-title">prefixを入力</h3>
               <treeselect
                 :multiple="false"
                 :options="prefixes"
@@ -106,6 +123,7 @@
                 v-model="prefixSelect"
                 class="mb-4"
               />
+              <!--
               <v-text-field
                 density="compact"
                 v-model="nodeId"
@@ -113,6 +131,7 @@
                 variant="outlined"
                 required
               ></v-text-field>
+              -->
             </div>
             <div>
               <h3 class="input-title">タイプを選択</h3>
@@ -127,6 +146,7 @@
             </div>
             <div>
               <!--<h3>ラベルを入力</h3>-->
+              <h3 class="input-title">ラベルを選択</h3>
               <v-text-field
                 density="compact"
                 v-model="labelInput"
@@ -171,7 +191,7 @@
         <v-col sm="12">
           <v-card-text>
             <div>
-              <h3 class="input-title">IDを入力</h3>
+              <h3 class="input-title">prefixを入力</h3>
               <treeselect
                 :multiple="false"
                 :options="prefixes"
@@ -179,6 +199,7 @@
                 v-model="prefixSelect"
                 class="mb-4"
               />
+              <!--
               <v-text-field
                 density="compact"
                 v-model="entityId"
@@ -186,6 +207,7 @@
                 required
                 variant="outlined"
               ></v-text-field>
+              -->
             </div>
             <div>
               <h3 class="input-title">タイプを選択</h3>
@@ -276,7 +298,7 @@
     <v-card height="600px">
       <v-card-title>エッジの作成</v-card-title>
       <v-card-text>
-        <v-text-field v-model="edgeId" label="エッジID" required></v-text-field>
+        <!--<v-text-field v-model="edgeId" label="エッジID" required></v-text-field>-->
         <!--<v-text-field v-model="edgeType" label="エッジタイプ" required></v-text-field>-->
         <div
           v-if="
@@ -477,6 +499,7 @@
 //import ImageDrop from '@/components/ImageTextDrop.vue';
 import ImageTextDrop from "@/components/ImageTextDrop.vue";
 import ImageEditor from "@/components/ImageEditor.vue";
+import TextEditor from "@/components/TextEditor.vue";
 import { ref, watch } from "vue";
 import cytoscape from "cytoscape";
 import Treeselect from "vue3-treeselect";
@@ -502,13 +525,14 @@ import { computed } from "vue";
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, startToEndList, selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes } = useEditor();
 
 watch(annotation_result, (newValue, oldValue) => {
   console.log("annotation_resultが更新されました。", annotation_result.value);
 });
 
-const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
+//const activeTab = ref(null); // 最初のタブをデフォルトとしてアクティブにする
+const tabIndex = ref(0);
 
 const prefixes = ref(defaultPrefixes);
 const colors = ref(defaultColors);
@@ -587,6 +611,20 @@ const updateGraphDataWithAnnotation = () => {
   // 例えば、cytoscape.jsを利用している場合、グラフのノードやエッジを追加・更新する処理をここに書きます。
 };
 
+const updateNodeTextLink = () => {
+  console.log("clickedEntityObjectが更新されました。", clickedEntityObject.value);
+    if (clickedEntityObject.value) {
+      const nodeId = clickedEntityObject.value[0].id;
+      const elementId = clickedEntityObject.value[1];
+
+      console.log(nodeId);
+      console.log(elementId);
+
+      let node = cy.getElementById(nodeId);
+      node.data("correspondingText", elementId);
+    }
+};
+
 // annotation_resultを監視する
 watch(annotation_result.value, (newValue, oldValue) => {
   // annotation_resultが変更された際に実行される処理
@@ -594,6 +632,11 @@ watch(annotation_result.value, (newValue, oldValue) => {
 });
 
 onMounted(() => {
+
+  watch(clickedEntityObject, (newValue, oldValue) => {
+    updateNodeTextLink();
+  }, {deep: true});
+
   cy = cytoscape({
     container: cyElement.value,
     elements: [],
@@ -681,9 +724,21 @@ onMounted(() => {
 
   //cy.on('click', 'node, edge', (event) => {
   cy.on("click", "node", (event) => {
+    clickedNode.value = null;
+
     const node = event.target;
     const nodeId = node.id();
     const nodeShape = node.data("shape") || "unknown"; // shapeがない場合は'unknown'を使用
+
+    const selectedNodeStartEnd = [];
+    if (node.data("descriptionStart") && node.data("descriptionEnd")){
+      //console.log(node.data("descriptionStart"))
+      selectedNodeStartEnd.push(node.data("descriptionStart").split("#").slice(-1)[0]);
+      //console.log(node.data("descriptionEnd"))
+      selectedNodeStartEnd.push(node.data("descriptionEnd").split("#").slice(-1)[0]);
+      //console.log(selectedNodeStartEnd)
+      selectedNodeStartToEndList.value = selectedNodeStartEnd;
+    }
 
     deletingElement.value = event.target;
 
@@ -694,6 +749,7 @@ onMounted(() => {
       // ノードがすでに選択されている場合は削除
       selectedNodes.value.splice(nodeIndex, 1);
       node.removeClass("selected");
+      selectedNodeStartToEndList.value = [null, null];
     } else {
       // 新しいノードを選択する
       if (selectedNodes.value.length >= 2) {
@@ -702,6 +758,7 @@ onMounted(() => {
         cy.getElementById(removedNode.id).removeClass("selected");
       }
       selectedNodes.value.push({ id: nodeId, shape: nodeShape });
+      clickedNode.value = node.data();
       node.addClass("selected");
     }
   });
@@ -858,6 +915,9 @@ const handleMouseover = (event, nodeData) => {
           key !== "label" &&
           key !== "shape" &&
           key !== "correspondingImage" &&
+          key !== "correspondingText" &&
+          key !== "descriptionStart" &&
+          key !== "descriptionEnd" &&
           value
         ) {
           // キー名をラベルとして、値を表示
@@ -1371,6 +1431,21 @@ function convertToTurtle(nodes, edges, curations) {
         `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasVisualDescription> <${node.correspondingImage}>`
       );
     }
+    if (node.correspondingText) {
+      properties.push(
+        `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTextualDescription> <${node.correspondingText}>`
+      );
+    }
+    if (node.descriptionStart) {
+      properties.push(
+        `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#descriptionStart> <${node.descriptionStart}>`
+      );
+    };
+    if (node.descriptionEnd) {
+      properties.push(
+        `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#descriptionEnd> <${node.descriptionEnd}>`
+      );
+    };
 
     // dataFieldsに基づいてノードの各プロパティを処理
     const processedModels = new Set();
@@ -1421,50 +1496,13 @@ function convertToTurtle(nodes, edges, curations) {
 
     console.log(curation);
 
-    /*
-    // 先に tags の処理を行う
-    if (
-      curation["https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"]
-    ) {
-      const tagsString =
-        curation[
-          "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"
-        ][0];
-      const tags = tagsString.split(",");
-      console.log(tags);
-      for (const tag of tags) {
-        properties.push(
-          `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag> "${tag}"`
-        );
-      }
-    }
-    */
-    /*
-    for (const key in curation) {
-      if (
-        key != "id" &&
-        key != "type" &&
-        key != "https://junjun7613.github.io/MicroKnowledge/himiko.owl#hasTag"
-      ) {
-        if (
-          key ==
-          "https://junjun7613.github.io/MicroKnowledge/himiko.owl#referencesEntity"
-        ) {
-          properties.push(`  <${key}> <${curation[key]}>`);
-        } else {
-          properties.push(`  <${key}> "${curation[key]}"`);
-        }
-      }
-    }
-    */
-
     // dataFieldsに基づいてノードの各プロパティを処理
     const processedModels = new Set();
     dataFields.value.forEach((field) => {
       console.log(field);
       if (!processedModels.has(field.model)) {
         const value = curation[field.model];
-        if (value != null) {
+        if (value != "" && value != null) {
           const object = field.type === "uri" ? `<${value}>` : `"${value}"`; // 目的語の型に応じてフォーマット
           properties.push(`  <${field.id}> ${object}`);
         }
@@ -1642,6 +1680,8 @@ const loadGraphData = (data) => {
     curationURIs.value = curations;
     annotation_result.value = curations;
     cy.layout({ name: "preset" }).run(); // レイアウトを更新
+
+    uploadedNodes.value = nodes;
   }
 };
 
@@ -1762,6 +1802,21 @@ const relateImage = () => {
 
     let node = cy.getElementById(nodeId);
     node.data("correspondingImage", content_state_api.value);
+  }
+};
+
+//ノードとテクスト領域をリンクする処理
+const relateText = () => {
+  const selectedNodes_ = selectedNodes.value;
+
+  if (selectedNodes_.length === 1) {
+    const selectedNode = selectedNodes_[0];
+
+    let nodeId = selectedNode.id;
+
+    let node = cy.getElementById(nodeId);
+    node.data("descriptionStart", startToEndList.value[0]);
+    node.data("descriptionEnd", startToEndList.value[1]);
   }
 };
 

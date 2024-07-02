@@ -292,7 +292,7 @@ const defaultEntityData = [
 
 const defaultNodeData = [
     { 
-        title: "コメントを入力", 
+        title: "説明を入力", 
         label: "Comment", 
         model: "comment", 
         type: "text", 

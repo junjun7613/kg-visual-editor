@@ -11,11 +11,26 @@ export const useEditor = () => {
 
   const curationURIs = useState<Entity[]>("curations", () => []);
 
+  const startToEndList = useState<Entity[]>("startToEndList", () => []);
+
+  const selectedNodeStartToEndList = useState<Entity[]>("selectedNodeStartToEndList", () => []);
+
+  const clickedEntityObject = useState<Entity[]>("clickedEntity", () => []);
+
+  const clickedNode = useState<Entity[]>("clickedNodeLabel", () => []);
+
+  const uploadedNodes = useState<Entity[]>("uploadedNodes", () => []);
+
   return {
     content_state_api,
     annotation_result,
     curation_type_select,
     curation_data,
     curationURIs,
+    startToEndList,
+    selectedNodeStartToEndList,
+    clickedEntityObject,
+    clickedNode,
+    uploadedNodes,
   };
 };
