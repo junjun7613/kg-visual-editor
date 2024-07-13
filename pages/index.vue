@@ -10,6 +10,10 @@
   </v-app>
 -->
 <v-container fluid>
+  <!--
+  {{entityFields}}
+  {{editableEntityData}}
+  -->
     <v-row>
       <v-col cols="12" md="6">
         <div>
@@ -382,15 +386,15 @@
               ></v-text-field>
             </div>
             <div v-for="field in nodeFields" :key="field.model">
-              <h3 class="input-title">{{ field.title }}</h3>
-              <v-text-field
-                density="compact"
-                :type="field.type"
-                :label="field.label"
-                :required="field.required"
-                variant="outlined"
-                v-model="editableFactoidData[field.model]"
-              ></v-text-field>
+                <h3 class="input-title">{{ field.title }}</h3>
+                <v-text-field
+                  density="compact"
+                  :type="field.type"
+                  :label="field.label"
+                  :required="field.required"
+                  variant="outlined"
+                  v-model="editableFactoidData[field.model]"
+                ></v-text-field>
             </div>
           </v-card-text>
         </v-col>
@@ -446,6 +450,7 @@
               ></v-text-field>
             </div>
             <div v-for="field in entityFields" :key="field.model">
+              <div v-if="field.attachedType.includes(editableEntityData.type)">
               <h3 class="input-title">{{ field.title }}</h3>
               <v-text-field
                 density="compact"
@@ -455,6 +460,7 @@
                 variant="outlined"
                 v-model="editableEntityData[field.model]"
               ></v-text-field>
+              </div>
             </div>
           </v-card-text>
         </v-col>
@@ -999,7 +1005,8 @@ const showGraphData = () => {
     // node.dataに含まれるすべてのキーについて反復処理を行う
     Object.entries(node.data()).forEach(([key, value]) => {
       // 値がnullでない場合、それをnodeDataに追加する
-      if (value != null) {
+      //if (value != null) {
+      if (value != "" && value != null) {
         nodeData[key] = value;
       }
     });
@@ -1021,7 +1028,9 @@ const showGraphData = () => {
       } else if ((key == "@id") | (key == "@type")) {
         item[key.replace("@", "")] = curation[key];
       } else {
-        item[key] = curation[key];
+        if (curation[key] != "") {
+          item[key] = curation[key];
+        }
       }
     }
     curations.push(item);
@@ -1493,6 +1502,10 @@ function convertToTurtle(nodes, edges, curations) {
   curations.forEach((curation) => {
     turtleData += `<${curation.id}> a <${curation.type}>`;
     const properties = [];
+
+    properties.push(
+      `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#contentStateAPI> <${curation.contentStateAPI}>`
+    );
 
     console.log(curation);
 

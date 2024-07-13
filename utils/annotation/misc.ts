@@ -44,7 +44,7 @@ const defaultColors = {
 const defaultNodeTypeSelect = [
     {
         "id": 'https://junjun7613.github.io/MicroKnowledge/class/EventFactoid',
-        "label": "出来事",
+        "label": "行為",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Dedication',
@@ -70,7 +70,7 @@ const defaultNodeTypeSelect = [
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeFactoid',
-                "label": "役職在任",
+                "label": "役職",
             },
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/AffiliationFactoid',
@@ -229,12 +229,12 @@ const defaultCurationTypeSelect = [
 
 const defaultEntityRelationSelect = [
     {
-        "label": "なぜなら",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
+        "label": "親子",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/parentChild',
     },
     {
-        "label": "それゆえ",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
+        "label": "夫婦",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/spouse',
     }
 ];
 
@@ -288,11 +288,27 @@ const defaultEntityData = [
         attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference"],
         id: "https://junjun7613.github.io/MicroKnowledge/class/sex" 
     },
+    { 
+        title: "単位", 
+        label: "Unit", 
+        model: "UnitInput", 
+        type: "text", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/class/unity" 
+    },
+    { 
+        title: "数量", 
+        label: "Quantity", 
+        model: "QuantityInput", 
+        type: "text", 
+        attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PhysicalObjReference"],
+        id: "https://junjun7613.github.io/MicroKnowledge/class/quantity" 
+    },
 ]
 
 const defaultNodeData = [
     { 
-        title: "説明を入力", 
+        title: "コメント", 
         label: "Comment", 
         model: "comment", 
         type: "text", 

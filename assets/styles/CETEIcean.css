@@ -76,6 +76,18 @@ tei-add[place=inline]:before {
 tei-add[place=inline]:after {
   content: "»";
 }
+tei-ex:before {
+  content: "(";
+}
+tei-ex:after {
+  content: ")";
+}
+tei-supplied:before {
+  content: "[";
+}
+tei-supplied:after {
+  content: "]";
+}
 tei-add[place=below] {
   vertical-align: sub;
 }
@@ -939,6 +951,7 @@ tei-supplied:after {
   content: "]";
 }
 
+/*tei-gap[extent="unknown"]:before {*/
 tei-gap:before {
-  content: "[---]";
+  content: "[ --- ]";
 }
