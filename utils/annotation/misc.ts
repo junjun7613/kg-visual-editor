@@ -235,30 +235,46 @@ const defaultEntityRelationSelect = [
     {
         "label": "夫婦",
         "id": 'https://junjun7613.github.io/MicroKnowledge/property/spouse',
+    },
+    {
+        "label": "友人",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/friend',
     }
 ];
 
 const defaultFactoidRelationSelect = [
     {
-        "label": "なぜなら",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
+        "label": "因果関係",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/causalRelation',
+        "children": [
+            {
+                "label": "なぜなら",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/because',
+            },
+            {
+                "label": "それゆえ",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
+            },
+        ]
     },
     {
-        "label": "それゆえ",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/therefore',
-    },
-    {
-        "label": "の間",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/during',
-    },
-    {
-        "label": "の前に生じた",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/before',
-    },
-    {
-        "label": "の後に生じた",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/after',
-    }
+        "label": "時系列",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/chronologicalRelation',
+        "children": [
+            {
+                "label": "の間",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/during',
+            },
+            {
+                "label": "の前に生じた",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/before',
+            },
+            {
+                "label": "の後に生じた",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/after',
+            }
+        ]
+        }
 ];
 
 const defaultEntityData = [
@@ -273,7 +289,7 @@ const defaultEntityData = [
     },
     */
     { 
-        title: "外部URIを入力", 
+        title: "典拠データを入力", 
         label: "External URI", 
         model: "externalURIInput", 
         type: "uri", 
@@ -281,8 +297,8 @@ const defaultEntityData = [
         id: "https://junjun7613.github.io/MicroKnowledge/class/referencesEntity" 
     },
     { 
-        title: "（生物学的）性別", 
-        label: "(Biological) Sex", 
+        title: "ジェンダー", 
+        label: "Gender", 
         model: "SexInput", 
         type: "text", 
         attachedType: ["https://junjun7613.github.io/MicroKnowledge/class/PersonReference"],
