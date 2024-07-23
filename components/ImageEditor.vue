@@ -20,6 +20,7 @@ const dialog2 = ref(false);
 const dialogInfo = ref(false)
 
 const annotationData = ref(null)
+const type_label = ref("")
 
 const curationTypeSelect = ref(defaultCurationTypeSelect);
 const origCurationData = ref(defaultCurationData);
@@ -362,34 +363,16 @@ const loadManifest = async () => {
     }
     if (annotation && annotation.body.length > 1 ){
       annotationData.value = annotation;
+      //typeのラベルを表示するための探索をこの時点で行い、type_labelを取得する
+      const type = annotation.body.find(item => item.field === 'type').value
+      for (const item of curationTypeSelect.value){
+        if (item.id === type){
+          type_label.value = item.label
+        }
+      }
       dialogInfo.value = true;
     }
   });
-  anno.on('mouseEnterAnnotation', function(annotation:any, element:any) {
-      console.log(annotation)
-      const popup = document.getElementById('popup');
-      if (popup) {
-        // アノテーションの座標をビューポート座標に変換（例えば、アノテーションが画像上の特定の点を指している場合）
-        const viewportPoint = viewer.viewport.imageToViewportCoordinates(annotation.x, annotation.y);
-
-        // ビューポート座標をウェブページのピクセル座標に変換
-        const pixelPoint = viewer.viewport.viewportToViewerElementCoordinates(viewportPoint);
-
-        // ポップアップの位置を設定
-        popup.style.left = `${pixelPoint.x}px`;
-        popup.style.top = `${pixelPoint.y}px`;
-
-        // ポップアップの内容を更新
-        popup.innerHTML = `Annotation: ${annotation.id}`;
-        popup.style.display = 'block';
-      }
-  });
-  anno.on('mouseLeaveAnnotation', function() {
-      const popup = document.getElementById('popup');
-      if (popup) {
-        popup.style.display = 'none'; // ポップアップを非表示にする
-      }
-    });
 };
 
 const openDialog = () => {
@@ -576,6 +559,7 @@ const closeDialogInfo = () => {
     <!--
     {{existsAnnotationMap}}
     {{selectedAnnotationUri}}
+    {{annotation_result}}
     -->
     <v-text-field
       class="mt-4"
@@ -611,6 +595,7 @@ const closeDialogInfo = () => {
             class="mb-4"
           ></treeselect>
         </v-card-text>
+        <br/>
         <v-card-actions>
           <v-btn varinat="flat" @click="dialog = false">キャンセル</v-btn>
           <v-spacer></v-spacer>
@@ -655,12 +640,17 @@ const closeDialogInfo = () => {
         <v-card-title>Annotation情報</v-card-title>
         
         <div v-for="item in annotationData.body">
-          <div v-if="'field' in item && item['value'] !== ''">
+          <div v-if="'field' in item && item['value'] !== null && item['value'] !== ''">
+            <v-card-text v-if="item.field === 'type'">
+              <h3 class="input-title">{{ item.field }}</h3>
+              <p style="margin-left: 50px;margin-right: 50px;text-align: center;">{{type_label}}</p>
+            </v-card-text>
+            <v-card-text v-else>
               <h3 class="input-title">{{ item.field }}</h3>
               <p style="margin-left: 50px;margin-right: 50px;text-align: center;">{{item.value}}</p>
-              <br/>
+            </v-card-text>
           </div>
-          </div>
+        </div>
         <v-card-actions>
           <v-btn varinat="flat" @click="closeDialogInfo()">閉じる</v-btn>
         </v-card-actions>
