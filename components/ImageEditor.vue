@@ -17,6 +17,9 @@ interface Annotation {
 
 const dialog = ref(false);
 const dialog2 = ref(false);
+const dialogInfo = ref(false)
+
+const annotationData = ref(null)
 
 const curationTypeSelect = ref(defaultCurationTypeSelect);
 const origCurationData = ref(defaultCurationData);
@@ -356,10 +359,37 @@ const loadManifest = async () => {
       console.log("Selected annotation ID:", selectedAnnotationId.value); // コンソールに表示
       console.log("selected annotation URI: ", selectedAnnotationUri);
       findSelectedAnnotationUri(); // URIを検索して表示
-
-      //dialog.value = true;
+    }
+    if (annotation && annotation.body.length > 1 ){
+      annotationData.value = annotation;
+      dialogInfo.value = true;
     }
   });
+  anno.on('mouseEnterAnnotation', function(annotation:any, element:any) {
+      console.log(annotation)
+      const popup = document.getElementById('popup');
+      if (popup) {
+        // アノテーションの座標をビューポート座標に変換（例えば、アノテーションが画像上の特定の点を指している場合）
+        const viewportPoint = viewer.viewport.imageToViewportCoordinates(annotation.x, annotation.y);
+
+        // ビューポート座標をウェブページのピクセル座標に変換
+        const pixelPoint = viewer.viewport.viewportToViewerElementCoordinates(viewportPoint);
+
+        // ポップアップの位置を設定
+        popup.style.left = `${pixelPoint.x}px`;
+        popup.style.top = `${pixelPoint.y}px`;
+
+        // ポップアップの内容を更新
+        popup.innerHTML = `Annotation: ${annotation.id}`;
+        popup.style.display = 'block';
+      }
+  });
+  anno.on('mouseLeaveAnnotation', function() {
+      const popup = document.getElementById('popup');
+      if (popup) {
+        popup.style.display = 'none'; // ポップアップを非表示にする
+      }
+    });
 };
 
 const openDialog = () => {
@@ -536,6 +566,10 @@ const backToDialog = () => {
   dialog.value = true;
 }
 
+const closeDialogInfo = () => {
+  dialogInfo.value = false;
+}
+
 </script>
 <template>
   <client-only>
@@ -615,6 +649,27 @@ const backToDialog = () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialogInfo" width="600px">
+      <v-card>
+        <v-card-title>Annotation情報</v-card-title>
+        
+        <div v-for="item in annotationData.body">
+          <div v-if="'field' in item && item['value'] !== ''">
+              <h3 class="input-title">{{ item.field }}</h3>
+              <p style="margin-left: 50px;margin-right: 50px;text-align: center;">{{item.value}}</p>
+              <br/>
+          </div>
+          </div>
+        <v-card-actions>
+          <v-btn varinat="flat" @click="closeDialogInfo()">閉じる</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <div id="popup" style="position: absolute; display: none; background: white; border: 1px solid black; padding: 10px;">
+    <!-- ポップアップの内容 -->
+    </div>
   </client-only>
 </template>
 <style>

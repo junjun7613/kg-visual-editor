@@ -531,7 +531,7 @@ import { computed } from "vue";
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, startToEndList, selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, startToEndList, selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes, colorMatches } = useEditor();
 
 watch(annotation_result, (newValue, oldValue) => {
   console.log("annotation_resultが更新されました。", annotation_result.value);
@@ -1733,6 +1733,7 @@ const updateSettings = (type, data) => {
   switch (type) {
     case "Colors":
       colors.value = data["data"];
+      colorMatches.value = data["data"];
       break;
     case "Prefixes":
       prefixes.value = data["data"];

@@ -2,7 +2,23 @@
 import CETEI from "CETEIcean";
 import { v4 as uuidv4 } from "uuid";
 
-const { startToEndList,selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes } = useEditor();
+import {
+  defaultPrefixes,
+  defaultColors,
+  defaultNodeTypeSelect,
+  defaultEntityTypeSelect,
+  defaultEdgeTypeSelect,
+  defaultEntityRelationSelect,
+  defaultFactoidRelationSelect,
+  defaultEntityData,
+  defaultNodeData,
+  defaultCurationTypeSelect,
+  defaultCurationData,
+} from "~/utils/annotation/misc";
+
+const { startToEndList,selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes, colorMatches } = useEditor();
+
+const colors = ref(defaultColors)
 
 const teiHTML = ref<string>("");
 const text = ref("");
@@ -48,6 +64,10 @@ watch(selectedNodeStartToEndList, (newVal) => {
     highlightRange(newVal[0], newVal[1]);
   }
 });
+
+watch(colorMatches, () => {
+  colors.value = colorMatches
+})
 
 function getNodeAndOffset(root, offset) {
   const stack = [root];
@@ -101,6 +121,9 @@ function highlightRange(start, end) {
     const highlight = document.createElement('span');
     highlight.classList.add('highlight'); // ハイライト用のクラスを追加
     highlight.appendChild(contents);
+
+    const styleColor = colors.value[clickedNode.value["type"]];
+    highlight.style.backgroundColor = styleColor;
 
     //range.surroundContents(highlight);
     range.insertNode(highlight);
@@ -387,7 +410,4 @@ function changeClickedEntityObject() {
   padding-bottom: 10px;
 }
 
-.highlight {
-  background-color: yellow; /* ハイライト色 */
-}
 </style>

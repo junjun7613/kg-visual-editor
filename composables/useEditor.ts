@@ -21,6 +21,8 @@ export const useEditor = () => {
 
   const uploadedNodes = useState<Entity[]>("uploadedNodes", () => []);
 
+  const colorMatches = useState<Entity[]>("colorMatches", () => []);
+
   return {
     content_state_api,
     annotation_result,
@@ -32,5 +34,6 @@ export const useEditor = () => {
     clickedEntityObject,
     clickedNode,
     uploadedNodes,
+    colorMatches,
   };
 };
