@@ -23,6 +23,10 @@ export const useEditor = () => {
 
   const colorMatches = useState<Entity[]>("colorMatches", () => []);
 
+  const deletingEntity = useState<string>("deletingEntity", () => "");
+
+  const manifestUrl = useState<string>("manifestUrl", () => "");
+
   return {
     content_state_api,
     annotation_result,
@@ -35,5 +39,7 @@ export const useEditor = () => {
     clickedNode,
     uploadedNodes,
     colorMatches,
+    deletingEntity,
+    manifestUrl,
   };
 };

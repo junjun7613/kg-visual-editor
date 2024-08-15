@@ -18,7 +18,7 @@ const defaultPrefixes = [/*{
 ]
 
 const defaultColors = {
-    "https://junjun7613.github.io/MicroKnowledge/class/EventFactoid": 'red',
+    "https://junjun7613.github.io/MicroKnowledge/class/Honoring": 'red',
     "https://junjun7613.github.io/MicroKnowledge/class/Dedication": 'darkred',
     //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#ContactFactoid": 'crimson',
     //"https://junjun7613.github.io/MicroKnowledge/himiko.owl#StatementFactoid": 'coral',
@@ -43,74 +43,300 @@ const defaultColors = {
 
 const defaultNodeTypeSelect = [
     {
-        "id": 'https://junjun7613.github.io/MicroKnowledge/class/EventFactoid',
-        "label": "行為",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Activity',
+        "label": "Activity",
         "children": [
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Dedication',
-                "label": "奉献",
+                "label": "Dedication",
+                "children": [
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/DivineDedication',
+                        "label": 'Divine dedication'
+                    }
+                ]
             },
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Honoring',
-                "label": "顕彰",
+                "label": "Honoring",
             },
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Mourning',
-                "label": "追悼",
+                "label": "Mourning",
             },
             {
                 "id": 'https://junjun7613.github.io/MicroKnowledge/class/Decree',
-                "label": "決議",
+                "label": "Decree",
+                "children": [
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/MunicipalDecree',
+                        "label": 'Municipal decree',
+                    }
+                ]
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Donation',
+                "label": "Donation",
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Transaction',
+                "label": "Transaction",
             },
         ],
     },
     {
         "id": 'https://junjun7613.github.io/MicroKnowledge/class/StateOfAffairsFactoid',
-        "label": "状態・状況",
+        "label": "State of affairs",
         "children": [
             {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeFactoid',
-                "label": "役職",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/class/AffiliationFactoid',
-                "label": "所属",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/class/StatusFactoid',
-                "label": "身分",
-            },
-            {
-                "id": 'https://junjun7613.github.io/MicroKnowledge/class/RelationsipFactoid',
-                "label": "関係",
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/OfficeHold',
+                "label": "Office",
                 "children": [
                     {
-                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/FamilialRelationshipFactoid',
-                        "label": "親族関係",
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/StateOfficeHold',
+                        "label": 'State office-hold'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/MunicialOfficeHold',
+                        "label": 'Municipal office-hold'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/VillageOfficeHold',
+                        "label": 'Village office-hold'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/ProvateOfficeHold',
+                        "label": 'Private office-hold'
+                    }
+                ]
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Affiliation',
+                "label": "Affiliation",
+                "children": [
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Citizen',
+                        "label": 'is citizen of'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Member',
+                        "label": 'is member of'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Patron',
+                        "label": 'is patron of'
+                    }
+                ]
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Status',
+                "label": "Status",
+                "children": [
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Senatorial',
+                        "label": 'Senatorial'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Equites',
+                        "label": 'Equites'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Equites',
+                        "label": 'Equites'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/Decuriones',
+                        "label": 'Decuriones'
+                    },
+                    {
+                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/possessor',
+                        "label": 'Possessor'
+                    }
+                ]
+            },
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/class/Relation',
+                "label": "Relation",
+                "children": [
+                    {
+                        "id": 'http://data.snapdrgn.net/ontology/snap#AllianceWith',
+                        "label": "Alliance with",
                         "children": [
                             {
-                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/HusbandWifeFactoid',
-                                "label": "夫ー妻",
-                            },
-                            {
-                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/FatherSonFactoid',
-                                "label": "父ー子",
+                                "id": 'http://data.snapdrgn.net/ontology/snap#FriendshipFor',
+                                "label": "Friendship for",
                             },
                         ],
                     },
                     {
-                        "id": 'https://junjun7613.github.io/MicroKnowledge/class/SocialRelationshipFactoid',
-                        "label": "社会関係",
+                        "id": 'http://data.snapdrgn.net/ontology/snap#ExtendedHouseholdOf',
+                        "label": "Extended househod of",
                         "children": [
                             {
-                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/PatronageFactoid',
-                                "label": "パトロネジ",
+                                "id": 'http://data.snapdrgn.net/ontology/snap#SlaveOf',
+                                "label": "Slave of",
+                                "children":[
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#HouseSlaveOf',
+                                        "label": 'House slave of',
+                                    }
+                                ],
                             },
                             {
-                                "id": 'https://junjun7613.github.io/MicroKnowledge/class/ExSlaveFactoid',
-                                "label": "被解放関係",
+                                "id": 'http://data.snapdrgn.net/ontology/snap#HouseHoldOf',
+                                "label": "Household of",
+                                "children":[
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#HouseSlaveOf',
+                                        "label": 'House slave of',
+                                    }
+                                ],
+                            },
+                            {
+                                "id": 'http://data.snapdrgn.net/ontology/snap#FreedSlaveOf',
+                                "label": "Freed slave of",
+                                "children":[
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#FreedmanOf',
+                                        "label": 'Freed man of',
+                                    },
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#FreedwomanOf',
+                                        "label": 'Freed woman of',
+                                    },
+                                ],
                             },
                         ],
+                    },
+                    {
+                        "id": 'http://data.snapdrgn.net/ontology/snap#QualifierRelationship',
+                        "label": 'Qualifier relationship',
+                        "children": [
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#ClaimedFamilyRelationship',
+                                "label":'Claimed family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#AcknowledgedFamilyRelationship',
+                                "label":'Acknowledged family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#StepFamilyRelationship',
+                                "label":'Step family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#InLawFamilyRelationship',
+                                "label":'In law family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#AdoptedFamilyRelationship',
+                                "label":'Adopted family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#FosterFamilyRelationship',
+                                "label":'Foster family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#HalfFamilyRelationship',
+                                "label":'Half family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#MaternalFamilyRelationship',
+                                "label":'Maternal family relationship',
+                            },
+                            {
+                                "id":'http://data.snapdrgn.net/ontology/snap#PaternalFamilyRelationship',
+                                "label":'Paternal family relationship',
+                            },
+                        ]
+                    },
+                    {
+                        "id":'http://data.snapdrgn.net/ontology/snap#KinOf',
+                        "label": 'Kin of',
+                        "children": [
+                            {
+                                "id": 'http://data.snapdrgn.net/ontology/snap#FamilyOf',
+                                "label": 'Family of',
+                                "children": [
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#HereditaryFamilyOf',
+                                        "label": 'Hereditary family of',
+                                        "children": [
+                                            {
+                                                "id": 'http://data.snapdrgn.net/ontology/snap#SiblingOf',
+                                                "label": 'Sibling of',
+                                                "children": [
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#BrotherOf',
+                                                        "label": 'Brother of'
+                                                    },
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#SisterOf',
+                                                        "label": 'Sister of'
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 'http://data.snapdrgn.net/ontology/snap#ParentOf',
+                                                "label": 'Parent of',
+                                                "children": [
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#MotherOf',
+                                                        "label": 'Mother of'
+                                                    },
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#FatherOf',
+                                                        "label": 'Father of'
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 'http://data.snapdrgn.net/ontology/snap#ChildOf',
+                                                "label": 'Child of',
+                                                "children": [
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#DaughterOf',
+                                                        "label": 'Daughter of'
+                                                    },
+                                                    {
+                                                        "id": 'http://data.snapdrgn.net/ontology/snap#SonOf',
+                                                        "label": 'Son of'
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": 'http://data.snapdrgn.net/ontology/snap#EmnityFor',
+                        "label": 'Emnity for'
+                    },
+                    {
+                        "id": 'http://data.snapdrgn.net/ontology/snap#ProfessionalRelationship',
+                        "label": 'Professional relationship'
+                    },
+                    {
+                        "id": 'http://data.snapdrgn.net/ontology/snap#IntimateRelationshipWith',
+                        "label": 'Intimate relationship with',
+                        "children": [
+                            {
+                                "id": 'http://data.snapdrgn.net/ontology/snap#SeriousIntimateRelationshipWith',
+                                "laebel": 'Serious intimate relationship with',
+                                "children": [
+                                    {
+                                        "id": 'http://data.snapdrgn.net/ontology/snap#LegallyRecognizedRelationshipWith',
+                                        "label": 'Legally recognized relationship with'
+                                    }
+                                ]
+                            },
+                            {
+                                "id": 'http://data.snapdrgn.net/ontology/snap#CasualIntimateRelationshipWith',
+                                "laebel": 'Casual intimate relationship with',
+                            }
+                        ]
                     }
                 ],
             }
@@ -229,8 +455,14 @@ const defaultCurationTypeSelect = [
 
 const defaultEntityRelationSelect = [
     {
-        "label": "親子",
-        "id": 'https://junjun7613.github.io/MicroKnowledge/property/parentChild',
+        "label": "relation",
+        "id": 'https://junjun7613.github.io/MicroKnowledge/property/relation',
+        "children": [
+            {
+                "id": 'https://junjun7613.github.io/MicroKnowledge/property/alliedWith',
+                "label": 'allied with'
+            }
+        ]
     },
     {
         "label": "夫婦",

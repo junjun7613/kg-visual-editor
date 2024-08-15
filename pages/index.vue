@@ -1,18 +1,10 @@
-
 <template>
-  <!--
-  <v-app>
-    <v-content>
-    <v-container fluid class="mainSearch">
-    <h1 class="searchTitle">HIMIKO Image Editor</h1>
-    </v-container>
-    </v-content>
-  </v-app>
--->
 <v-container fluid>
   <!--
   {{entityFields}}
   {{editableEntityData}}
+  {{annotation_result}}
+  {{selectedNodes}}
   -->
     <v-row>
       <v-col cols="12" md="6">
@@ -28,9 +20,10 @@
           >
         </div>
         <div class="mt-3">
+          <!--
           <v-btn v-if="tabIndex == 0" @click="relateImage" class="ml-2 mt-2" color="green"
             ><em>画像</em>とリンク</v-btn
-          >
+          >-->
           <v-btn v-if="tabIndex == 1" @click="relateText" class="ml-2 mt-2" color="green"
             ><em>テクスト</em>とリンク</v-btn
           >
@@ -48,7 +41,7 @@
           class="my-4"
           id="cy"
           ref="cyElement"
-          style="width: 100%; height: 650px; border: 1px solid #ccc"
+          style="width: 100%; height: 707px; border: 1px solid #ccc"
         ></div>
 
         <div>
@@ -348,10 +341,45 @@
         <v-btn color="blue darken-1" text @click="showEdgeModal = false"
           >キャンセル</v-btn
         >
+        <!--<v-btn color="blue darken-1" text @click="showEdgeDataModal = true">データ入力へ</v-btn>-->
         <v-btn color="blue darken-1" text @click="createEdge">作成</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- エッジデータ作成用モーダル -->
+   <!--
+  <v-dialog
+    v-model="showEdgeDataModal"
+    persistent
+    max-width="500px"
+    max-height="400px"
+  >
+    <v-card height="600px">
+      <v-card-title>エッジデータの作成</v-card-title>
+      <v-card-text>
+        <div v-for="field in nodeFields" :key="field.model">
+              <h3 class="input-title">{{ field.title }}</h3>
+              <v-text-field
+                density="compact"
+                :type="field.type"
+                :label="field.label"
+                :required="field.required"
+                variant="outlined"
+                v-model="factoidData[field.model]"
+              ></v-text-field>
+            </div>
+      </v-card-text>
+        
+      <v-card-actions>
+        <v-btn color="blue darken-1" text @click="showEdgeDataModal = false"
+          >キャンセル</v-btn
+        >
+        <v-btn color="blue darken-1" text @click="createEdge">作成</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+-->
 
   <!--ノード編集用モーダル-->
   <v-dialog
@@ -531,7 +559,7 @@ import { computed } from "vue";
 
 //const selectedAnnotationUri = computed(() => store.state.selectedAnnotationUri);
 
-const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, startToEndList, selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes, colorMatches } = useEditor();
+const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, startToEndList, selectedNodeStartToEndList, clickedEntityObject, clickedNode, uploadedNodes, colorMatches, deletingEntity, manifestUrl } = useEditor();
 
 watch(annotation_result, (newValue, oldValue) => {
   console.log("annotation_resultが更新されました。", annotation_result.value);
@@ -566,12 +594,14 @@ const cyElement = ref(null);
 let cy = null;
 const selectedElement = ref(null);
 const deletingElement = ref(null);
+const deletingEntityId = ref(null);
 const selectedNodes = ref([]);
 const selectedEdges = ref([]);
 const showNodeModal = ref(false);
 const showEntityModal = ref(false);
 const showEntityDataModal = ref(false);
 const showEdgeModal = ref(false);
+const showEdgeDataModal = ref(false);
 const prefixSelect = ref(null);
 const nodeId = ref(null);
 const nodeType = ref(null);
@@ -649,6 +679,7 @@ onMounted(() => {
     style: [
       {
         selector: 'node[shape="factoid"]',
+        /*
         style: {
           shape: "round-rectangle", // 角なし四角形
           color: "grey",
@@ -660,9 +691,37 @@ onMounted(() => {
           label: (ele) => {
             return ele.data("label");
           },
+          "text-valign": "center", // テキストを垂直方向の中央に配置
+          "text-halign": "center", // テキストを水平方向の中央に配置
+          "text-outline-width": 1, // テキストのアウトラインの太さを2に設定
+          "text-outline-color": "#FFF", // テキストのアウトラインの色を白に設定
           width: 70, // 幅を50ピクセルに設定
           height: 50, // 高さを50ピクセルに設定
         },
+        */
+        style: {
+          'shape': 'round-rectangle',
+          'background-color': '#fff',
+          'border-color': (ele) => {
+            // ノードの type データに基づいて色を返す
+            const type = ele.data("type");
+            return colors.value[type] || "#666"; // 色が定義されていない場合のデフォルト値
+          },
+          'border-width': 1,
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'color': '#000',
+          'font-size': '9px',
+          'font-weight': 'bold',
+          'text-wrap': 'wrap',
+          'text-max-width': 80, // テキストの最大幅を制限
+          'padding': '10px', // ノード内のパディング
+          'background-image': 'url(画像のURL)', // オプション: 背景画像
+          'background-fit': 'cover', // 背景画像のフィット方法
+          label: (ele) => {
+            return ele.data("label");
+          },
+        }
       },
       {
         selector: 'node[shape="entity"]',
@@ -681,6 +740,11 @@ onMounted(() => {
             //return parts[parts.length - 1];
             return ele.data("label");
           },
+          "text-valign": "center", // テキストを垂直方向の中央に配置
+          "text-halign": "center", // テキストを水平方向の中央に配置
+          'font-size': '9px',
+          "text-outline-width": 1.5, // テキストのアウトラインの太さを2に設定
+          "text-outline-color": "#FFF", // テキストのアウトラインの色を白に設定
         },
       },
       {
@@ -697,7 +761,8 @@ onMounted(() => {
           width: 3,
           "line-color": "#ccc",
           "target-arrow-color": "#ccc",
-          "target-arrow-shape": "triangle-tee", // エッジの矢印の形状を設定
+          //"target-arrow-shape": "triangle-tee", // エッジの矢印の形状を設定
+          "target-arrow-shape": "diamond", // エッジの矢印の形状を設定
           "curve-style": "bezier",
           label: (ele) => {
             //ID(URL)をスラッシュで分割し、最後の要素を取得
@@ -712,6 +777,7 @@ onMounted(() => {
           },
           "text-rotation": "autorotate", // ラベルの回転を自動調整
           "text-margin-y": -10,
+          'font-size': '9px',
         },
       },
       {
@@ -746,6 +812,7 @@ onMounted(() => {
       selectedNodeStartToEndList.value = selectedNodeStartEnd;
     }
 
+    deletingEntityId.value = nodeId;
     deletingElement.value = event.target;
 
     // selectedNodesに現在のノードが含まれているかチェック
@@ -823,6 +890,7 @@ onMounted(() => {
     handleMouseout();
     selectedElement.value = null;
   });
+
 });
 
 // ポップアップのスタイル設定
@@ -900,7 +968,8 @@ console.log(dataFields.value)
 const handleMouseover = (event, nodeData) => {
   if (!popperElement.value) {
     const IDParts = nodeData.id.split("/");
-    const completeID = IDParts[IDParts.length - 1];
+    let completeID = IDParts[IDParts.length - 1];
+    completeID = completeID.replace("manifest.json", "");
     const TypeParts = nodeData.type.split("#");
     const completeType = TypeParts[TypeParts.length - 1];
     // ポップアップ要素がまだない場合は作成
@@ -924,6 +993,8 @@ const handleMouseover = (event, nodeData) => {
           key !== "correspondingText" &&
           key !== "descriptionStart" &&
           key !== "descriptionEnd" &&
+          key !== "@context" &&
+          key !== "contentStateAPI" &&
           value
         ) {
           // キー名をラベルとして、値を表示
@@ -1013,12 +1084,23 @@ const showGraphData = () => {
     return nodeData;
   });
 
-  const edges = cy.edges().map((edge) => ({
-    id: edge.id(),
-    type: edge.data("type"),
-    source: edge.data("source"),
-    target: edge.data("target"),
-  }));
+  const edges = cy.edges().map((edge) => {
+    const edgeData = {
+      id: edge.id(),
+      type: edge.data("type"),
+      source: edge.data("source"),
+      target: edge.data("target"),
+    };
+    // node.dataに含まれるすべてのキーについて反復処理を行う
+    Object.entries(edge.data()).forEach(([key, value]) => {
+      // 値がnullでない場合、それをedgeDataに追加する
+      //if (value != null) {
+      if (value != "" && value != null) {
+        edgeData[key] = value;
+      }
+    });
+    return edgeData;
+});
 
   const curations = [];
   for (const curation of annotation_result.value) {
@@ -1039,9 +1121,75 @@ const showGraphData = () => {
   graphData.value = {
     nodes,
     edges,
-    curations,
+    //curations,
   };
 };
+
+// deletingEntityの値が変更されたときに実行されるウォッチャー
+watch(() => deletingEntity.value, (newVal, oldVal) => {
+  if (newVal) {
+    const nodeToDelete = cy.getElementById(manifestUrl.value + newVal);
+    if (nodeToDelete) {
+      nodeToDelete.remove();
+      console.log(`ノード ${newVal} が削除されました。`);
+    }
+  }
+});
+
+// annotation_resultが更新されたときに実行される関数
+watch(annotation_result.value, (newValue, oldValue) => {
+  const nodeIds = cy.nodes().map((node) => node.id());
+    console.log(nodeIds);
+    // 新しいアノテーション結果を基にノードデータを準備
+    const nodeData = newValue.map(annotation => {
+      // ノードの一意のIDを取得し、#で分割して最後の要素を取得
+      const nodeId = annotation["@id"]
+      //const nodeId = annotation["strippedID"]
+      //console.log(nodeId);
+      // cyインスタンスから特定のノードの現在の位置を取得
+      let position = { x: Math.random() * 800, y: Math.random() * 600 }; // デフォルト位置
+      if (cy.getElementById(nodeId).length) {
+        // ノードが存在する場合、その現在の位置を取得
+        position = cy.getElementById(nodeId).position();
+      }
+      return {
+        group: 'nodes',
+        data: {
+          id: annotation["@id"], // 一意のID
+          //id: annotation["strippedID"],
+          type: annotation["@type"],
+          //label: annotation.label,
+          label: annotation["label"],
+          shape: annotation["shape"],
+          // 上記以外にannotationにキーが存在すれば、それをdataのキー、値をdataの値として追加
+          //@id, @type, label, shapeは除外
+          ...Object.fromEntries(
+            Object.entries(annotation).filter(([key, value]) => !["@id", "@type", "label", "shape"].includes(key))
+          ),
+        },
+        //現在のノードの位置情報を取得し、それを新しいノードの位置として設定
+
+        position: position,
+        // ノードの位置やスタイルに関するオプションがあればここに追加
+      };
+    });
+
+    //既存のエッジデータを保持
+    const existingEdges = cy.edges();
+
+    console.log(nodeData);
+
+    //準備したノードデータを使用して、各ノードをcyに追加。もしすでにノードが存在する場合は上書きされる
+    nodeData.forEach(node => {
+      //もしnode.idがすでに存在する場合は、そのノードを削除
+      if (cy.getElementById(node.data["id"]).length > 0) {
+        cy.getElementById(node.data["id"]).remove();
+      }
+      cy.add(node);
+    });
+    cy.add(existingEdges);
+    cy.layout({ name: 'preset' }).run();
+  });
 
 const addNode = () => {
   if (detailType.value == "") {
@@ -1049,8 +1197,9 @@ const addNode = () => {
   }
 
   if (prefixSelect.value && nodeType.value) {
-    const completeID =
+    let completeID =
       prefixSelect.value + (nodeId.value || crypto.randomUUID());
+    completeID = completeID.replace("manifest.json", "");
 
     const nodeData = {
       id: completeID,
@@ -1104,8 +1253,9 @@ const addEntity = () => {
   console.log(entityData.value);
 
   if (prefixSelect.value && entityType.value) {
-    const completeID =
+    let completeID =
       prefixSelect.value + (entityId.value || crypto.randomUUID());
+    completeID = completeID.replace("manifest.json", "");
 
     const nodeData = {
       id: completeID,
@@ -1168,6 +1318,10 @@ const createEdge = () => {
         type: edgeType.value,
         source: selectedNodes.value[0]["id"],
         target: selectedNodes.value[1]["id"],
+        /*
+        ...Object.fromEntries(
+        Object.entries(factoidData.value).map(([key, value]) => [key, value])
+      ),*/
       },
     });
     edgeId.value = "";
@@ -1185,6 +1339,10 @@ const createEdge = () => {
         type: edgeType.value,
         source: selectedNodes.value[0]["id"],
         target: selectedNodes.value[1]["id"],
+        /*
+        ...Object.fromEntries(
+        Object.entries(factoidData.value).map(([key, value]) => [key, value])
+      ),*/
       },
     });
     edgeId.value = "";
@@ -1198,7 +1356,15 @@ const createEdge = () => {
 
 const deleteSelectedElement = () => {
   if (deletingElement.value) {
-    deletingElement.value.remove(); // 選択された要素を削除
+    deletingEntity.value = deletingEntityId.value;
+    //annotation_resultから当該ノードを削除
+    /*
+    const newAnnotationResult = annotation_result.value.filter(
+      (annotation) => annotation["@id"] !== deletingEntityId.value
+    );
+    annotation_result.value = newAnnotationResult;
+    */
+    deletingElement.value.remove(); // 選択された要素を削除;
     deletingElement.value = null;
   }
 };
@@ -1357,7 +1523,8 @@ const downloadJson = () => {
     const nodeData = {
       //group: 'nodes', // ノードのグループを指定
       //data: {
-      id: node.id(),
+      //id: node.id(),
+      id: node.data("wholeID"),
       type: node.data("type"),
       shape: node.data("shape"),
       label: node.data("label"),
@@ -1377,12 +1544,23 @@ const downloadJson = () => {
     return nodeData;
   });
 
-  const edges = cy.edges().map((edge) => ({
-    id: edge.id(),
-    type: edge.data("type"),
-    source: edge.data("source"),
-    target: edge.data("target"),
-  }));
+  const edges = cy.edges().map((edge) => {
+    const edgeData = {
+      id: edge.id(),
+      type: edge.data("type"),
+      source: edge.data("source"),
+      target: edge.data("target"),
+    };
+    // node.dataに含まれるすべてのキーについて反復処理を行う
+    Object.entries(edge.data()).forEach(([key, value]) => {
+      // 値がnullでない場合、それをedgeDataに追加する
+      //if (value != null) {
+      if (value != "" && value != null) {
+        edgeData[key] = value;
+      }
+    });
+    return edgeData;
+});
 
   const curations = [];
   for (const curation of annotation_result.value) {
@@ -1401,7 +1579,7 @@ const downloadJson = () => {
   const graphData = {
     nodes,
     edges,
-    curations,
+    //curations,
   };
   const graphDataJson = JSON.stringify(graphData, null, 2);
   const blob = new Blob([graphDataJson], { type: "application/json" });
@@ -1414,7 +1592,8 @@ const downloadJson = () => {
 };
 
 //Turtleへの変換
-function convertToTurtle(nodes, edges, curations) {
+//function convertToTurtle(nodes, edges, curations) {
+  function convertToTurtle(nodes, edges) {
   let turtleData =
     "@prefix : <https://junjun7613.github.io/MicroKnowledge/himiko.owl#> .\n"; // ベースURIを定義
   //存在するprefixを記述
@@ -1453,6 +1632,11 @@ function convertToTurtle(nodes, edges, curations) {
     if (node.descriptionEnd) {
       properties.push(
         `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#descriptionEnd> <${node.descriptionEnd}>`
+      );
+    };
+    if (node.contentStateAPI) {
+      properties.push(
+        `  <https://junjun7613.github.io/MicroKnowledge/himiko.owl#contentStateAPI> <${node.contentStateAPI}>`
       );
     };
 
@@ -1499,6 +1683,7 @@ function convertToTurtle(nodes, edges, curations) {
     turtleData += `<${edge.source}> <${edge.type}> <${edge.target}> .\n`;
   });
 
+  /*
   curations.forEach((curation) => {
     turtleData += `<${curation.id}> a <${curation.type}>`;
     const properties = [];
@@ -1541,13 +1726,17 @@ function convertToTurtle(nodes, edges, curations) {
       turtleData += ".\n";
     }
   });
+  */
 
   return turtleData;
 }
 
 //Turtleファイルのダウンロード
-function downloadTurtleFile(nodes, edges, curations) {
-  const turtleData = convertToTurtle(nodes, edges, curations);
+//function downloadTurtleFile(nodes, edges, curations) {
+function downloadTurtleFile(nodes, edges) {
+  console.log(nodes)
+  //const turtleData = convertToTurtle(nodes, edges, curations);
+  const turtleData = convertToTurtle(nodes, edges);
   const blob = new Blob([turtleData], { type: "text/turtle" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -1559,6 +1748,7 @@ function downloadTurtleFile(nodes, edges, curations) {
 
 const downloadTurtle = () => {
   const nodesData = cy.nodes().map((node) => {
+    console.log(node.data)
     // 基本構造のセットアップ
     let nodeData = {
       id: node.id(),
@@ -1602,7 +1792,8 @@ const downloadTurtle = () => {
   }
 
   //console.log(nodesData)
-  downloadTurtleFile(nodesData, edgesData, curationsData);
+  //downloadTurtleFile(nodesData, edgesData, curationsData);
+  downloadTurtleFile(nodesData, edgesData);
 };
 
 const handleGraphFileUpload = (event) => {
@@ -1628,7 +1819,9 @@ const triggerGraphFileUpload = () => {
 
 const loadGraphData = (data) => {
   cy.elements().remove(); // 現在のグラフデータを削除
-  if (data.nodes || data.edges || data.curations) {
+  //if (data.nodes || data.edges || data.curations) {
+  if (data.nodes || data.edges) {
+
     const nodes = data.nodes.map((node) => {
       const nodeData = {
         group: "nodes",
@@ -1666,7 +1859,7 @@ const loadGraphData = (data) => {
         target: edge.target,
       },
     }));
-
+    /*
     const curations = data.curations.map((curation) => {
       const curationData = {
         id: curation.id,
@@ -1686,12 +1879,33 @@ const loadGraphData = (data) => {
 
       return curationData;
     });
+    */
 
     cy.add(nodes);
     cy.add(edges);
-    console.log(curations);
-    curationURIs.value = curations;
-    annotation_result.value = curations;
+    console.log(nodes);
+    //curationURIsに値を入れる際に、annotation_resultの記法に合わせる
+    //curationURIs.value = curations;
+    curationURIs.value = nodes;
+    //annotation_result.value = curations;
+    for (const node of data.nodes){
+      data = {
+        "@id": node.id,
+        "@type": node.type,
+        "label": node.label,
+      }
+      Object.entries(node).forEach(([key, value]) => {
+        // id, type, positionはすでに設定されているのでスキップ
+        if (
+          !["id", "type", "position", "label"].includes(key) &&
+          value != null
+        ) {
+          data[key] = value;
+        }
+      });
+      annotation_result.value.push(data);
+    }
+    //annotation_result.value = data.nodes;
     cy.layout({ name: "preset" }).run(); // レイアウトを更新
 
     uploadedNodes.value = nodes;
