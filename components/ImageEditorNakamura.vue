@@ -149,6 +149,12 @@ watch(curationURIs, () => {
       }[];
     } = {};
 
+    //existsAnnotationMap_をオブジェクトごとに処理
+    for (const key in existsAnnotationMap_) {
+      const loadedData = existsAnnotationMap_[key];
+      console.log(loadedData);
+    }
+
     console.log({ existsAnnotationMap_, annotationsMap });
 
     // existsAnnotationMap_ => annotationsMap
@@ -531,6 +537,7 @@ const loadManifest = async () => {
   const saveToAnnotationsMap = () => {
     const index = currentIndex.value;
     annotationsMap[index] = anno.getAnnotations();
+    console.log(annotationsMap);
   };
 
   anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
