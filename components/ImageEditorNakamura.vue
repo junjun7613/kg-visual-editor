@@ -64,7 +64,11 @@ watch(curationURIs, () => {
 
   console.log("curationsが変更されました");
   curationURIs.value.forEach((uri, index) => {
-    if ("contentStateAPI" in uri.data && uri.data["contentStateAPI"] !== null) {
+    if (
+      uri.data &&
+      "contentStateAPI" in uri.data &&
+      uri.data["contentStateAPI"] !== null
+    ) {
       const loadedId = uri.data["id"];
       //const loadedId = uri.data["strippedID"]
       //console.log(loadedId)
@@ -135,6 +139,20 @@ watch(curationURIs, () => {
     //const canvases = json.sequences?.[0]?.canvases ?? [];
     const canvases = json.sequences[0].canvases;
 
+    const existsAnnotationMap_ = existsAnnotationMap.value;
+
+    var annotationsMap: {
+      [key: number]: {
+        target: {
+          source: string;
+        };
+      }[];
+    } = {};
+
+    console.log({ existsAnnotationMap_, annotationsMap });
+
+    // existsAnnotationMap_ => annotationsMap
+
     const tileSources = canvases.map((canvas: any) => {
       const resource = canvas.images[0].resource;
       //const infoUrl = canvas.images[0].resource["@id"].replace(
@@ -165,7 +183,20 @@ watch(curationURIs, () => {
 
     viewer.addHandler("page", function (event) {
       currentIndex.value = event.page;
+      anno.clearAnnotations();
+      showCurrentCanvasAnnotations();
     });
+
+    const showCurrentCanvasAnnotations = () => {
+      const index = currentIndex.value;
+
+      if (annotationsMap[index]) {
+        annotationsMap[index].forEach((annotation) => {
+          console.log({ annotation });
+          anno.addAnnotation(annotation);
+        });
+      }
+    };
 
     anno = $Annotorious(viewer);
     anno.disableEditor = true;
