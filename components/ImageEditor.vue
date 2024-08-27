@@ -18,12 +18,12 @@ interface Annotation {
 
 const dialog = ref(false);
 const dialog2 = ref(false);
-const dialogInfo = ref(false)
-const dialogEdit = ref(false)
-const dialogEdit2 = ref(false)
+const dialogInfo = ref(false);
+const dialogEdit = ref(false);
+const dialogEdit2 = ref(false);
 
-const annotationData = ref(null)
-const type_label = ref("")
+const annotationData = ref(null);
+const type_label = ref("");
 
 const label = ref("");
 
@@ -46,83 +46,95 @@ const { $OpenSeadragon, $Annotorious } = useNuxtApp();
 //? String(route.query.manifest)
 //: "https://dl.ndl.go.jp/api/iiif/1307825/manifest.json";
 
-const { content_state_api, annotation_result, curation_type_select, curation_data, curationURIs, clickedNode, deletingEntity, manifestUrl } = useEditor();
+const {
+  content_state_api,
+  annotation_result,
+  curation_type_select,
+  curation_data,
+  curationURIs,
+  clickedNode,
+  deletingEntity,
+  manifestUrl,
+} = useEditor();
 
 const uploadedPositions = ref([]);
 
 watch(curationURIs, () => {
-
-  let loadedID = ""
+  let loadedID = "";
 
   console.log("curationsが変更されました");
   curationURIs.value.forEach((uri, index) => {
-    console.log(uri)
+    console.log(uri);
 
-    if ("contentStateAPI" in uri.data && uri.data["contentStateAPI"] !== null){ 
-    
-
-      const loadedId = uri.data["id"]
+    if ("contentStateAPI" in uri.data && uri.data["contentStateAPI"] !== null) {
+      const loadedId = uri.data["id"];
       //const loadedId = uri.data["strippedID"]
       //console.log(loadedId)
       //const id = loadedId.replace("https://dl.ndl.go.jp/api/iiif/1307825/manifest.json",'')
       //const id = "#" + loadedId.split("#")[1]
-      const id = loadedId
-      console.log(id)
-      loadedID = id
-      const loadedUri = uri.data["contentStateAPI"]
-      console.log(loadedUri)
-      const decodeUri = loadedUri.replace('https://icsae.vercel.app/viewer/?iiif-content=','')
-      const decodedString = atob(decodeUri)
-      console.log(decodedString)
-      
-      if (uploadedManifestUrl.value === ""){ 
-        const manifest = JSON.parse(decodedString).partOf[0].id
-        uploadedManifestUrl.value = manifest
-        inputManifestUrl.value = manifest
-        manifestUrl.value = manifest
+      const id = loadedId;
+      console.log(id);
+      loadedID = id;
+      const loadedUri = uri.data["contentStateAPI"];
+      console.log(loadedUri);
+      const decodeUri = loadedUri.replace(
+        "https://icsae.vercel.app/viewer/?iiif-content=",
+        ""
+      );
+      const decodedString = atob(decodeUri);
+      console.log(decodedString);
+
+      if (uploadedManifestUrl.value === "") {
+        const manifest = JSON.parse(decodedString).partOf[0].id;
+        uploadedManifestUrl.value = manifest;
+        inputManifestUrl.value = manifest;
+        manifestUrl.value = manifest;
       }
-      
+
       /*
       if (inputManifestUrl.value === ""){
         const manifest = JSON.parse(decodedString).partOf[0].id
         inputManifestUrl.value = manifest
       }
       */
-      const xywh = JSON.parse(decodedString)["id"].split("#xywh=")[1]
+      const xywh = JSON.parse(decodedString)["id"].split("#xywh=")[1];
       //console.log(xywh)
-      uploadedPositions.value.push(xywh)
+      uploadedPositions.value.push(xywh);
 
       //ここでresult_を作成し、existsAnnotationMapに追加する
       const result_ = {
         "@context":
           "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
-        "@id": uri.data['id'],
+        "@id": uri.data["id"],
         //"@id": uploadedManifestUrl.value + id,
         "@type": uri.data["type"],
-        "label": uri.data["label"],
-        "contentStateAPI": uri.data["contentStateAPI"],
-        "shape": "entity",
-        "coor": xywh
+        label: uri.data["label"],
+        contentStateAPI: uri.data["contentStateAPI"],
+        shape: "entity",
+        coor: xywh,
       };
       result_["contentStateAPI"] = loadedUri;
-      for (const key in uri.data){
-        if (key !== "id" && key !== "type" && key !== "label" && key !== "contentStateAPI"){
-          result_[key] = uri.data[key]
+      for (const key in uri.data) {
+        if (
+          key !== "id" &&
+          key !== "type" &&
+          key !== "label" &&
+          key !== "contentStateAPI"
+        ) {
+          result_[key] = uri.data[key];
         }
       }
 
       existsAnnotationMap.value[id] = result_;
       //existsAnnotationMap.value[strippedID] = result_;
-
     }
-
   });
-  
+
   const loadManifest = async () => {
     const res = await fetch(uploadedManifestUrl.value);
     //const res = await fetch(inputManifestUrl.value);
     const json = await res.json();
-    console.log(json)
+    console.log(json);
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
     const canvases = json.sequences[0].canvases;
@@ -164,22 +176,21 @@ watch(curationURIs, () => {
 
     //uploadedPositions.value.forEach((position) => {
     for (const key in existsAnnotationMap.value) {
-
       console.log(existsAnnotationMap.value[key]["coor"]);
       const index = currentIndex.value;
       const canvasId = Object.values(canvasImageMap)[index];
 
       //ここで、loadedIDを使って、bodyにデータを追加する
-      const loadedData = existsAnnotationMap.value[key]
-      console.log(loadedData)
+      const loadedData = existsAnnotationMap.value[key];
+      console.log(loadedData);
 
       const body = [
         {
           type: "TextualBody",
           value: "",
-          format: "text/plain"
-        }
-      ]
+          format: "text/plain",
+        },
+      ];
       body?.push({
         field: "id",
         value: loadedData["@id"],
@@ -192,34 +203,45 @@ watch(curationURIs, () => {
         field: "label",
         value: loadedData["label"],
       });
-      for (const key in loadedData){
-        if (key !== "@id" && key !== "@type" && key !== "label"&& key !== "@context" && key !== "contentStateAPI" && key !== "shape" && key !== "coor"){
+      for (const key in loadedData) {
+        if (
+          key !== "@id" &&
+          key !== "@type" &&
+          key !== "label" &&
+          key !== "@context" &&
+          key !== "contentStateAPI" &&
+          key !== "shape" &&
+          key !== "coor"
+        ) {
           body?.push({
             field: key,
             value: loadedData[key],
-          })
+          });
         }
       }
-      
+
       anno.addAnnotation({
         "@context": "http://www.w3.org/ns/anno.jsonld",
         //"id": existsAnnotationMap.value[key]["@id"].replace(inputManifestUrl.value, ""),
-        "id": existsAnnotationMap.value[key]["@id"].replace(uploadedManifestUrl.value, ""),
-        "type": "Annotation",
-        "body": body,
-        "target": {
+        id: existsAnnotationMap.value[key]["@id"].replace(
+          uploadedManifestUrl.value,
+          ""
+        ),
+        type: "Annotation",
+        body: body,
+        target: {
           //"source": inputManifestUrl.value,
-          "source": uploadedManifestUrl.value,
-          "selector": {
-            "type": "FragmentSelector",
-            "conformsTo": "http://www.w3.org/TR/media-frags/",
-            "value": `xywh=pixel:${existsAnnotationMap.value[key]["coor"]}`
-          }
-        }
+          source: uploadedManifestUrl.value,
+          selector: {
+            type: "FragmentSelector",
+            conformsTo: "http://www.w3.org/TR/media-frags/",
+            value: `xywh=pixel:${existsAnnotationMap.value[key]["coor"]}`,
+          },
+        },
       });
-      
-    //});
-    };
+
+      //});
+    }
 
     anno.on("createSelection", async function (selection: any) {
       // Tag to insert
@@ -241,7 +263,7 @@ watch(curationURIs, () => {
 
     // アノテーションが選択されたときのイベントハンドラ
     anno.on("selectAnnotation", function (annotation: any) {
-      console.log(annotation)
+      console.log(annotation);
       selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
       if (annotation && annotation.id) {
         selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -251,51 +273,50 @@ watch(curationURIs, () => {
         console.log("selected annotation URI: ", selectedAnnotationUri);
         findSelectedAnnotationUri(); // URIを検索して表示
       }
-      if (annotation && annotation.body.length > 1 ){
-      annotationData.value = annotation;
-      //typeのラベルを表示するための探索をこの時点で行い、type_labelを取得する
-      const type = annotation.body.find(item => item.field === 'type').value
-      for (const item of curationTypeSelect.value){
-        if (item.id === type){
-          type_label.value = item.label
+      if (annotation && annotation.body.length > 1) {
+        annotationData.value = annotation;
+        //typeのラベルを表示するための探索をこの時点で行い、type_labelを取得する
+        const type = annotation.body.find(
+          (item) => item.field === "type"
+        ).value;
+        for (const item of curationTypeSelect.value) {
+          if (item.id === type) {
+            type_label.value = item.label;
+          }
         }
+        dialogInfo.value = true;
       }
-      dialogInfo.value = true;
-    }
-      
     });
 
     watch(clickedNode, () => {
-    console.log("clickedNodeが変更されました");
-    if (clickedNode.value !== null){
-      console.log(clickedNode.value)
-      //const annotationId = clickedNode.value["id"].replace(inputManifestUrl.value, "")
-      const annotationId = clickedNode.value["id"]
-      console.log(annotationId)
-      selectAnnotationById(anno, annotationId)
-    }
-  });
+      console.log("clickedNodeが変更されました");
+      if (clickedNode.value !== null) {
+        console.log(clickedNode.value);
+        //const annotationId = clickedNode.value["id"].replace(inputManifestUrl.value, "")
+        const annotationId = clickedNode.value["id"];
+        console.log(annotationId);
+        selectAnnotationById(anno, annotationId);
+      }
+    });
 
-  watch (deletingEntity, (newVal, oldVal) => {
-  if (newVal !== null) {
-    deleteAnnotationById(newVal);
-    //annotation_resultから、deletingEntityに一致するものを削除する
-    
-    const index = annotation_result.value.findIndex(
-      (item: Entity) => item["@id"] === inputManifestUrl.value + deletingEntity.value
-    );
-    //if (index !== -1) {
-    annotation_result.value.splice(index, 1);
-    //}
-    
-  }
-});
+    watch(deletingEntity, (newVal, oldVal) => {
+      if (newVal !== null) {
+        deleteAnnotationById(newVal);
+        //annotation_resultから、deletingEntityに一致するものを削除する
 
-  }
+        const index = annotation_result.value.findIndex(
+          (item: Entity) =>
+            item["@id"] === inputManifestUrl.value + deletingEntity.value
+        );
+        //if (index !== -1) {
+        annotation_result.value.splice(index, 1);
+        //}
+      }
+    });
+  };
 
   loadManifest();
-  
-})
+});
 
 const canvasImageMap: { [key: string]: string } = {};
 
@@ -304,9 +325,9 @@ const text = ref("");
 const uri = ref("");
 const height = ref(0);
 //const existsAnnotationMap = ref<{
-  //[key: string]: Entity;
+//[key: string]: Entity;
 //}>({});
-const existsAnnotationMap = ref({})
+const existsAnnotationMap = ref({});
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const uploadedManifestUrl = ref(""); // アップロードされたManifestのURL
@@ -332,21 +353,21 @@ watch(curation_type_select, () => {
 watch(curation_data, () => {
   console.log("curation_dataが変更されました");
   origCurationData.value = curation_data.value;
-      curationFields.value = [];
-      curationData.value = {};
-      curation_data.value.forEach((item) => {
-        curationData.value[item["model"]] = "";
-        const field = {
-          title: item["title"],
-          label: item["label"],
-          model: item["model"],
-          type: item["type"],
-          attachedType: item["attachedType"],
-          id: item["id"],
-          required: true,
-        };
-        curationFields.value.push(field);
-      });
+  curationFields.value = [];
+  curationData.value = {};
+  curation_data.value.forEach((item) => {
+    curationData.value[item["model"]] = "";
+    const field = {
+      title: item["title"],
+      label: item["label"],
+      model: item["model"],
+      type: item["type"],
+      attachedType: item["attachedType"],
+      id: item["id"],
+      required: true,
+    };
+    curationFields.value.push(field);
+  });
 });
 
 onMounted(async () => {
@@ -391,11 +412,9 @@ let anno: any = null;
 //onMounted(async () => {
 //height.value = window.innerHeight - 64;
 const loadManifest = async () => {
-  
   manifest.value = inputManifestUrl.value; // ユーザーが入力したURLを使用する
   //manifest.value = 'https://edh.ub.uni-heidelberg.de/iiif/edh/F000001.manifest.json';
-  
-  
+
   const res = await fetch(manifest.value);
   //const res = await fetch(manifest);
   const json = await res.json();
@@ -458,7 +477,7 @@ const loadManifest = async () => {
 
   // アノテーションが選択されたときのイベントハンドラ
   anno.on("selectAnnotation", function (annotation: any) {
-    console.log(annotation)
+    console.log(annotation);
     selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -467,13 +486,13 @@ const loadManifest = async () => {
       console.log("selected annotation URI: ", selectedAnnotationUri);
       findSelectedAnnotationUri(); // URIを検索して表示
     }
-    if (annotation && annotation.body.length > 1 ){
+    if (annotation && annotation.body.length > 1) {
       annotationData.value = annotation;
       //typeのラベルを表示するための探索をこの時点で行い、type_labelを取得する
-      const type = annotation.body.find(item => item.field === 'type').value
-      for (const item of curationTypeSelect.value){
-        if (item.id === type){
-          type_label.value = item.label
+      const type = annotation.body.find((item) => item.field === "type").value;
+      for (const item of curationTypeSelect.value) {
+        if (item.id === type) {
+          type_label.value = item.label;
         }
       }
       dialogInfo.value = true;
@@ -482,39 +501,40 @@ const loadManifest = async () => {
 
   watch(clickedNode, () => {
     console.log("clickedNodeが変更されました");
-    if (clickedNode.value !== null){
-      console.log(clickedNode.value)
-      const annotationId = clickedNode.value["id"].replace(inputManifestUrl.value, "") 
-      selectAnnotationById(anno, annotationId)
+    if (clickedNode.value !== null) {
+      console.log(clickedNode.value);
+      const annotationId = clickedNode.value["id"].replace(
+        inputManifestUrl.value,
+        ""
+      );
+      selectAnnotationById(anno, annotationId);
     }
   });
 
-  watch (deletingEntity, (newVal, oldVal) => {
-  if (newVal !== null) {
-    deleteAnnotationById(newVal.replace(inputManifestUrl.value, ""));
-    //deleteAnnotationById(newVal);
-    //annotation_resultから、deletingEntityに一致するものを削除する
-    
-    const index = annotation_result.value.findIndex(
-      (item: Entity) => item["@id"] === deletingEntity.value
-    );
-    if (index !== -1) {
-      annotation_result.value.splice(index, 1);
-    }
-    
-  }
-});
+  watch(deletingEntity, (newVal, oldVal) => {
+    if (newVal !== null) {
+      deleteAnnotationById(newVal.replace(inputManifestUrl.value, ""));
+      //deleteAnnotationById(newVal);
+      //annotation_resultから、deletingEntityに一致するものを削除する
 
+      const index = annotation_result.value.findIndex(
+        (item: Entity) => item["@id"] === deletingEntity.value
+      );
+      if (index !== -1) {
+        annotation_result.value.splice(index, 1);
+      }
+    }
+  });
 };
 
 const openDialog = () => {
   dialog.value = true;
   label.value = "";
-}
+};
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
   const annotationId = annotation.id;
-  console.log(annotation)
+  console.log(annotation);
 
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
   const intXywh = xywh
@@ -552,15 +572,15 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     //"@id": annotationId,
     "@id": inputManifestUrl.value + annotationId,
     "@type": "",
-    "label": label.value,
-    "shape": "entity",
+    label: label.value,
+    shape: "entity",
     //"strippedID": annotationId,
   };
 
   result_["contentStateAPI"] = uri_;
 
   const body = annotation.body;
-  console.log(body)
+  console.log(body);
 
   const tags = [];
 
@@ -619,7 +639,6 @@ const deleteContentStateAPI = () => {
   delete existsAnnotationMap.value[selectedAnnotationId.value];
 };
 
-
 const createAnnotation = async () => {
   const valueType_ = valueType.value;
 
@@ -636,13 +655,12 @@ const createAnnotation = async () => {
   });
 
   //console.log(curationData.value)
-  for (const field of filteredCurationFields.value){
+  for (const field of filteredCurationFields.value) {
     body?.push({
       field: field["model"],
       value: curationData.value[field["model"]],
-    })
+    });
   }
-  
 
   await anno.updateSelected(selectedAnnotation_);
   anno.saveSelected();
@@ -651,14 +669,14 @@ const createAnnotation = async () => {
   selectedAnnotation.value = null;
   valueType.value = null;
   Object.keys(curationData.value).forEach((key) => {
-      curationData.value[key] = null;
-    });
+    curationData.value[key] = null;
+  });
 
   dialog2.value = false;
   filteredCurationFields.value = [];
 };
 
-const createEditedAnnotation = async() => {
+const createEditedAnnotation = async () => {
   const valueType_ = selectedAnnotationType.value;
 
   const selectedAnnotation_ = selectedAnnotation.value;
@@ -667,7 +685,7 @@ const createEditedAnnotation = async() => {
 
   const body = selectedAnnotation_?.body;
   //ここで一度、既存のbodyを空にする
-  body?.splice(0)
+  body?.splice(0);
   body?.push({
     field: "type",
     value: valueType_,
@@ -677,11 +695,11 @@ const createEditedAnnotation = async() => {
     value: selectedAnnotationLabel.value,
   });
 
-  for (const field of filteredCurationFields.value){
+  for (const field of filteredCurationFields.value) {
     body?.push({
       field: field["model"],
       value: editableDataFieldsMap.value[field["model"]],
-    })
+    });
   }
 
   //console.log(body)
@@ -693,22 +711,21 @@ const createEditedAnnotation = async() => {
   selectedAnnotation.value = null;
   valueType.value = null;
   Object.keys(editableDataFieldsMap.value).forEach((key) => {
-      editableDataFieldsMap.value[key] = null;
-    });
+    editableDataFieldsMap.value[key] = null;
+  });
 
   dialogEdit2.value = false;
   filteredCurationFields.value = [];
-
-}
+};
 
 const deleteAnnotation = async () => {
   const selectedAnnotation_ = selectedAnnotation.value;
   //deletingEntity.value = selectedAnnotation_.id;
   deletingEntity.value = willDeleteAnnotation.value;
-  if (uploadedManifestUrl.value){
-    manifestUrl.value = uploadedManifestUrl.value
+  if (uploadedManifestUrl.value) {
+    manifestUrl.value = uploadedManifestUrl.value;
   } else {
-    manifestUrl.value = ""
+    manifestUrl.value = "";
   }
   await anno.removeAnnotation(selectedAnnotation_);
   dialog.value = false;
@@ -720,98 +737,105 @@ const deleteAnnotation = async () => {
 const valueType = ref(null);
 
 const curationDataModal = () => {
-  const curationTypeValue = valueType.value
-  const newCurationFields = []
-  console.log(curationFields.value)
-  for (const field of curationFields.value){
-    console.log(field)
-    console.log('Field attachedType:', field.attachedType)
-    console.log('Curation Type Value:', curationTypeValue)
-    if (field.attachedType.includes(curationTypeValue)){
-    //if (field["attachedType"] == curationTypeValue){
-      newCurationFields.push(field)
+  const curationTypeValue = valueType.value;
+  const newCurationFields = [];
+  console.log(curationFields.value);
+  for (const field of curationFields.value) {
+    console.log(field);
+    console.log("Field attachedType:", field.attachedType);
+    console.log("Curation Type Value:", curationTypeValue);
+    if (field.attachedType.includes(curationTypeValue)) {
+      //if (field["attachedType"] == curationTypeValue){
+      newCurationFields.push(field);
     }
-  };
-  console.log(newCurationFields)
+  }
+  console.log(newCurationFields);
   filteredCurationFields.value = newCurationFields;
   dialog.value = false;
   dialog2.value = true;
-}
+};
 
 const editedCurationDataModal = () => {
-  const curationTypeValue = selectedAnnotationType.value
-  const newCurationFields = []
-  console.log(curationFields.value)
-  for (const field of curationFields.value){
-    console.log(field)
-    console.log('Field attachedType:', field.attachedType)
-    console.log('Curation Type Value:', selectedAnnotationType.value)
-    if (field.attachedType.includes(curationTypeValue)){
-      newCurationFields.push(field)
+  const curationTypeValue = selectedAnnotationType.value;
+  const newCurationFields = [];
+  console.log(curationFields.value);
+  for (const field of curationFields.value) {
+    console.log(field);
+    console.log("Field attachedType:", field.attachedType);
+    console.log("Curation Type Value:", selectedAnnotationType.value);
+    if (field.attachedType.includes(curationTypeValue)) {
+      newCurationFields.push(field);
     }
-  };
-  console.log(newCurationFields)
+  }
+  console.log(newCurationFields);
   filteredCurationFields.value = newCurationFields;
   dialogEdit.value = false;
   dialogEdit2.value = true;
-}
+};
 
 const backToDialog = () => {
   dialog2.value = false;
   dialog.value = true;
-}
+};
 
 const closeDialogInfo = () => {
   dialogInfo.value = false;
-}
+};
 
 const editAnnotation = (data: object) => {
   dialogInfo.value = false;
   dialogEdit.value = true;
   selectedAnnotationId.value = data["id"];
   //data.bodyの要素から、filedというキーの値がtypeのものを取得し、そのvalueをtype_labelに代入する
-  selectedAnnotationType.value = data["body"].find(item => item.field === 'type')["value"]
-  if (data["id"] in existsAnnotationMap.value){
+  selectedAnnotationType.value = data["body"].find(
+    (item) => item.field === "type"
+  )["value"];
+  if (data["id"] in existsAnnotationMap.value) {
     selectedAnnotationUri.value = existsAnnotationMap.value[data["id"]]["@id"];
   } else {
-    selectedAnnotationUri.value = existsAnnotationMap.value[inputManifestUrl.value + data["id"]]["@id"];
+    selectedAnnotationUri.value =
+      existsAnnotationMap.value[inputManifestUrl.value + data["id"]]["@id"];
   }
-  selectedAnnotationLabel.value = data["body"].find(item => item.field === 'label')["value"]
+  selectedAnnotationLabel.value = data["body"].find(
+    (item) => item.field === "label"
+  )["value"];
   //findSelectedAnnotationUri();
-  for (const item of data["body"]){
-    console.log(item)
-    if (item["field"] !== "type" && item["type"] !== "TextualBody"){
-      const fieldType = item["field"]
-      console.log(fieldType)
-      const fieldValue = item["value"]
-      editableDataFieldsMap.value[fieldType] = fieldValue
-      editableDataFields.value.push(item["field"])
+  for (const item of data["body"]) {
+    console.log(item);
+    if (item["field"] !== "type" && item["type"] !== "TextualBody") {
+      const fieldType = item["field"];
+      console.log(fieldType);
+      const fieldValue = item["value"];
+      editableDataFieldsMap.value[fieldType] = fieldValue;
+      editableDataFields.value.push(item["field"]);
     }
   }
-}
+};
 
 function selectAnnotationById(anno, annotationId) {
   // 全てのアノテーションを取得
   const annotations = anno.getAnnotations();
 
   // 指定されたIDを持つアノテーションを検索
-  const targetAnnotation = annotations.find(annotation => annotation.id === annotationId.replace(inputManifestUrl.value, ''));
+  const targetAnnotation = annotations.find(
+    (annotation) =>
+      annotation.id === annotationId.replace(inputManifestUrl.value, "")
+  );
 
   if (targetAnnotation) {
     // 該当するアノテーションが見つかった場合、選択状態にする
     anno.selectAnnotation(targetAnnotation);
   } else {
-    console.log('指定されたIDを持つアノテーションが見つかりませんでした。');
+    console.log("指定されたIDを持つアノテーションが見つかりませんでした。");
   }
 }
 
 function deleteAnnotationById(id: any) {
-      // ここでアノテーションを削除するロジックを実装します。
-      // 例: this.annotations = this.annotations.filter(annotation => annotation.id !== id);
-      console.log(`Deleting annotation with ID: ${id}`);
-      anno.removeAnnotation(id.replace(inputManifestUrl.value, ""));
-    };
-
+  // ここでアノテーションを削除するロジックを実装します。
+  // 例: this.annotations = this.annotations.filter(annotation => annotation.id !== id);
+  console.log(`Deleting annotation with ID: ${id}`);
+  anno.removeAnnotation(id.replace(inputManifestUrl.value, ""));
+}
 </script>
 <template>
   <client-only>
@@ -838,13 +862,15 @@ function deleteAnnotationById(id: any) {
     ></v-text-field>
 
     <v-btn class="my-4 mr-4" @click="loadManifest">表示</v-btn>
-    <v-btn class="my-4 mr-4" color="primary" @click="openDialog">フォームを表示</v-btn>
+    <v-btn class="my-4 mr-4" color="primary" @click="openDialog"
+      >フォームを表示</v-btn
+    >
 
     <div
       id="osd"
       style="width: 100%; height: 650px; background-color: black"
     ></div>
-  
+
     <!-- :style="`height: ${height * 1.1}px`" -->
 
     <v-dialog v-model="dialog" width="600px">
@@ -869,7 +895,7 @@ function deleteAnnotationById(id: any) {
             v-model="label"
           ></v-text-field>
         </v-card-text>
-        <br/>
+        <br />
         <v-card-actions>
           <v-btn varinat="flat" @click="dialog = false">キャンセル</v-btn>
           <v-spacer></v-spacer>
@@ -888,15 +914,15 @@ function deleteAnnotationById(id: any) {
         <v-card-title>詳細データの入力</v-card-title>
         <v-card-text>
           <div v-for="field in filteredCurationFields" :key="field.model">
-              <h3 class="input-title">{{ field.title }}</h3>
-              <v-text-field
-                density="compact"
-                :type="field.type"
-                :label="field.label"
-                :required="field.required"
-                variant="outlined"
-                v-model="curationData[field.model]"
-              ></v-text-field>
+            <h3 class="input-title">{{ field.title }}</h3>
+            <v-text-field
+              density="compact"
+              :type="field.type"
+              :label="field.label"
+              :required="field.required"
+              variant="outlined"
+              v-model="curationData[field.model]"
+            ></v-text-field>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -912,23 +938,47 @@ function deleteAnnotationById(id: any) {
     <v-dialog v-model="dialogInfo" width="600px">
       <v-card>
         <v-card-title>Annotation情報</v-card-title>
-        
+
         <div v-for="item in annotationData.body">
-          <div v-if="'field' in item && item['value'] !== null && item['value'] !== ''">
+          <div
+            v-if="
+              'field' in item && item['value'] !== null && item['value'] !== ''
+            "
+          >
             <v-card-text v-if="item.field === 'type'">
               <h3 class="input-title">{{ item.field }}</h3>
-              <p style="margin-left: 50px;margin-right: 50px;text-align: center;">{{type_label}}</p>
+              <p
+                style="
+                  margin-left: 50px;
+                  margin-right: 50px;
+                  text-align: center;
+                "
+              >
+                {{ type_label }}
+              </p>
             </v-card-text>
             <v-card-text v-else>
               <h3 class="input-title">{{ item.field }}</h3>
-              <p style="margin-left: 50px;margin-right: 50px;text-align: center;">{{item.value}}</p>
+              <p
+                style="
+                  margin-left: 50px;
+                  margin-right: 50px;
+                  text-align: center;
+                "
+              >
+                {{ item.value }}
+              </p>
             </v-card-text>
           </div>
         </div>
         <v-card-actions>
           <v-btn varinat="flat" @click="closeDialogInfo()">閉じる</v-btn>
-          <v-btn color="blue" varinat="flat" @click="editAnnotation(annotationData)"
-            >変更</v-btn>
+          <v-btn
+            color="blue"
+            varinat="flat"
+            @click="editAnnotation(annotationData)"
+            >変更</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -955,7 +1005,7 @@ function deleteAnnotationById(id: any) {
             v-model="selectedAnnotationLabel"
           ></v-text-field>
         </v-card-text>
-        <br/>
+        <br />
         <v-card-actions>
           <v-btn varinat="flat" @click="dialogEdit = false">キャンセル</v-btn>
           <v-spacer></v-spacer>
@@ -974,16 +1024,17 @@ function deleteAnnotationById(id: any) {
         <v-card-title>詳細データの入力</v-card-title>
         <v-card-text>
           <div v-for="field in filteredCurationFields" :key="field.model">
-              <h3 class="input-title">{{ field.title }}</h3>
-              <!--もしfield.modelの値がeditableDataFieldsに含まれる各要素のfieldキーの値と一致しなければ-->
-              <v-text-field v-if="editableDataFields.includes(field.model)"
-                density="compact"
-                :type="field.type"
-                :label="field.label"
-                :required="field.required"
-                variant="outlined"
-                v-model="editableDataFieldsMap[field.model]"
-              ></v-text-field>
+            <h3 class="input-title">{{ field.title }}</h3>
+            <!--もしfield.modelの値がeditableDataFieldsに含まれる各要素のfieldキーの値と一致しなければ-->
+            <v-text-field
+              v-if="editableDataFields.includes(field.model)"
+              density="compact"
+              :type="field.type"
+              :label="field.label"
+              :required="field.required"
+              variant="outlined"
+              v-model="editableDataFieldsMap[field.model]"
+            ></v-text-field>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -996,8 +1047,17 @@ function deleteAnnotationById(id: any) {
       </v-card>
     </v-dialog>
 
-    <div id="popup" style="position: absolute; display: none; background: white; border: 1px solid black; padding: 10px;">
-    <!-- ポップアップの内容 -->
+    <div
+      id="popup"
+      style="
+        position: absolute;
+        display: none;
+        background: white;
+        border: 1px solid black;
+        padding: 10px;
+      "
+    >
+      <!-- ポップアップの内容 -->
     </div>
   </client-only>
 </template>

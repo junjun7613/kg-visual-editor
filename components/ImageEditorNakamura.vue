@@ -57,15 +57,13 @@ const {
   manifestUrl,
 } = useEditor();
 
-const uploadedPositions = ref([]);
+const uploadedPositions = ref<string[]>([]);
 
 watch(curationURIs, () => {
   let loadedID = "";
 
   console.log("curationsが変更されました");
   curationURIs.value.forEach((uri, index) => {
-    console.log(uri);
-
     if ("contentStateAPI" in uri.data && uri.data["contentStateAPI"] !== null) {
       const loadedId = uri.data["id"];
       //const loadedId = uri.data["strippedID"]
@@ -73,16 +71,13 @@ watch(curationURIs, () => {
       //const id = loadedId.replace("https://dl.ndl.go.jp/api/iiif/1307825/manifest.json",'')
       //const id = "#" + loadedId.split("#")[1]
       const id = loadedId;
-      console.log(id);
       loadedID = id;
-      const loadedUri = uri.data["contentStateAPI"];
-      console.log(loadedUri);
+      const loadedUri = uri.data["contentStateAPI"] || "";
       const decodeUri = loadedUri.replace(
         "https://icsae.vercel.app/viewer/?iiif-content=",
         ""
       );
       const decodedString = atob(decodeUri);
-      console.log(decodedString);
 
       if (uploadedManifestUrl.value === "") {
         const manifest = JSON.parse(decodedString).partOf[0].id;
@@ -102,7 +97,7 @@ watch(curationURIs, () => {
       uploadedPositions.value.push(xywh);
 
       //ここでresult_を作成し、existsAnnotationMapに追加する
-      const result_ = {
+      const result_: Entity = {
         "@context":
           "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
         "@id": uri.data["id"],
@@ -110,6 +105,7 @@ watch(curationURIs, () => {
         "@type": uri.data["type"],
         label: uri.data["label"],
         contentStateAPI: uri.data["contentStateAPI"],
+        thumbnail: uri.data["thumbnail"],
         shape: "entity",
         coor: xywh,
       };
@@ -176,15 +172,18 @@ watch(curationURIs, () => {
 
     //uploadedPositions.value.forEach((position) => {
     for (const key in existsAnnotationMap.value) {
-      console.log(existsAnnotationMap.value[key]["coor"]);
       const index = currentIndex.value;
-      const canvasId = Object.values(canvasImageMap)[index];
+      // const canvasId = Object.values(canvasImageMap)[index];
 
       //ここで、loadedIDを使って、bodyにデータを追加する
       const loadedData = existsAnnotationMap.value[key];
-      console.log(loadedData);
 
-      const body = [
+      const body: {
+        field?: string;
+        value: string;
+        type?: string;
+        format?: string;
+      }[] = [
         {
           type: "TextualBody",
           value: "",
@@ -258,12 +257,12 @@ watch(curationURIs, () => {
     });
 
     anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
+      console.log("method: updateAnnotation");
       createContentStateAPI(annotation, overrideId);
     });
 
     // アノテーションが選択されたときのイベントハンドラ
     anno.on("selectAnnotation", function (annotation: any) {
-      console.log(annotation);
       selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
       if (annotation && annotation.id) {
         selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -327,7 +326,9 @@ const height = ref(0);
 //const existsAnnotationMap = ref<{
 //[key: string]: Entity;
 //}>({});
-const existsAnnotationMap = ref({});
+const existsAnnotationMap = ref<{
+  [key: string]: Entity;
+}>({});
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const uploadedManifestUrl = ref(""); // アップロードされたManifestのURL
@@ -510,7 +511,6 @@ const loadManifest = async () => {
 
   // アノテーションが選択されたときのイベントハンドラ
   anno.on("selectAnnotation", function (annotation: any) {
-    console.log(annotation);
     selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -535,7 +535,6 @@ const loadManifest = async () => {
   watch(clickedNode, () => {
     console.log("clickedNodeが変更されました");
     if (clickedNode.value !== null) {
-      console.log(clickedNode.value);
       const annotationId = clickedNode.value["id"].replace(
         inputManifestUrl.value,
         ""
@@ -566,16 +565,16 @@ const openDialog = () => {
 };
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
+  console.log("method: createContentStateAPI");
   const annotationId = annotation.id;
-  console.log(annotation);
 
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
+
   const intXywh = xywh
     .split(",")
     .map((num: string) => Math.round(parseFloat(num)));
   const index = currentIndex.value;
   const canvasId = Object.values(canvasImageMap)[index];
-  console.log(canvasId);
 
   const api = {
     id: `${canvasId}#xywh=${intXywh}`,
@@ -599,7 +598,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const uri_ = `https://icsae.vercel.app${path}`;
   uri.value = uri_;
 
-  const result_ = {
+  const result_: Entity = {
     "@context":
       "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
     //"@id": annotationId,
@@ -608,12 +607,14 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     label: label.value,
     shape: "entity",
     //"strippedID": annotationId,
+    coor: xywh,
+    contentStateAPI: uri_,
+    thumbnail: `${annotation.target.source}/${intXywh}/300,/0/default.jpg`,
   };
 
-  result_["contentStateAPI"] = uri_;
-
   const body = annotation.body;
-  console.log(body);
+
+  const skipFields = ["thumbnail"];
 
   const tags = [];
 
@@ -633,7 +634,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       result_["@type"] = value.value;
     } else if (value.purpose === "tagging") {
       tags.push(value.value);
-    } else {
+    } else if (!skipFields.includes(value.field)) {
       result_[value.field] = value.value;
     }
   }
@@ -687,7 +688,6 @@ const createAnnotation = async () => {
     value: label.value,
   });
 
-  //console.log(curationData.value)
   for (const field of filteredCurationFields.value) {
     body?.push({
       field: field["model"],
@@ -714,8 +714,6 @@ const createEditedAnnotation = async () => {
 
   const selectedAnnotation_ = selectedAnnotation.value;
 
-  //console.log(selectedAnnotation_)
-
   const body = selectedAnnotation_?.body;
   //ここで一度、既存のbodyを空にする
   body?.splice(0);
@@ -734,8 +732,6 @@ const createEditedAnnotation = async () => {
       value: editableDataFieldsMap.value[field["model"]],
     });
   }
-
-  //console.log(body)
 
   await anno.updateSelected(selectedAnnotation_);
   anno.saveSelected();
@@ -772,7 +768,6 @@ const valueType = ref(null);
 const curationDataModal = () => {
   const curationTypeValue = valueType.value;
   const newCurationFields = [];
-  console.log(curationFields.value);
   for (const field of curationFields.value) {
     console.log(field);
     console.log("Field attachedType:", field.attachedType);

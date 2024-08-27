@@ -772,6 +772,12 @@ onMounted(() => {
           "font-size": "9px",
           "text-outline-width": 1.5, // テキストのアウトラインの太さを2に設定
           "text-outline-color": "#FFF", // テキストのアウトラインの色を白に設定
+          "background-fit": "cover",
+          "background-image": (ele) => {
+            // console.log({ ele });
+            // ノードの type データに基づいて色を返す
+            return ele.data("thumbnail") || "";
+          },
         },
       },
       {
@@ -1169,16 +1175,40 @@ watch(
   }
 );
 
+const getImageUrlFromContentStateApi = async (contentStateAPI) => {
+  const iiifContent = contentStateAPI.split("?iiif-content=")[1];
+
+  const decodedString = atob(iiifContent);
+
+  const decodedObject = JSON.parse(decodedString);
+  const itemId = decodedObject["id"];
+
+  const [canvasId, xywh] = itemId.split("#xywh=");
+
+  const manifestUri = decodedObject.partOf[0]["id"];
+
+  const res = await fetch(manifestUri);
+  const manifestJson = await res.json();
+
+  const imageApi = manifestJson["sequences"][0]["canvases"].find(
+    (canvas) => canvas["@id"] == canvasId
+  )["images"][0]["resource"]["service"]["@id"];
+
+  const imageUrl = `${imageApi}/${xywh}/300,/0/default.jpg`;
+
+  return imageUrl;
+};
+
 // annotation_resultが更新されたときに実行される関数
 watch(annotation_result.value, (newValue, oldValue) => {
+  console.log({ newValue });
   const nodeIds = cy.nodes().map((node) => node.id());
   console.log(nodeIds);
   // 新しいアノテーション結果を基にノードデータを準備
   const nodeData = newValue.map((annotation) => {
     // ノードの一意のIDを取得し、#で分割して最後の要素を取得
     const nodeId = annotation["@id"];
-    //const nodeId = annotation["strippedID"]
-    //console.log(nodeId);
+
     // cyインスタンスから特定のノードの現在の位置を取得
     let position = { x: Math.random() * 800, y: Math.random() * 600 }; // デフォルト位置
     if (cy.getElementById(nodeId).length) {
@@ -1201,6 +1231,7 @@ watch(annotation_result.value, (newValue, oldValue) => {
             ([key, value]) => !["@id", "@type", "label", "shape"].includes(key)
           )
         ),
+        thumbnail: annotation.thumbnail,
       },
       //現在のノードの位置情報を取得し、それを新しいノードの位置として設定
 
@@ -1211,8 +1242,6 @@ watch(annotation_result.value, (newValue, oldValue) => {
 
   //既存のエッジデータを保持
   const existingEdges = cy.edges();
-
-  console.log(nodeData);
 
   //準備したノードデータを使用して、各ノードをcyに追加。もしすでにノードが存在する場合は上書きされる
   nodeData.forEach((node) => {
@@ -1283,8 +1312,6 @@ const addEntity = () => {
   if (roleInput.value == "") {
     roleInput.value = null;
   }
-
-  console.log(entityData.value);
 
   if (prefixSelect.value && entityType.value) {
     let completeID =
@@ -1407,7 +1434,6 @@ const editSelectedElement = () => {
   if (selectedNodes.value.length === 1) {
     const selectedNodeId = selectedNodes.value[0].id;
     const selectedNode = cy.getElementById(selectedNodeId);
-    console.log(selectedNode.data());
 
     // 現在のノードデータを取得してeditableNodeDataに設定
     //editableNodeData.value = { ...selectedNode.data() };
@@ -1460,7 +1486,7 @@ const editSelectedElement = () => {
   } else if (selectedEdges.value.length === 1) {
     const selectedEdgeId = selectedEdges.value[0].id;
     const selectedEdge = cy.getElementById(selectedEdgeId);
-    console.log(selectedEdge.data());
+
     // 現在のノードデータを取得してeditableNodeDataに設定
     editableNodeData.value = { ...selectedEdge.data() };
     showEditEdgeModal.value = true;
@@ -1470,7 +1496,6 @@ const editSelectedElement = () => {
 };
 
 const updateNodes = () => {
-  console.log(editableFactoidData.value);
   let nodeId = editableFactoidData.value.id;
   let node = cy.getElementById(nodeId);
 
@@ -1918,7 +1943,6 @@ const loadGraphData = (data) => {
 
     cy.add(nodes);
     cy.add(edges);
-    console.log(nodes);
     //curationURIsに値を入れる際に、annotation_resultの記法に合わせる
     //curationURIs.value = curations;
     curationURIs.value = nodes;
