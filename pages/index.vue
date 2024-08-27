@@ -767,12 +767,14 @@ onMounted(() => {
             //return parts[parts.length - 1];
             return ele.data("label");
           },
-          "text-valign": "center", // テキストを垂直方向の中央に配置
+          "text-valign": "bottom", // テキストを垂直方向の中央に配置
           "text-halign": "center", // テキストを水平方向の中央に配置
           "font-size": "9px",
           "text-outline-width": 1.5, // テキストのアウトラインの太さを2に設定
           "text-outline-color": "#FFF", // テキストのアウトラインの色を白に設定
           "background-fit": "cover",
+          'background-width': '100%',
+          'background-height': '100%', 
           "background-image": (ele) => {
             // console.log({ ele });
             // ノードの type データに基づいて色を返す
