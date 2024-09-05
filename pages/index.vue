@@ -10,13 +10,13 @@
       <v-col cols="12" md="6">
         <div>
           <v-btn @click="showNodeModal = true" class="ml-2 mt-2"
-            >Statementを追加</v-btn
+            >add Statement</v-btn
           >
           <v-btn @click="showEntityModal = true" class="ml-2 mt-2"
-            >Entityを追加</v-btn
+            >add Entity</v-btn
           >
           <v-btn @click="showEdgeModal = true" class="ml-2 mt-2"
-            >Edgeを追加</v-btn
+            >add Edge</v-btn
           >
         </div>
         <div class="mt-3">
@@ -34,10 +34,10 @@
         </div>
         <div class="mt-3">
           <v-btn @click="editSelectedElement" class="ml-2 mt-2" color="blue"
-            >更新</v-btn
+            >update</v-btn
           >
           <v-btn @click="deleteSelectedElement" class="ml-2 mt-2" color="red"
-            >削除</v-btn
+            >delete</v-btn
           >
         </div>
 
@@ -74,11 +74,11 @@
           />
           <!-- 一つのボタンに変更  mt-2 -->
           <v-btn @click="triggerSettingFileUpload" class="ml-2 mt-3"
-            >設定を編集</v-btn
+            >edit settings</v-btn
           >
 
           <v-btn @click="showGraphData" class="ml-2 mt-3"
-            >グラフデータを表示</v-btn
+            >show graph data</v-btn
           >
 
           <div v-if="graphData" class="graph-container my-4">
@@ -775,10 +775,11 @@ onMounted(() => {
           "background-fit": "cover",
           'background-width': '100%',
           'background-height': '100%', 
+          //もしサムネイルがあればbackground-imageを設定
           "background-image": (ele) => {
-            // console.log({ ele });
-            // ノードの type データに基づいて色を返す
-            return ele.data("thumbnail") || "";
+            if (ele.data("thumbnail")) {
+              return ele.data("thumbnail");
+            }
           },
         },
       },
@@ -1233,7 +1234,8 @@ watch(annotation_result.value, (newValue, oldValue) => {
             ([key, value]) => !["@id", "@type", "label", "shape"].includes(key)
           )
         ),
-        thumbnail: annotation.thumbnail,
+        //もしthumbnailが存在する場合は、そのURLを取得
+        ...(annotation.thumbnail && { thumbnail: annotation.thumbnail })
       },
       //現在のノードの位置情報を取得し、それを新しいノードの位置として設定
 

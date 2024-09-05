@@ -85,6 +85,7 @@ watch(curationURIs, () => {
 
       if (uploadedManifestUrl.value === "") {
         const manifest = JSON.parse(decodedString).partOf[0].id;
+
         uploadedManifestUrl.value = manifest;
         inputManifestUrl.value = manifest;
         manifestUrl.value = manifest;
@@ -131,6 +132,10 @@ watch(curationURIs, () => {
   });
 
   const loadManifest = async () => {
+
+    const loadedCanvasesMap = {};
+    const annotationsMap = {};
+
     const res = await fetch(uploadedManifestUrl.value);
     //const res = await fetch(inputManifestUrl.value);
     const json = await res.json();
@@ -138,9 +143,15 @@ watch(curationURIs, () => {
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
     const canvases = json.sequences[0].canvases;
+    for (const key in canvases) {
+      //loadedCanvasesMap[key] = canvases[key]["@id"];
+      loadedCanvasesMap[key] = canvases[key]["images"][0]["resource"]["service"]["@id"];
+      annotationsMap[key] = [];
+    }
+    //console.log(loadedCanvasesMap);
 
     const existsAnnotationMap_ = existsAnnotationMap.value;
-
+    /*
     var annotationsMap: {
       [key: number]: {
         target: {
@@ -148,6 +159,7 @@ watch(curationURIs, () => {
         };
       }[];
     } = {};
+     */
 
     //existsAnnotationMap_をオブジェクトごとに処理
     for (const key in existsAnnotationMap_) {
@@ -256,7 +268,7 @@ watch(curationURIs, () => {
         }
       }
 
-      anno.addAnnotation({
+      const annotation = {
         "@context": "http://www.w3.org/ns/anno.jsonld",
         //"id": existsAnnotationMap.value[key]["@id"].replace(inputManifestUrl.value, ""),
         id: existsAnnotationMap.value[key]["@id"].replace(
@@ -274,7 +286,32 @@ watch(curationURIs, () => {
             value: `xywh=pixel:${existsAnnotationMap.value[key]["coor"]}`,
           },
         },
-      });
+      }
+
+      anno.addAnnotation(annotation);
+
+      console.log(loadedCanvasesMap);
+      //existsAnnotationMap.value[key]["thumbnail"]からcanvas idの部分のみ取得
+      const canvasId = existsAnnotationMap.value[key]["thumbnail"];
+      // 正規表現を使用して、特定の部分を抽出
+      const match = canvasId.match(/(https:\/\/dl\.ndl\.go\.jp\/api\/iiif\/\d+\/R\d+)/);
+
+      if (match) {
+        const extractedPart = match[1];
+        console.log(extractedPart); // https://dl.ndl.go.jp/api/iiif/1307825/R0000001
+        //extractedPartの値をvalueに持つキーをloadedCanvasesMapから取得
+        const index = Object.keys(loadedCanvasesMap).filter( (key) => { 
+          return loadedCanvasesMap[key] === extractedPart;
+        });
+        console.log(index[0]);
+        if (index.length > 0) {
+          annotationsMap[index[0]].push(annotation);
+        }
+      } else {
+        console.log("URLの形式が一致しませんでした。");
+      }
+
+      console.log(annotationsMap);
 
       //});
     }
@@ -927,9 +964,9 @@ function deleteAnnotationById(id: any) {
       hide-details
     ></v-text-field>
 
-    <v-btn class="my-4 mr-4" @click="loadManifest">表示</v-btn>
+    <v-btn class="my-4 mr-4" @click="loadManifest">show image</v-btn>
     <v-btn class="my-4 mr-4" color="primary" @click="openDialog"
-      >フォームを表示</v-btn
+      >annotation</v-btn
     >
 
     <div

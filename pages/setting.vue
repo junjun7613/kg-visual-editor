@@ -6,6 +6,7 @@
             </div>
 
             <!--ファクトイド・タイプの入力カード-->
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">ファクトイドのタイプを設定</p>
@@ -63,18 +64,27 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
                 </div>
             </v-card>
-
+            -->
+            
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">STATEMENT TYPE</p>
+                <v-btn class="add-button" @click="addFactoidTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in factoidTypeRows" :key="index">
+                    <FactoidRow :row="row" :removeRow="() => removeFactoidTypeRow(index)" />
+                </v-col>
+                </div>
+            </v-card>
+            
             <!--ファクトイドデータ項目の入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">ファクトイドのデータ入力項目を設定</p>
-                    <v-btn class="add-button" @click="addFactoidDataRow">+</v-btn>
+                    <p class="card-title">STATEMENT PROPERTY</p>
+                    <v-btn class="add-button" @click="addFactoidDataRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in factoidDataRows" :key="index">
                         <v-row>
-                            *
                             <v-col cols="12" md="2">
                                 <v-text-field density="compact" v-model="row.title" label="Titleを入力"
                                     outlined />
@@ -99,11 +109,10 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="1">
-                                <v-btn @click="removeFactoidDataRow(index)">削除</v-btn>
+                                <v-btn @click="removeFactoidDataRow(index)" color="red">DEL</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
-                    <!--{{ factoidDataRows }}-->
                 </div>
             </v-card>
 
@@ -566,7 +575,7 @@
                 </div>
             </v-card>
 
-            <v-btn class="dl-button" @click="downloadJSON">JSONダウンロード</v-btn>
+            <v-btn class="dl-button" @click="downloadJSON" color="blue">JSONダウンロード</v-btn>
             <!--{{colorTypes}}-->
         </v-container>
     </v-app>
@@ -576,6 +585,7 @@
 import { ref, watch } from "vue";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
+import FactoidRow from '@/components/FactoidRow.vue';
 
 const factoidTypeLabel = ref("");
 const factoidTypeId = ref("");
