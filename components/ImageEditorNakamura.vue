@@ -132,9 +132,16 @@ watch(curationURIs, () => {
   });
 
   const loadManifest = async () => {
-
-    const loadedCanvasesMap = {};
-    const annotationsMap = {};
+    const loadedCanvasesMap: {
+      [key: number]: string;
+    } = {};
+    const annotationsMap: {
+      [key: number]: {
+        target: {
+          source: string;
+        };
+      }[];
+    } = {};
 
     const res = await fetch(uploadedManifestUrl.value);
     //const res = await fetch(inputManifestUrl.value);
@@ -143,12 +150,11 @@ watch(curationURIs, () => {
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
     const canvases = json.sequences[0].canvases;
-    for (const key in canvases) {
-      //loadedCanvasesMap[key] = canvases[key]["@id"];
-      loadedCanvasesMap[key] = canvases[key]["images"][0]["resource"]["service"]["@id"];
-      annotationsMap[key] = [];
+
+    for (let i = 0; i < canvases.length; i++) {
+      loadedCanvasesMap[i] = canvases[i]["@id"];
+      annotationsMap[i] = [];
     }
-    //console.log(loadedCanvasesMap);
 
     const existsAnnotationMap_ = existsAnnotationMap.value;
     /*
@@ -167,7 +173,7 @@ watch(curationURIs, () => {
       console.log(loadedData);
     }
 
-    console.log({ existsAnnotationMap_, annotationsMap });
+    // console.log({ existsAnnotationMap_, annotationsMap });
 
     // existsAnnotationMap_ => annotationsMap
 
@@ -221,11 +227,24 @@ watch(curationURIs, () => {
 
     //uploadedPositions.value.forEach((position) => {
     for (const key in existsAnnotationMap.value) {
-      const index = currentIndex.value;
-      // const canvasId = Object.values(canvasImageMap)[index];
-
-      //ここで、loadedIDを使って、bodyにデータを追加する
       const loadedData = existsAnnotationMap.value[key];
+
+      const getIiifContentJson = (contentStateAPIUrl: string) => {
+        const iiifContentString = contentStateAPIUrl.split("?iiif-content=")[1];
+        return JSON.parse(atob(iiifContentString));
+      };
+
+      const iiifContentJson = getIiifContentJson(loadedData["contentStateAPI"]); // JSON.parse(atob(iiifContentString));
+
+      const canvasUri = iiifContentJson.id.split("#xywh=")[0];
+
+      const getCanvasIndex = (canvasUri: string) => {
+        return Object.values(canvasImageMap).findIndex(
+          (value) => value === canvasUri
+        );
+      };
+
+      const canvasIndex = getCanvasIndex(canvasUri);
 
       const body: {
         field?: string;
@@ -268,9 +287,10 @@ watch(curationURIs, () => {
         }
       }
 
+      const canvas = canvases[canvasIndex];
+
       const annotation = {
         "@context": "http://www.w3.org/ns/anno.jsonld",
-        //"id": existsAnnotationMap.value[key]["@id"].replace(inputManifestUrl.value, ""),
         id: existsAnnotationMap.value[key]["@id"].replace(
           uploadedManifestUrl.value,
           ""
@@ -278,42 +298,20 @@ watch(curationURIs, () => {
         type: "Annotation",
         body: body,
         target: {
-          //"source": inputManifestUrl.value,
-          source: uploadedManifestUrl.value,
+          source: canvas["images"][0].resource.service["@id"],
           selector: {
             type: "FragmentSelector",
             conformsTo: "http://www.w3.org/TR/media-frags/",
             value: `xywh=pixel:${existsAnnotationMap.value[key]["coor"]}`,
           },
         },
+      };
+
+      if (canvasIndex === 0) {
+        anno.addAnnotation(annotation);
       }
 
-      anno.addAnnotation(annotation);
-
-      console.log(loadedCanvasesMap);
-      //existsAnnotationMap.value[key]["thumbnail"]からcanvas idの部分のみ取得
-      const canvasId = existsAnnotationMap.value[key]["thumbnail"];
-      // 正規表現を使用して、特定の部分を抽出
-      const match = canvasId.match(/(https:\/\/dl\.ndl\.go\.jp\/api\/iiif\/\d+\/R\d+)/);
-
-      if (match) {
-        const extractedPart = match[1];
-        console.log(extractedPart); // https://dl.ndl.go.jp/api/iiif/1307825/R0000001
-        //extractedPartの値をvalueに持つキーをloadedCanvasesMapから取得
-        const index = Object.keys(loadedCanvasesMap).filter( (key) => { 
-          return loadedCanvasesMap[key] === extractedPart;
-        });
-        console.log(index[0]);
-        if (index.length > 0) {
-          annotationsMap[index[0]].push(annotation);
-        }
-      } else {
-        console.log("URLの形式が一致しませんでした。");
-      }
-
-      console.log(annotationsMap);
-
-      //});
+      annotationsMap[canvasIndex].push(annotation);
     }
 
     anno.on("createSelection", async function (selection: any) {
@@ -673,6 +671,10 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const uri_ = `https://icsae.vercel.app${path}`;
   uri.value = uri_;
 
+  const thumbnail = `${annotation.target.source}/${intXywh}/300,/0/default.jpg`;
+
+  console.log({ thumbnail });
+
   const result_: Entity = {
     "@context":
       "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
@@ -684,7 +686,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     //"strippedID": annotationId,
     coor: xywh,
     contentStateAPI: uri_,
-    thumbnail: `${annotation.target.source}/${intXywh}/300,/0/default.jpg`,
+    thumbnail,
   };
 
   const body = annotation.body;
