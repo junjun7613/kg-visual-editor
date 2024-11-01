@@ -73,7 +73,7 @@
                 <p class="card-title">STATEMENT TYPE</p>
                 <v-btn class="add-button" @click="addFactoidTypeRow" color="green">+</v-btn>
                 <v-col v-for="(row, index) in factoidTypeRows" :key="index">
-                    <FactoidRow :row="row" :removeRow="() => removeFactoidTypeRow(index)" />
+                    <FactoidRow :row="row" :index="index" :removeRow="() => removeFactoidTypeRow(index)" />
                 </v-col>
                 </div>
             </v-card>
@@ -81,7 +81,7 @@
             <!--ファクトイドデータ項目の入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">STATEMENT PROPERTY</p>
+                    <p class="card-title">STATEMENT PROPERTIES</p>
                     <v-btn class="add-button" @click="addFactoidDataRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in factoidDataRows" :key="index">
                         <v-row>
@@ -117,6 +117,8 @@
             </v-card>
 
             <!--エンティティ・タイプの入力カード-->
+
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">エンティティのタイプを設定</p>
@@ -174,18 +176,26 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+        -->
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">ENTITY TYPE</p>
+                <v-btn class="add-button" @click="addEntityTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in entityTypeRows" :key="index">
+                    <EntityRow :row="row" :removeRow="() => removeEntityTypeRow(index)" />
+                </v-col>
                 </div>
             </v-card>
 
             <!--エンティティデータ項目の入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">エンティティのデータ入力項目を設定</p>
-                    <v-btn class="add-button" @click="addEntityDataRow">+</v-btn>
+                    <p class="card-title">ENTITY PROPERTIES</p>
+                    <v-btn class="add-button" @click="addEntityDataRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in entityDataRows" :key="index">
                         <v-row>
-                            *
                             <v-col cols="12" md="2">
                                 <v-text-field density="compact" v-model="row.title" label="Titleを入力"
                                     outlined />
@@ -218,7 +228,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="1">
-                                <v-btn @click="removeEntityDataRow(index)">削除</v-btn>
+                                <v-btn @click="removeEntityDataRow(index)" color="red">DEL</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -226,7 +236,8 @@
                 </div>
             </v-card>
 
-            <!--エッジ・タイプの入力カード-->
+            <!--ファクトイド-エンティティ・リレーションのタイプの入力カード-->
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">ファクトイド-エンティティ・リレーションのタイプを設定</p>
@@ -284,11 +295,21 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+        -->
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">STATEMENT-ENTITY RELATIONS</p>
+                <v-btn class="add-button" @click="addEdgeTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in edgeTypeRows" :key="index">
+                    <FactoidEntityRelationRow :row="row" :removeRow="() => removeEdgeTypeRow(index)" />
+                </v-col>
                 </div>
             </v-card>
 
             <!--エンティティ関係・タイプの入力カード-->
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">エンティティ・リレーションのタイプを設定</p>
@@ -346,11 +367,21 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+        -->
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">ENTITY RELATIONS</p>
+                <v-btn class="add-button" @click="addEntityRelationTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in entityRelationTypeRows" :key="index">
+                    <EntityRelationRow :row="row" :removeRow="() => removeEntityRelationTypeRow(index)" />
+                </v-col>
                 </div>
             </v-card>
 
             <!--ファクトイド関係・タイプの入力カード-->
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">ファクトイド・リレーションのタイプを設定</p>
@@ -408,18 +439,26 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+        -->
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">STATEMENT RELATIONS</p>
+                <v-btn class="add-button" @click="addFactoidRelationTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in factoidRelationTypeRows" :key="index">
+                    <FactoidRelationRow :row="row" :removeRow="() => removeFactoidRelationTypeRow(index)" />
+                </v-col>
                 </div>
             </v-card>
 
             <!--prefixの入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">prefixを設定</p>
-                    <v-btn class="add-button" @click="addPrefixRow">+</v-btn>
+                    <p class="card-title">PREFIX</p>
+                    <v-btn class="add-button" @click="addPrefixRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in prefixRows" :key="index">
                         <v-row>
-                            *
                             <v-col cols="12" md="3">
                                 <v-text-field density="compact" v-model="row.label" label="prefixを入力"
                                     outlined />
@@ -428,7 +467,7 @@
                                 <v-text-field density="compact" v-model="row.id" label="名前空間URIを入力" outlined />
                             </v-col>
                             <v-col cols="12" md="1">
-                                <v-btn @click="removePrefixRow(index)">削除</v-btn>
+                                <v-btn @click="removePrefixRow(index)" color="red">DEL</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -439,11 +478,10 @@
             <!--colorの入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">配色を設定</p>
-                    <v-btn class="add-button" @click="addColorRow">+</v-btn>
+                    <p class="card-title">COLORS</p>
+                    <v-btn class="add-button" @click="addColorRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in colorRows" :key="index">
                         <v-row>
-                            *
                             <v-col cols="12" md="2">
                                 <v-text-field density="compact" v-model="row.label" label="色を入力"
                                     outlined />
@@ -457,7 +495,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="1">
-                                <v-btn @click="removeColorRow(index)">削除</v-btn>
+                                <v-btn @click="removeColorRow(index)" color="red">DEL</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -466,6 +504,7 @@
             </v-card>
 
             <!--キュレーション・タイプの入力カード-->
+            <!--
             <v-card class="input-card">
                 <div>
                     <p class="card-title">キュレーションのタイプを設定</p>
@@ -523,18 +562,26 @@
                         </v-col>
                         </v-col>
                     </v-col>
-                    <!--{{ factoidTypeRows }}-->
+                </div>
+            </v-card>
+        -->
+            <v-card class="input-card">
+                <div>
+                <p class="card-title">CURATION TYPE</p>
+                <v-btn class="add-button" @click="addCurationTypeRow" color="green">+</v-btn>
+                <v-col v-for="(row, index) in curationTypeRows" :key="index">
+                    <CurationRow :row="row" :removeRow="() => removeCurationTypeRow(index)" />
+                </v-col>
                 </div>
             </v-card>
 
             <!--キュレーションデータ項目の入力カード-->
             <v-card class="input-card">
                 <div>
-                    <p class="card-title">キュレーションのデータ入力項目を設定</p>
-                    <v-btn class="add-button" @click="addCurationDataRow">+</v-btn>
+                    <p class="card-title">CURATION PROPERTIES</p>
+                    <v-btn class="add-button" @click="addCurationDataRow" color="green">+</v-btn>
                     <v-col class="input-row" v-for="(row, index) in curationDataRows" :key="index">
                         <v-row>
-                            *
                             <v-col cols="12" md="2">
                                 <v-text-field density="compact" v-model="row.title" label="Titleを入力"
                                     outlined />
@@ -567,7 +614,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" md="1">
-                                <v-btn @click="removeCurationDataRow(index)">削除</v-btn>
+                                <v-btn @click="removeCurationDataRow(index)" color="red">DEL</v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
@@ -575,7 +622,7 @@
                 </div>
             </v-card>
 
-            <v-btn class="dl-button" @click="downloadJSON" color="blue">JSONダウンロード</v-btn>
+            <v-btn class="dl-button" @click="downloadJSON" color="blue">JSON DOWNLOAD</v-btn>
             <!--{{colorTypes}}-->
         </v-container>
     </v-app>
@@ -586,6 +633,11 @@ import { ref, watch } from "vue";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import FactoidRow from '@/components/FactoidRow.vue';
+import EntityRow from '@/components/EntityRow.vue';
+import FactoidEntityRelationRow from '@/components/FactoidEntityRelationRow.vue';
+import EntityRelationRow from '@/components/EntityRelationRow.vue';
+import FactoidRelationRow from '@/components/FactoidRelationRow.vue';
+import CurationRow from '@/components/CurationRow.vue';
 
 const factoidTypeLabel = ref("");
 const factoidTypeId = ref("");
