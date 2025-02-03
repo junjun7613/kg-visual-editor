@@ -142,11 +142,18 @@ watch(curationURIs, () => {
     console.log(json);
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
-    const canvases = json.sequences[0].canvases;
+    let canvases = json.canvases || json.items;
+
+    console.log(canvases)
     for (const key in canvases) {
-      //loadedCanvasesMap[key] = canvases[key]["@id"];
-      loadedCanvasesMap[key] = canvases[key]["images"][0]["resource"]["service"]["@id"];
-      annotationsMap[key] = [];
+      const canvas = canvases[key];
+          if (canvas.images && canvas.images[0] && canvas.images[0].resource && canvas.images[0].resource.service) {
+            loadedCanvasesMap[key] = canvas.images[0].resource.service["@id"];
+            annotationsMap[key] = [];
+          } else {
+            console.log(canvas)
+            console.warn(`Image resource not found for canvas ${key}`);
+          }
     }
     //console.log(loadedCanvasesMap);
 
@@ -497,7 +504,10 @@ const loadManifest = async () => {
   const json = await res.json();
 
   //const canvases = json.sequences?.[0]?.canvases ?? [];
-  const canvases = json.sequences[0].canvases;
+  const canvases = (json.sequences && json.sequences[0] && json.sequences[0].canvases) || json.items;
+      if (!canvases) {
+        const canvases = json.items;
+      }
 
   var annotationsMap: {
     [key: number]: {
@@ -508,7 +518,16 @@ const loadManifest = async () => {
   } = {};
 
   const tileSources = canvases.map((canvas: any) => {
-    const resource = canvas.images[0].resource;
+    console.log(canvas);
+    let resource;
+        if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+          resource = canvas.images[0].resource;
+        } else if (canvas.items && canvas.items[0] && canvas.items[0].items && canvas.items[0].items[0] && canvas.items[0].items[0].body) {
+          resource = canvas.items[0].items[0].body;
+        } else {
+          console.warn(`Resource not found for canvas ${canvas["@id"]}`);
+          return null;
+        }
     //const infoUrl = canvas.images[0].resource["@id"].replace(
     let infoUrl = resource["@id"].replace(
       "/full/full/0/default.jpg",
