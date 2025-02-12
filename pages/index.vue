@@ -12,9 +12,11 @@
           <v-btn @click="showNodeModal = true" class="ml-2 mt-2"
             >add Statement</v-btn
           >
+          <!--
           <v-btn @click="showEntityModal = true" class="ml-2 mt-2"
             >add Entity</v-btn
           >
+          -->
           <v-btn @click="showEdgeModal = true" class="ml-2 mt-2"
             >add Edge</v-btn
           >
@@ -1444,21 +1446,6 @@ const editSelectedElement = () => {
 
     // 編集用モーダルを表示
     if (selectedNodes.value[0].shape === "factoid") {
-      /*
-      editedNodeType.value = selectedNode.data().type
-      if (selectedNode.data().detailType) {
-        editedDetailType.value = selectedNode.data().detailType
-      }
-      if (selectedNode.data().label) {
-        editedLabelInput.value = selectedNode.data().label
-      }
-      if (selectedNode.data().sourceCitation) {
-        editedSourceCitation.value = selectedNode.data().sourceCitation
-      }
-      if (selectedNode.data().sourceURI) {
-        editedSourceURI.value = selectedNode.data().sourceURI
-      }
-      */
       editedNodeType.value = selectedNode.data().type;
       editedLabelInput.value = selectedNode.data().label;
       Object.entries(selectedNode.data()).forEach(([key, value]) => {
@@ -1468,17 +1455,6 @@ const editSelectedElement = () => {
       showEditNodeModal.value = true;
     } else if (selectedNodes.value[0].shape === "entity") {
       /*
-      editedEntityType.value = selectedNode.data().type
-      if (selectedNode.data().role) {
-        editedRoleInput.value = selectedNode.data().role;
-      }
-      if (selectedNode.data().label) {
-        editedLabelInput.value = selectedNode.data().label;
-      }
-      if (selectedNode.data().referencedEntity) {
-        editedReferencedEntity.value = selectedNode.data().referencedEntity;
-      }
-      */
       editedEntityType.value = selectedNode.data().type;
       editedLabelInput.value = selectedNode.data().label;
       Object.entries(selectedNode.data()).forEach(([key, value]) => {
@@ -1486,6 +1462,8 @@ const editSelectedElement = () => {
       });
       //モーダルを開く
       showEditEntityModal.value = true;
+      */
+     alert("Please Edit Entity on the Image"); 
     }
   } else if (selectedEdges.value.length === 1) {
     const selectedEdgeId = selectedEdges.value[0].id;
@@ -1545,6 +1523,15 @@ const updateNodes = () => {
   showEditNodeModal.value = false;
 };
 const updateEntities = () => {
+
+  /*
+  //console.log(annotation_result.value);
+  const newAnnotationResult = annotation_result.value.filter(
+    (annotation) => annotation["@id"] !== editableEntityData.value.id
+  );
+  console.log(newAnnotationResult);
+  */
+
   let nodeId = editableEntityData.value.id;
   let node = cy.getElementById(nodeId);
 
@@ -1560,13 +1547,21 @@ const updateEntities = () => {
   */
   Object.entries(editableEntityData.value).forEach(([key, value]) => {
     if (key === "type") {
-      node.data(key, editedEntityType.value);
+      node.data("@"+key, editedEntityType.value);
     } else if (key === "label") {
       node.data(key, editedLabelInput.value);
+    } else if (key === "id") {
+      node.data("@"+key, value);
     } else {
       node.data(key, value);
     }
   });
+
+  /*
+  console.log(node.data());
+  newAnnotationResult.push(node.data());
+  annotation_result.value = newAnnotationResult;
+  */
 
   /*
   editableNodeData.value = {};
@@ -1970,6 +1965,8 @@ const loadGraphData = (data) => {
     }
     //annotation_result.value = data.nodes;
     cy.layout({ name: "preset" }).run(); // レイアウトを更新
+
+    console.log(nodes);
 
     uploadedNodes.value = nodes;
   }

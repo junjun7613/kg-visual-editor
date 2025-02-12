@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@annotorious/annotorious": "^3.0.0-rc.22",
+    "@iiif/parser": "^2.1.7",
     "@mdi/font": "^7.3.67",
     "@popperjs/core": "^2.11.8",
     "@recogito/recogito-js": "^1.8.2",
