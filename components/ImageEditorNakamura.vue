@@ -331,6 +331,7 @@ watch(curationURIs, () => {
         },
       }
 
+      console.log(annotation);
       anno.addAnnotation(annotation);
 
       console.log(loadedCanvasesMap);
@@ -402,6 +403,10 @@ watch(curationURIs, () => {
     anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
       console.log(annotation);
       console.log("method: updateAnnotation");
+
+      const source = tileSources[currentIndex.value].split("/info.json")[0];
+      annotation.target.source = source;
+
       createContentStateAPI(annotation, overrideId);
     });
 
@@ -674,6 +679,10 @@ const loadManifest = async () => {
   anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
     console.log(annotation);
     console.log("updateAnnotation");
+
+    const source = tileSources[currentIndex.value].split("/info.json")[0];
+    annotation.target.source = source;
+
     // リサイズして保存されたら、既存のアノテーションを更新する
     saveToAnnotationsMap();
     createContentStateAPI(annotation, overrideId);
@@ -782,7 +791,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     //"strippedID": annotationId,
     coor: xywh,
     contentStateAPI: uri_,
-    //thumbnail: `${annotation.target.source}/${intXywh}/300,/0/default.jpg`,
+    //thumbnail: `${canvasId}/full/${intXywh.join(",")}/0/default.jpg`,
     thumbnail: `${annotation.target.source}/${intXywh}/max/0/default.jpg`,
   };
 
@@ -832,6 +841,8 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     // 要素が見つからなかった場合、newItem を配列の末尾に追加
     annotation_result.value.push(result_);
   }
+
+  console.log(result_);
 
   existsAnnotationMap.value[annotation.id] = result_;
 };
