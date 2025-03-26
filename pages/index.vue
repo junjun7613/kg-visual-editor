@@ -1005,6 +1005,7 @@ const entityNodeFields = entityFields.value.concat(nodeFields.value);
 dataFields.value = entityNodeFields.concat(curationFields.value);
 console.log(dataFields.value);
 
+/*
 // ノードにマウスオーバーしたときの処理
 const handleMouseover = (event, nodeData) => {
   if (!popperElement.value) {
@@ -1095,6 +1096,7 @@ const handleMouseover = (event, nodeData) => {
     ],
   });
 };
+*/
 
 // ノードからマウスが離れたときの処理
 const handleMouseout = () => {
