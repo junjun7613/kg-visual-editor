@@ -541,7 +541,7 @@
 <script setup>
 //import ImageDrop from '@/components/ImageTextDrop.vue';
 import ImageTextDrop from "@/components/ImageTextDrop.vue";
-import ImageEditor from "@/components/ImageEditorNakamura.vue"; // 中村版に変更
+import ImageEditor from "@/components/ImageEditor.vue"; // 中村版に変更
 import TextEditor from "@/components/TextEditor.vue";
 import { ref, watch } from "vue";
 import cytoscape from "cytoscape";

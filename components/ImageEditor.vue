@@ -1,11 +1,14 @@
 <script lang="ts" setup>
+import { convertPresentation2 } from "@iiif/parser/presentation-2";
 import type { Entity } from "~/types";
 import { ref, watch } from "vue";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import {
-  defaultCurationTypeSelect,
-  defaultCurationData,
+  //defaultCurationTypeSelect,
+  //defaultCurationData,
+  defaultEntityTypeSelect,
+  defaultEntityData,
 } from "~/utils/annotation/misc";
 
 interface Annotation {
@@ -30,8 +33,10 @@ const label = ref("");
 const editableDataFieldsMap = ref({});
 const editableDataFields = ref([]);
 
-const curationTypeSelect = ref(defaultCurationTypeSelect);
-const origCurationData = ref(defaultCurationData);
+//const curationTypeSelect = ref(defaultCurationTypeSelect);
+//const origCurationData = ref(defaultCurationData);
+const curationTypeSelect = ref(defaultEntityTypeSelect);
+const origCurationData = ref(defaultEntityData);
 
 const curationData = ref({});
 const editedCurationData = ref({});
@@ -57,26 +62,26 @@ const {
   manifestUrl,
 } = useEditor();
 
-const uploadedPositions = ref([]);
+const uploadedPositions = ref<string[]>([]);
 
 watch(curationURIs, () => {
   let loadedID = "";
 
   console.log("curationsが変更されました");
   curationURIs.value.forEach((uri, index) => {
-    console.log(uri);
-
-    if ("contentStateAPI" in uri.data && uri.data["contentStateAPI"] !== null) {
+    if (
+      uri.data &&
+      "contentStateAPI" in uri.data &&
+      uri.data["contentStateAPI"] !== null
+    ) {
       const loadedId = uri.data["id"];
       //const loadedId = uri.data["strippedID"]
       //console.log(loadedId)
       //const id = loadedId.replace("https://dl.ndl.go.jp/api/iiif/1307825/manifest.json",'')
       //const id = "#" + loadedId.split("#")[1]
       const id = loadedId;
-      console.log(id);
       loadedID = id;
-      const loadedUri = uri.data["contentStateAPI"];
-      console.log(loadedUri);
+      const loadedUri = uri.data["contentStateAPI"] || "";
       const decodeUri = loadedUri.replace(
         "https://icsae.vercel.app/viewer/?iiif-content=",
         ""
@@ -86,6 +91,7 @@ watch(curationURIs, () => {
 
       if (uploadedManifestUrl.value === "") {
         const manifest = JSON.parse(decodedString).partOf[0].id;
+
         uploadedManifestUrl.value = manifest;
         inputManifestUrl.value = manifest;
         manifestUrl.value = manifest;
@@ -102,7 +108,7 @@ watch(curationURIs, () => {
       uploadedPositions.value.push(xywh);
 
       //ここでresult_を作成し、existsAnnotationMapに追加する
-      const result_ = {
+      const result_: Entity = {
         "@context":
           "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
         "@id": uri.data["id"],
@@ -110,6 +116,7 @@ watch(curationURIs, () => {
         "@type": uri.data["type"],
         label: uri.data["label"],
         contentStateAPI: uri.data["contentStateAPI"],
+        thumbnail: uri.data["thumbnail"],
         shape: "entity",
         coor: xywh,
       };
@@ -131,15 +138,59 @@ watch(curationURIs, () => {
   });
 
   const loadManifest = async () => {
+
+    const loadedCanvasesMap = {};
+    const annotationsMap = {};
+
     const res = await fetch(uploadedManifestUrl.value);
     //const res = await fetch(inputManifestUrl.value);
     const json = await res.json();
-    console.log(json);
+    console.log(convertPresentation2(json));
 
     //const canvases = json.sequences?.[0]?.canvases ?? [];
-    const canvases = json.sequences[0].canvases;
+    //let canvases = json.canvases || json.items;
+    const canvases = (json.sequences && json.sequences[0] && json.sequences[0].canvases) || json.items;
+    if (!canvases) {
+      const canvases = json.items;
+    }
+
+    console.log(canvases)
+    for (const key in canvases) {
+      const canvas = canvases[key];
+          if (canvas.images && canvas.images[0] && canvas.images[0].resource && canvas.images[0].resource.service) {
+            loadedCanvasesMap[key] = canvas.images[0].resource.service["@id"];
+          } else if (canvas.items && canvas.items[0] && canvas.items[0].items && canvas.items[0].items[0] && canvas.items[0].items[0].body) {
+            loadedCanvasesMap[key] = canvas.items[0].items[0].body["id"];
+          } else {
+            console.log(canvas)
+            console.warn(`Image resource not found for canvas ${key}`);
+          }
+    }
+    console.log(loadedCanvasesMap);
+
+    const existsAnnotationMap_ = existsAnnotationMap.value;
+    /*
+    var annotationsMap: {
+      [key: number]: {
+        target: {
+          source: string;
+        };
+      }[];
+    } = {};
+     */
+
+    //existsAnnotationMap_をオブジェクトごとに処理
+    for (const key in existsAnnotationMap_) {
+      const loadedData = existsAnnotationMap_[key];
+      console.log(loadedData);
+    }
+
+    console.log({ existsAnnotationMap_, annotationsMap });
+
+    // existsAnnotationMap_ => annotationsMap
 
     const tileSources = canvases.map((canvas: any) => {
+      /*
       const resource = canvas.images[0].resource;
       //const infoUrl = canvas.images[0].resource["@id"].replace(
       let infoUrl = resource["@id"].replace(
@@ -151,7 +202,25 @@ watch(curationURIs, () => {
       }
       canvasImageMap[infoUrl] = canvas["@id"];
       return infoUrl;
-    });
+      */
+      console.log(canvas);
+      let resource;
+      /*
+          if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+            resource = canvas.images[0].resource;
+            console.log(resource);
+          } else */ if (canvas.items && canvas.items[0] && canvas.items[0].items && canvas.items[0].items[0] && canvas.items[0].items[0].body) {
+            resource = canvas.items[0].items[0].body;
+            console.log(resource);
+          } else {
+            console.warn(`Resource not found for canvas ${canvas["@id"]}`);
+            return null;
+          }      
+
+      const infoUrl = resource.service[0]["@id"] + "/info.json";
+      canvasImageMap[infoUrl] = canvas["id"];
+      return infoUrl;
+      });
 
     if (viewer) {
       viewer.open(tileSources);
@@ -169,22 +238,40 @@ watch(curationURIs, () => {
 
     viewer.addHandler("page", function (event) {
       currentIndex.value = event.page;
+      console.log(currentIndex.value);
+      anno.clearAnnotations();
+      showCurrentCanvasAnnotations();
     });
+
+    const showCurrentCanvasAnnotations = () => {
+      const index = currentIndex.value;
+      console.log(index);
+
+      if (annotationsMap[index]) {
+        annotationsMap[index].forEach((annotation) => {
+          console.log({ annotation });
+          anno.addAnnotation(annotation);
+        });
+      }
+    };
 
     anno = $Annotorious(viewer);
     anno.disableEditor = true;
 
     //uploadedPositions.value.forEach((position) => {
     for (const key in existsAnnotationMap.value) {
-      console.log(existsAnnotationMap.value[key]["coor"]);
       const index = currentIndex.value;
-      const canvasId = Object.values(canvasImageMap)[index];
+      // const canvasId = Object.values(canvasImageMap)[index];
 
       //ここで、loadedIDを使って、bodyにデータを追加する
       const loadedData = existsAnnotationMap.value[key];
-      console.log(loadedData);
 
-      const body = [
+      const body: {
+        field?: string;
+        value: string;
+        type?: string;
+        format?: string;
+      }[] = [
         {
           type: "TextualBody",
           value: "",
@@ -220,7 +307,7 @@ watch(curationURIs, () => {
         }
       }
 
-      anno.addAnnotation({
+      const annotation = {
         "@context": "http://www.w3.org/ns/anno.jsonld",
         //"id": existsAnnotationMap.value[key]["@id"].replace(inputManifestUrl.value, ""),
         id: existsAnnotationMap.value[key]["@id"].replace(
@@ -230,21 +317,54 @@ watch(curationURIs, () => {
         type: "Annotation",
         body: body,
         target: {
-          //"source": inputManifestUrl.value,
-          source: uploadedManifestUrl.value,
+          //source: uploadedManifestUrl.value,
+          source: tileSources[currentIndex.value].split("/info.json")[0],
           selector: {
             type: "FragmentSelector",
             conformsTo: "http://www.w3.org/TR/media-frags/",
             value: `xywh=pixel:${existsAnnotationMap.value[key]["coor"]}`,
           },
         },
-      });
+      }
+
+      console.log(annotation);
+      anno.addAnnotation(annotation);
+
+      console.log(loadedCanvasesMap);
+      //existsAnnotationMap.value[key]["thumbnail"]からcanvas idの部分のみ取得
+      const canvasId = existsAnnotationMap.value[key]["thumbnail"];
+      // 正規表現を使用して、特定の部分を抽出
+      const match = canvasId.match(/(https:\/\/dl\.ndl\.go\.jp\/api\/iiif\/\d+\/R\d+)/);
+
+      if (match) {
+        const extractedPart = match[1];
+        console.log(extractedPart); // https://dl.ndl.go.jp/api/iiif/1307825/R0000001
+        //extractedPartの値をvalueに持つキーをloadedCanvasesMapから取得
+        const index = Object.keys(loadedCanvasesMap).filter( (key) => { 
+          console.log(key);
+          return loadedCanvasesMap[key].split("/full")[0] === extractedPart;
+        });
+        console.log(index);
+        console.log(annotationsMap)
+        if (index.length > 0) {
+          // annotationsMap[index[0]]が存在しない場合に初期化
+          if (!annotationsMap[index[0]]) {
+            annotationsMap[index[0]] = [];
+          }
+          annotationsMap[index[0]].push(annotation);
+        }
+      } else {
+        console.log("URLの形式が一致しませんでした。");
+      }
+
+      console.log(annotationsMap);
 
       //});
     }
 
     anno.on("createSelection", async function (selection: any) {
       // Tag to insert
+      /*
       selection.body = [
         {
           type: "TextualBody",
@@ -253,17 +373,41 @@ watch(curationURIs, () => {
         },
       ];
 
+      console.log(selection);
+
       await anno.updateSelected(selection);
       anno.saveSelected();
-    });
+      */
+      const source = tileSources[currentIndex.value].split("/info.json")[0];
+      console.log(source);
+      // Tag to insert
+      selection.body = [
+        {
+          type: "TextualBody",
+          purpose: "tagging",
+          value: "",
+        },
+      ];
+      selection.target.source = source;
+
+      console.log(selection);
+
+      await anno.updateSelected(selection);
+      await anno.saveSelected();
+      });
 
     anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
+      console.log(annotation);
+      console.log("method: updateAnnotation");
+
+      const source = tileSources[currentIndex.value].split("/info.json")[0];
+      annotation.target.source = source;
+
       createContentStateAPI(annotation, overrideId);
     });
 
     // アノテーションが選択されたときのイベントハンドラ
     anno.on("selectAnnotation", function (annotation: any) {
-      console.log(annotation);
       selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
       if (annotation && annotation.id) {
         selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -327,7 +471,9 @@ const height = ref(0);
 //const existsAnnotationMap = ref<{
 //[key: string]: Entity;
 //}>({});
-const existsAnnotationMap = ref({});
+const existsAnnotationMap = ref<{
+  [key: string]: Entity;
+}>({});
 
 const inputManifestUrl = ref(""); // ユーザーが入力するManifestのURL
 const uploadedManifestUrl = ref(""); // アップロードされたManifestのURL
@@ -411,28 +557,50 @@ let anno: any = null;
 // async
 //onMounted(async () => {
 //height.value = window.innerHeight - 64;
+
+// TODO: ここに注目
 const loadManifest = async () => {
+
+  console.log("はじめての作業です");  
+
   manifest.value = inputManifestUrl.value; // ユーザーが入力したURLを使用する
   //manifest.value = 'https://edh.ub.uni-heidelberg.de/iiif/edh/F000001.manifest.json';
 
   const res = await fetch(manifest.value);
   //const res = await fetch(manifest);
   const json = await res.json();
+  console.log(convertPresentation2(json));
 
   //const canvases = json.sequences?.[0]?.canvases ?? [];
-  const canvases = json.sequences[0].canvases;
+  const canvases = (json.sequences && json.sequences[0] && json.sequences[0].canvases) || json.items;
+  if (!canvases) {
+    const canvases = json.items;
+  }
+
+  var annotationsMap: {
+    [key: number]: {
+      target: {
+        source: string;
+      };
+    }[];
+  } = {};
 
   const tileSources = canvases.map((canvas: any) => {
-    const resource = canvas.images[0].resource;
-    //const infoUrl = canvas.images[0].resource["@id"].replace(
-    let infoUrl = resource["@id"].replace(
-      "/full/full/0/default.jpg",
-      "/info.json"
-    );
-    if (resource.service) {
-      infoUrl = resource.service["@id"] + "/info.json";
-    }
-    canvasImageMap[infoUrl] = canvas["@id"];
+    let resource;
+        /*if (canvas.images && canvas.images[0] && canvas.images[0].resource) {
+          resource = canvas.images[0].resource;
+          console.log(resource);
+        } else */ if (canvas.items && canvas.items[0] && canvas.items[0].items && canvas.items[0].items[0] && canvas.items[0].items[0].body) {
+          resource = canvas.items[0].items[0].body;
+          console.log(resource);
+        } else {
+          console.warn(`Resource not found for canvas ${canvas["@id"]}`);
+          return null;
+        }
+
+
+    const infoUrl = resource.service[0]["@id"] + "/info.json";
+    canvasImageMap[infoUrl] = canvas["id"];
     return infoUrl;
   });
 
@@ -450,14 +618,31 @@ const loadManifest = async () => {
     viewer = $OpenSeadragon(config);
   }
 
-  viewer.addHandler("page", function (event) {
+  viewer.addHandler("page", function (event: { page: number }) {
     currentIndex.value = event.page;
+    anno.clearAnnotations();
+    showCurrentCanvasAnnotations();
   });
+
+  const showCurrentCanvasAnnotations = () => {
+    const index = currentIndex.value;
+
+    if (annotationsMap[index]) {
+      annotationsMap[index].forEach((annotation) => {
+        console.log({ annotation });
+        anno.addAnnotation(annotation);
+      });
+    }
+  };
 
   anno = $Annotorious(viewer);
   anno.disableEditor = true;
 
   anno.on("createSelection", async function (selection: any) {
+    console.log(selection);
+
+    const source = tileSources[currentIndex.value].split("/info.json")[0];
+    console.log(source);
     // Tag to insert
     selection.body = [
       {
@@ -466,18 +651,36 @@ const loadManifest = async () => {
         value: "",
       },
     ];
+    selection.target.source = source;
+
+    console.log(selection);
 
     await anno.updateSelected(selection);
-    anno.saveSelected();
+    await anno.saveSelected();
+
+    saveToAnnotationsMap();
   });
 
+  const saveToAnnotationsMap = () => {
+    const index = currentIndex.value;
+    annotationsMap[index] = anno.getAnnotations();
+    console.log(annotationsMap);
+  };
+
   anno.on("updateAnnotation", function (annotation: any, overrideId: string) {
+    console.log(annotation);
+    console.log("updateAnnotation");
+
+    const source = tileSources[currentIndex.value].split("/info.json")[0];
+    annotation.target.source = source;
+
+    // リサイズして保存されたら、既存のアノテーションを更新する
+    saveToAnnotationsMap();
     createContentStateAPI(annotation, overrideId);
   });
 
   // アノテーションが選択されたときのイベントハンドラ
   anno.on("selectAnnotation", function (annotation: any) {
-    console.log(annotation);
     selectedAnnotation.value = annotation; // 選択されたアノテーションを保存
     if (annotation && annotation.id) {
       selectedAnnotationId.value = annotation.id; // 選択されたアノテーションのIDを保存
@@ -502,7 +705,6 @@ const loadManifest = async () => {
   watch(clickedNode, () => {
     console.log("clickedNodeが変更されました");
     if (clickedNode.value !== null) {
-      console.log(clickedNode.value);
       const annotationId = clickedNode.value["id"].replace(
         inputManifestUrl.value,
         ""
@@ -533,16 +735,19 @@ const openDialog = () => {
 };
 
 const createContentStateAPI = (annotation: any, overrideId: string) => {
-  const annotationId = annotation.id;
+
   console.log(annotation);
 
+  console.log("method: createContentStateAPI");
+  const annotationId = annotation.id;
+
   const xywh = annotation.target.selector.value.split("xywh=pixel:")[1];
+
   const intXywh = xywh
     .split(",")
     .map((num: string) => Math.round(parseFloat(num)));
   const index = currentIndex.value;
   const canvasId = Object.values(canvasImageMap)[index];
-  console.log(canvasId);
 
   const api = {
     id: `${canvasId}#xywh=${intXywh}`,
@@ -566,7 +771,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
   const uri_ = `https://icsae.vercel.app${path}`;
   uri.value = uri_;
 
-  const result_ = {
+  const result_: Entity = {
     "@context":
       "https://junjun7613.github.io/MicroKnowledge/himiko-context.jsonld",
     //"@id": annotationId,
@@ -575,12 +780,15 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     label: label.value,
     shape: "entity",
     //"strippedID": annotationId,
+    coor: xywh,
+    contentStateAPI: uri_,
+    //thumbnail: `${canvasId}/full/${intXywh.join(",")}/0/default.jpg`,
+    thumbnail: `${annotation.target.source}/${intXywh}/max/0/default.jpg`,
   };
 
-  result_["contentStateAPI"] = uri_;
-
   const body = annotation.body;
-  console.log(body);
+
+  const skipFields = ["thumbnail"];
 
   const tags = [];
 
@@ -600,7 +808,7 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
       result_["@type"] = value.value;
     } else if (value.purpose === "tagging") {
       tags.push(value.value);
-    } else {
+    } else if (!skipFields.includes(value.field)) {
       result_[value.field] = value.value;
     }
   }
@@ -624,6 +832,8 @@ const createContentStateAPI = (annotation: any, overrideId: string) => {
     // 要素が見つからなかった場合、newItem を配列の末尾に追加
     annotation_result.value.push(result_);
   }
+
+  console.log(result_);
 
   existsAnnotationMap.value[annotation.id] = result_;
 };
@@ -654,7 +864,6 @@ const createAnnotation = async () => {
     value: label.value,
   });
 
-  //console.log(curationData.value)
   for (const field of filteredCurationFields.value) {
     body?.push({
       field: field["model"],
@@ -677,11 +886,12 @@ const createAnnotation = async () => {
 };
 
 const createEditedAnnotation = async () => {
+  console.log(filteredCurationFields.value);
+  console.log(editableDataFieldsMap.value);
+
   const valueType_ = selectedAnnotationType.value;
 
   const selectedAnnotation_ = selectedAnnotation.value;
-
-  //console.log(selectedAnnotation_)
 
   const body = selectedAnnotation_?.body;
   //ここで一度、既存のbodyを空にする
@@ -702,7 +912,7 @@ const createEditedAnnotation = async () => {
     });
   }
 
-  //console.log(body)
+  console.log(body);
 
   await anno.updateSelected(selectedAnnotation_);
   anno.saveSelected();
@@ -739,7 +949,6 @@ const valueType = ref(null);
 const curationDataModal = () => {
   const curationTypeValue = valueType.value;
   const newCurationFields = [];
-  console.log(curationFields.value);
   for (const field of curationFields.value) {
     console.log(field);
     console.log("Field attachedType:", field.attachedType);
@@ -861,9 +1070,9 @@ function deleteAnnotationById(id: any) {
       hide-details
     ></v-text-field>
 
-    <v-btn class="my-4 mr-4" @click="loadManifest">表示</v-btn>
+    <v-btn class="my-4 mr-4" @click="loadManifest">show image</v-btn>
     <v-btn class="my-4 mr-4" color="primary" @click="openDialog"
-      >フォームを表示</v-btn
+      >annotation</v-btn
     >
 
     <div
