@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { convertPresentation2 } from "@iiif/parser/presentation-2";
 import type { Entity } from "~/types";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick } from "vue";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
 import {
@@ -517,8 +517,33 @@ watch(curation_data, () => {
 });
 
 onMounted(async () => {
-  height.value = window.innerHeight - 255;
+  // 実際に必要な固定要素の高さを計算
+  const calculateViewerHeight = () => {
+    // OSD要素の位置を取得して、使用可能な高さを計算
+    const osdElement = document.getElementById('osd');
+    if (osdElement) {
+      const rect = osdElement.getBoundingClientRect();
+      // ウィンドウ高さから、OSD要素の上端位置を引く（下部にマージンを残すため-16px）
+      height.value = window.innerHeight - rect.top - 16;
+    } else {
+      // フォールバック: より大きめの値を引く
+      height.value = window.innerHeight - 220;
+    }
+  };
+
+  // 初回計算（DOMが完全に読み込まれた後に実行）
+  await nextTick();
+  await nextTick(); // 2回待つことで確実にレイアウトが完了
+
+  // 遅延を増やして確実に計算（v-app-barのレイアウトが完了するまで待つ）
+  setTimeout(() => {
+    calculateViewerHeight();
+  }, 300);
+
   await loadManifest();
+
+  // ウィンドウリサイズ時に高さを再計算
+  window.addEventListener('resize', calculateViewerHeight);
 });
 
 //curaionDataにdefaultCurationDataからデータ挿入
@@ -1077,10 +1102,8 @@ function deleteAnnotationById(id: any) {
 
     <div
       id="osd"
-      style="width: 100%; height: 650px; background-color: black"
+      :style="`width: 100%; height: ${height}px; background-color: black`"
     ></div>
-
-    <!-- :style="`height: ${height * 1.1}px`" -->
 
     <v-dialog v-model="dialog" width="600px">
       <v-card>

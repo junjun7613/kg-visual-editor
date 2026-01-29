@@ -1,19 +1,21 @@
 <template>
 	<div>
 		<nav>
+			<!--
 			<ul>
 				<li>
 					<nuxt-link to="/">Editor</nuxt-link>
 				</li>
 				<li>
-					<!--<nuxt-link to="/link03cyto">Editor</nuxt-link>-->
+					
 					<nuxt-link to="/help">Help</nuxt-link>
 				</li>
 				<li class="mr-4">
-					<!--<nuxt-link to="/link03cyto">Editor</nuxt-link>-->
+					
 					<nuxt-link to="/setting">Setting</nuxt-link>
 				</li>
 			</ul>
+			-->
 		</nav>
 	</div>
 </template>

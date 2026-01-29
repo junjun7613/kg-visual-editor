@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="mt-2">
     <!--
   {{entityFields}}
   {{editableEntityData}}
@@ -47,7 +47,7 @@
           class="my-4"
           id="cy"
           ref="cyElement"
-          style="width: 100%; height: 707px; border: 1px solid #ccc"
+          :style="`width: 100%; height: ${cyHeight}px; border: 1px solid #ccc`"
         ></div>
 
         <div>
@@ -543,7 +543,7 @@
 import ImageTextDrop from "@/components/ImageTextDrop.vue";
 import ImageEditor from "@/components/ImageEditor.vue"; // 中村版に変更
 import TextEditor from "@/components/TextEditor.vue";
-import { ref, watch } from "vue";
+import { ref, watch, nextTick } from "vue";
 import cytoscape from "cytoscape";
 import Treeselect from "vue3-treeselect";
 import "vue3-treeselect/dist/vue3-treeselect.css";
@@ -614,6 +614,7 @@ const curationFields = ref([]);
 const dataFields = ref([]);
 
 const cyElement = ref(null);
+const cyHeight = ref(0);
 let cy = null;
 const selectedElement = ref(null);
 const deletingElement = ref(null);
@@ -694,6 +695,31 @@ watch(annotation_result.value, (newValue, oldValue) => {
 });
 
 onMounted(() => {
+  // Cytoscapeグラフの高さを計算
+  const calculateCyHeight = () => {
+    const cyEl = document.getElementById('cy');
+    if (cyEl) {
+      const rect = cyEl.getBoundingClientRect();
+      // ウィンドウ高さから、cy要素の上端位置を引く（下部のボタンとマージンのため-180pxを引く）
+      cyHeight.value = window.innerHeight - rect.top - 180;
+    } else {
+      // フォールバック
+      cyHeight.value = window.innerHeight - 400;
+    }
+  };
+
+  // 初期高さを計算（レイアウトが完全に完了してから）
+  nextTick(() => {
+    nextTick(() => {
+      setTimeout(() => {
+        calculateCyHeight();
+      }, 300);
+    });
+  });
+
+  // ウィンドウリサイズ時に再計算
+  window.addEventListener('resize', calculateCyHeight);
+
   watch(
     clickedEntityObject,
     (newValue, oldValue) => {
